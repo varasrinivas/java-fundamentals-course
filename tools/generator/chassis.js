@@ -1,0 +1,435 @@
+// chassis.js — shared HTML/CSS/JS chassis for every module.
+// renderModule(mod, prev, next) -> full standalone HTML string.
+// Content lives in content.js; this file guarantees design-system + validation conformance.
+
+const CSS = `
+:root {
+  --bg-primary: #0f0f1a;
+  --bg-surface: #1a1a2e;
+  --bg-elevated: #242442;
+  --text-primary: #e8e8e8;
+  --text-secondary: #a0a0b8;
+  --text-muted: #6b6b80;
+  --accent-cyan: #00d4ff;
+  --accent-amber: #ffb627;
+  --accent-emerald: #06d6a0;
+  --accent-coral: #ef476f;
+  --accent-purple: #b088f9;
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+  --radius: 8px;
+  --transition: 400ms ease-out;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+.module-nav { position: sticky; top: 0; z-index: 50; background: rgba(15,15,26,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--bg-elevated); }
+.module-nav .wrap { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; padding-bottom: 14px; gap: 16px; }
+.module-nav .badge { font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.12em; color: var(--bg-primary); background: var(--accent-cyan); padding: 3px 9px; border-radius: 999px; font-weight: 700; }
+.module-nav .title { font-family: var(--font-display); font-weight: 600; font-size: 1rem; }
+.module-nav .title small { display:block; color: var(--text-muted); font-family: var(--font-body); font-weight: 400; font-size: 0.72rem; }
+.module-nav .links { display: flex; gap: 10px; flex-shrink: 0; }
+.module-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; padding: 6px 12px; border: 1px solid var(--bg-elevated); border-radius: var(--radius); transition: var(--transition); }
+.module-nav a:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+.module-nav a[aria-disabled="true"] { opacity: 0.35; pointer-events: none; }
+.hero { padding: 64px 0 36px; }
+.hero h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 6vw, 3.4rem); line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; }
+.hero h1 .grad { background: linear-gradient(100deg, var(--accent-cyan), var(--accent-purple)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p.lede { font-size: 1.15rem; color: var(--text-secondary); max-width: 62ch; }
+section { padding: 40px 0; border-top: 1px solid var(--bg-elevated); }
+.section-kicker { font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent-cyan); margin-bottom: 8px; }
+section h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.5rem, 4vw, 2.1rem); margin-bottom: 14px; letter-spacing: -0.01em; }
+section h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; margin: 24px 0 10px; }
+section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; }
+section p strong { color: var(--text-primary); }
+.key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
+.panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
+.tok-key { color: var(--accent-cyan); }
+.tok-str { color: var(--accent-amber); }
+.tok-com { color: var(--text-muted); font-style: italic; }
+.tok-num { color: var(--accent-emerald); }
+.tok-type { color: var(--accent-purple); }
+.tok-fn { color: #7ee787; }
+.tok-anno { color: var(--accent-coral); }
+.diagram-wrap { background: var(--bg-surface); border:1px solid var(--bg-elevated); border-radius: var(--radius); padding: 18px; margin: 18px 0; overflow-x: auto; }
+.stage rect { transition: fill var(--transition), stroke var(--transition); }
+.stage text { font-family: var(--font-code); fill: var(--text-secondary); }
+.stage.lit rect { fill: var(--bg-elevated); stroke: var(--accent-cyan); }
+.stage.lit text { fill: var(--text-primary); }
+.flow-arrow { stroke: var(--text-muted); stroke-width: 2; marker-end: url(#arrow); transition: stroke var(--transition); }
+.flow-arrow.lit { stroke: var(--accent-cyan); }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0; }
+.btn { font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; color: var(--text-primary); background: var(--bg-elevated); border: 1px solid transparent; padding: 8px 14px; border-radius: var(--radius); cursor: pointer; transition: var(--transition); }
+.btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.btn:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; }
+.btn-primary { background: var(--accent-cyan); color: var(--bg-primary); font-weight: 600; }
+.btn-primary:hover { background: #36ddff; color: var(--bg-primary); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.step-readout { font-family: var(--font-code); font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
+.caption { background: #12121f; border-left: 3px solid var(--accent-cyan); padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; min-height: 64px; font-size: 0.92rem; color: var(--text-secondary); transition: var(--transition); }
+.caption b { color: var(--accent-cyan); }
+.playground-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.editor-label, .output-label { font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; display: block; }
+textarea.editor { width: 100%; min-height: 240px; resize: vertical; background: #12121f; color: var(--text-primary); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 14px; font-family: var(--font-code); font-size: 0.84rem; line-height: 1.6; tab-size: 2; }
+textarea.editor:focus { outline: none; border-color: var(--accent-cyan); }
+.output { background: #0a0a12; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 14px; font-family: var(--font-code); font-size: 0.84rem; line-height: 1.6; min-height: 240px; white-space: pre-wrap; color: var(--accent-emerald); overflow-y: auto; }
+.output .err { color: var(--accent-coral); }
+.output .sys { color: var(--text-muted); }
+.callout { border-radius: var(--radius); padding: 16px 18px; margin: 14px 0; border: 1px solid var(--bg-elevated); background: var(--bg-surface); border-left-width: 4px; }
+.callout .lang-tag { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; font-family: var(--font-code); }
+.callout .lang-tag .dot { width: 9px; height: 9px; border-radius: 50%; }
+.callout p { margin: 0; font-size: 0.92rem; }
+.callout-python { border-left-color: #4584b6; }
+.callout-python .lang-tag { color: #6ea8d8; } .callout-python .dot { background: #4584b6; }
+.callout-js { border-left-color: var(--accent-amber); }
+.callout-js .lang-tag { color: var(--accent-amber); } .callout-js .dot { background: var(--accent-amber); }
+.callout-go { border-left-color: #00add8; }
+.callout-go .lang-tag { color: #4fd2f0; } .callout-go .dot { background: #00add8; }
+.callout-csharp { border-left-color: var(--accent-purple); }
+.callout-csharp .lang-tag { color: var(--accent-purple); } .callout-csharp .dot { background: var(--accent-purple); }
+.exercise { background: var(--bg-surface); border:1px solid var(--bg-elevated); border-radius: var(--radius); padding: 18px; margin: 14px 0; }
+.exercise h3 { margin-top: 0; }
+.exercise .prompt { color: var(--text-secondary); }
+details.hint { margin-top: 12px; }
+details.hint summary { cursor: pointer; color: var(--accent-amber); font-size: 0.88rem; font-weight: 500; list-style: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--bg-elevated); border-radius: var(--radius); transition: var(--transition); }
+details.hint summary:hover { border-color: var(--accent-amber); }
+details.hint summary::-webkit-details-marker { display: none; }
+details.hint[open] summary { margin-bottom: 10px; }
+details.hint .hint-body { font-size: 0.9rem; color: var(--text-secondary); padding-left: 4px; }
+footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+.install-btn { position: fixed; right: 16px; bottom: 16px; z-index: 60; font-family: var(--font-body); font-weight: 600; font-size: 0.9rem; color: var(--bg-primary); background: var(--accent-cyan); border: none; padding: 12px 18px; border-radius: 999px; box-shadow: 0 6px 20px rgba(0,0,0,0.45); cursor: pointer; }
+.install-btn:active { transform: scale(0.96); }
+@media (max-width: 680px) { .grid-2, .playground-grid { grid-template-columns: 1fr; } .module-nav .title { font-size: 0.85rem; } .hero { padding: 40px 0 24px; } }
+@media (max-width: 430px) {
+  .wrap { padding: 0 16px; }
+  .btn { padding: 11px 14px; font-size: 0.9rem; }            /* >=44px tap targets */
+  .module-nav .links a { padding: 9px 11px; }
+  .module-nav .wrap { gap: 10px; }
+  .controls { gap: 10px; }
+  pre.code { font-size: 0.78rem; padding: 14px; }
+  textarea.editor, .output { font-size: 0.8rem; min-height: 200px; }
+  .step-readout { width: 100%; margin-left: 0; order: 5; }
+  details.hint summary { padding: 10px 14px; }
+  .install-btn { right: 12px; bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 0ms !important; animation-duration: 0ms !important; scroll-behavior: auto !important; } }
+`;
+
+// ── shared runtime JS (highlighter + step engine + Java simulator) ──
+// STEPS_JSON and PLAY note are injected per module via placeholders.
+const RUNTIME = `
+"use strict";
+const JAVA_KEYWORDS = new Set("abstract assert boolean break byte case catch char class const continue default do double else enum extends final finally float for goto if implements import instanceof int interface long native new package private protected public return short static strictfp super switch synchronized this throw throws transient try void volatile while var record sealed permits yield".split(" "));
+const JAVA_TYPES = new Set("String System Object Integer Double Boolean List Map Set ArrayList HashMap LinkedList Optional Math Thread Runnable Stream Collectors Comparator Exception RuntimeException".split(" "));
+function escapeHtml(s){ return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function highlightJava(src){
+  let out=""; const re=/(\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/)|("(?:\\\\.|[^"\\\\])*")|(@\\w+)|(\\b\\d[\\d_]*\\.?\\d*[fFlLdD]?\\b)|([A-Za-z_$][\\w$]*)|([^A-Za-z_$0-9]+)/g; let m;
+  while((m=re.exec(src))!==null){
+    if(m[1]) out+='<span class="tok-com">'+escapeHtml(m[1])+'</span>';
+    else if(m[2]) out+='<span class="tok-str">'+escapeHtml(m[2])+'</span>';
+    else if(m[3]) out+='<span class="tok-anno">'+escapeHtml(m[3])+'</span>';
+    else if(m[4]) out+='<span class="tok-num">'+escapeHtml(m[4])+'</span>';
+    else if(m[5]){ const w=m[5];
+      if(JAVA_KEYWORDS.has(w)) out+='<span class="tok-key">'+w+'</span>';
+      else if(JAVA_TYPES.has(w)||/^[A-Z]/.test(w)) out+='<span class="tok-type">'+w+'</span>';
+      else { const rest=src.slice(re.lastIndex); out+=/^\\s*\\(/.test(rest)?'<span class="tok-fn">'+w+'</span>':escapeHtml(w); }
+    } else out+=escapeHtml(m[6]);
+  }
+  return out;
+}
+document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
+
+const STEPS = __STEPS_JSON__;
+let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
+const $=id=>document.getElementById(id);
+const caption=$('caption'), readout=$('readout');
+const playPauseBtn=$('playPause'), stepBackBtn=$('stepBack'), stepForwardBtn=$('stepForward'), resetBtn=$('resetBtn');
+function renderStep(){
+  document.querySelectorAll('#pipeAnim .stage').forEach(el=>el.classList.remove('lit'));
+  document.querySelectorAll('#pipeAnim .flow-arrow').forEach(el=>el.classList.remove('lit'));
+  STEPS[stepIdx].lit.forEach(id=>{const el=$(id); if(el) el.classList.add('lit');});
+  caption.innerHTML=STEPS[stepIdx].caption;
+  readout.textContent='step '+stepIdx+' / '+(STEPS.length-1);
+  stepBackBtn.disabled=stepIdx===0; stepForwardBtn.disabled=stepIdx===STEPS.length-1;
+}
+function setPlaying(on){
+  playing=on; playPauseBtn.textContent=on?'\\u275A\\u275A Pause':'\\u25B6 Play';
+  if(on){ if(stepIdx===STEPS.length-1){stepIdx=0;renderStep();} lastTick=performance.now(); rafId=requestAnimationFrame(tick); }
+  else if(rafId){ cancelAnimationFrame(rafId); rafId=null; }
+}
+function tick(now){ if(!playing) return; if(now-lastTick>=STEP_MS){ lastTick=now; if(stepIdx<STEPS.length-1){stepIdx++;renderStep();} if(stepIdx===STEPS.length-1){setPlaying(false);return;} } rafId=requestAnimationFrame(tick); }
+playPauseBtn.addEventListener('click',()=>setPlaying(!playing));
+stepForwardBtn.addEventListener('click',()=>{setPlaying(false); if(stepIdx<STEPS.length-1){stepIdx++;renderStep();}});
+stepBackBtn.addEventListener('click',()=>{setPlaying(false); if(stepIdx>0){stepIdx--;renderStep();}});
+resetBtn.addEventListener('click',()=>{setPlaying(false); stepIdx=0; renderStep();});
+renderStep();
+
+// ── Mini Java simulator: decls, println/print, + - * / %, comparisons, string concat ──
+function runJava(src){
+  const lines=src.split('\\n'); const vars=Object.create(null); const out=[]; let errored=null;
+  function findTop(s, ops){
+    let depth=0, inStr=false;
+    for(let i=0;i<s.length;i++){ const c=s[i];
+      if(c==='"'&&s[i-1]!=='\\\\') inStr=!inStr;
+      if(inStr) continue;
+      if(c==='(') depth++; else if(c===')') depth--;
+      else if(depth===0){ for(const op of ops){ if(s.substr(i,op.length)===op){ return {op,i}; } } }
+    }
+    return null;
+  }
+  function splitTop(s,op){ const res=[]; let depth=0,inStr=false,cur='';
+    for(let i=0;i<s.length;i++){ const c=s[i];
+      if(c==='"'&&s[i-1]!=='\\\\') inStr=!inStr;
+      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--; else if(c===op&&depth===0){res.push(cur);cur='';continue;} }
+      cur+=c; }
+    res.push(cur); return res; }
+  function evalExpr(expr){
+    expr=expr.trim();
+    const cmp=findTop(expr,['>=','<=','==','!=']) || findTop(expr,['>','<']);
+    if(cmp){ const l=evalExpr(expr.slice(0,cmp.i)); const r=evalExpr(expr.slice(cmp.i+cmp.op.length));
+      const lv=l.value, rv=r.value; let b;
+      switch(cmp.op){case'>=':b=lv>=rv;break;case'<=':b=lv<=rv;break;case'==':b=lv===rv;break;case'!=':b=lv!==rv;break;case'>':b=lv>rv;break;case'<':b=lv<rv;break;}
+      return {type:'boolean',value:b}; }
+    const parts=splitTop(expr,'+');
+    if(parts.length>1){ let acc=evalExpr(parts[0]);
+      for(let i=1;i<parts.length;i++){ const rhs=evalExpr(parts[i]);
+        if(acc.type==='String'||rhs.type==='String') acc={type:'String',value:toStr(acc)+toStr(rhs)};
+        else acc={type:'num',value:acc.value+rhs.value}; }
+      return acc; }
+    const mul=splitTop(expr,'*'); if(mul.length>1) return mul.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value*b.value}));
+    const mod=splitTop(expr,'%'); if(mod.length>1) return mod.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value%b.value}));
+    const sub=splitTop(expr,'-'); if(sub.length>1&&sub[0].trim()!=='') return sub.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value-b.value}));
+    const div=splitTop(expr,'/'); if(div.length>1) return div.map(evalExpr).reduce((a,b)=>({type:'num',value:Math.trunc(a.value/b.value)}));
+    return evalAtom(expr);
+  }
+  function evalAtom(t){ t=t.trim();
+    if(t.startsWith('(')&&t.endsWith(')')) return evalExpr(t.slice(1,-1));
+    if(/^".*"$/.test(t)) return {type:'String',value:t.slice(1,-1).replace(/\\\\n/g,'\\n').replace(/\\\\t/g,'\\t').replace(/\\\\"/g,'"')};
+    if(/^-?\\d+$/.test(t)) return {type:'num',value:parseInt(t,10)};
+    if(/^-?\\d*\\.\\d+$/.test(t)) return {type:'num',value:parseFloat(t)};
+    if(t==='true'||t==='false') return {type:'boolean',value:t==='true'};
+    if(t in vars) return vars[t];
+    throw new Error("cannot resolve symbol '"+t+"'");
+  }
+  function toStr(v){ if(v.type==='boolean') return v.value?'true':'false'; return String(v.value); }
+  try{
+    for(let raw of lines){
+      let line=raw.replace(/\\/\\/.*$/,'').trim(); if(!line) continue;
+      if(!line.endsWith(';')) throw new Error("missing ';' on: "+line);
+      line=line.slice(0,-1).trim(); let m;
+      if((m=line.match(/^System\\.out\\.(println|print)\\s*\\((.*)\\)$/s))){
+        const arg=m[2].trim(); const val=arg===''?{type:'String',value:''}:evalExpr(arg);
+        out.push(toStr(val)+(m[1]==='println'?'\\n':'')); continue; }
+      if((m=line.match(/^(int|double|String|boolean|var|long|float)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(.+)$/s))){ vars[m[2]]=evalExpr(m[3]); continue; }
+      if((m=line.match(/^([A-Za-z_$][\\w$]*)\\s*=\\s*(.+)$/s))){ if(!(m[1] in vars)) throw new Error("'"+m[1]+"' was not declared"); vars[m[1]]=evalExpr(m[2]); continue; }
+      throw new Error("don't know how to run: "+line);
+    }
+  }catch(e){ errored=e.message; }
+  return {text:out.join(''), error:errored};
+}
+const outEl=$('out');
+$('runBtn').addEventListener('click',()=>{
+  const res=runJava($('code').value); let html='';
+  if(res.text) html+=escapeHtml(res.text);
+  if(res.error) html+='<span class="err">\\nError: '+escapeHtml(res.error)+'</span>';
+  if(!res.text&&!res.error) html='<span class="sys">// (no output)</span>';
+  outEl.innerHTML=html||'<span class="sys">// (no output)</span>';
+});
+$('clearBtn').addEventListener('click',()=>{ outEl.innerHTML='<span class="sys">// press Run to execute on the simulated JVM</span>'; });
+`;
+
+const ACCENTS = { cyan:'#00d4ff', amber:'#ffb627', emerald:'#06d6a0', coral:'#ef476f', purple:'#b088f9' };
+
+// Build a horizontal pipeline SVG. prefix => stage ids `${prefix}-i`; arrows `${arrowPrefix}-i`.
+function pipelineSVG(svgId, prefix, arrowPrefix, stages, allLit){
+  const W = 860, H = 200, n = stages.length, m = 8, gap = 46;
+  const boxW = (W - 2*m - (n-1)*gap) / n;
+  let parts = `<svg id="${svgId}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Diagram: ${stages.map(s=>s.t).join(' then ')}">`;
+  parts += `<defs><marker id="arrow-${svgId}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs>`;
+  for(let i=0;i<n;i++){
+    const x = m + i*(boxW+gap);
+    const col = ACCENTS[stages[i].c] || '#a0a0b8';
+    const lit = allLit ? ' lit' : '';
+    parts += `<g class="stage${lit}" id="${prefix}-${i}">`;
+    parts += `<rect x="${x.toFixed(1)}" y="56" width="${boxW.toFixed(1)}" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect>`;
+    parts += `<text x="${(x+boxW/2).toFixed(1)}" y="95" text-anchor="middle" font-size="11.5" fill="${col}">${stages[i].t}</text>`;
+    parts += `<text x="${(x+boxW/2).toFixed(1)}" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">${stages[i].s}</text>`;
+    parts += `</g>`;
+    if(i<n-1){
+      const x1=x+boxW, x2=x+boxW+gap;
+      const lit2 = allLit ? ' lit' : '';
+      parts += `<line class="flow-arrow${lit2}" id="${arrowPrefix}-${i}" x1="${x1.toFixed(1)}" y1="100" x2="${x2.toFixed(1)}" y2="100" marker-end="url(#arrow-${svgId})"></line>`;
+    }
+  }
+  parts += `</svg>`;
+  return parts;
+}
+
+function calloutHtml(c){
+  const tag = { python:'Coming from Python', js:'Coming from JavaScript', go:'Coming from Go', csharp:'Coming from C#' };
+  return `<div class="callout callout-${c.lang}"><span class="lang-tag"><span class="dot"></span>${c.title||tag[c.lang]}</span><p>${c.body}</p></div>`;
+}
+
+function exerciseHtml(e, i){
+  return `<div class="exercise"><h3>${i+1} &middot; ${e.h3}</h3><p class="prompt">${e.prompt}</p>`+
+    `<details class="hint"><summary>\u{1F4A1} Show hint</summary><div class="hint-body">${e.hint}</div></details></div>`;
+}
+
+function renderModule(mod, prev, next){
+  // build STEPS json: progressive reveal of n stages + arrows
+  const steps = mod.steps.map(st => {
+    const lit = [];
+    for(let i=0;i<st.n;i++){ lit.push(`a-${i}`); if(i>0) lit.push(`b-${i-1}`); }
+    return { lit, caption: st.cap };
+  });
+  const stepsJson = JSON.stringify(steps);
+
+  const conceptSVG = pipelineSVG('pipeConcept','c','d', mod.stages, true);
+  const animSVG    = pipelineSVG('pipeAnim','a','b', mod.stages, false);
+
+  const prevLink = prev
+    ? `<a href="module-${prev.num}-${prev.slug}.html">‹ Prev</a>`
+    : `<a href="../index.html">Index</a>`;
+  const nextLink = next
+    ? `<a href="module-${next.num}-${next.slug}.html">Next ›</a>`
+    : `<a href="../index.html">Index</a>`;
+
+  const callouts = mod.callouts.map(calloutHtml).join('\n      ');
+  const exercises = mod.exercises.map(exerciseHtml).join('\n      ');
+  const runtime = RUNTIME.replace('__STEPS_JSON__', stepsJson);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module ${mod.num} — ${mod.title}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0f0f1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Java Course">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<style>${CSS}</style>
+</head>
+<body>
+<nav class="module-nav">
+  <div class="wrap">
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span class="badge">MODULE ${mod.num}</span>
+      <span class="title">${mod.navShort}<small>Java for Developers · ${mod.track}</small></span>
+    </div>
+    <div class="links">${prevLink}${nextLink}</div>
+  </div>
+</nav>
+
+<button class="install-btn" id="installBtn" hidden aria-label="Install this course as an app">⤓ Install app</button>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>${mod.heroTitle}</h1>
+    <p class="lede">${mod.lede}</p>
+  </div>
+</header>
+
+<section class="concept">
+  <div class="wrap">
+    <p class="section-kicker">Concept</p>
+    <h2>${mod.conceptH2}</h2>
+    ${mod.conceptHtml}
+    <div class="diagram-wrap">${conceptSVG}</div>
+    ${mod.conceptAfter || ''}
+  </div>
+</section>
+
+<section class="step-through">
+  <div class="wrap">
+    <p class="section-kicker">Step-through</p>
+    <h2>${mod.stepH2}</h2>
+    <p>${mod.stepIntro}</p>
+    <div class="diagram-wrap">${animSVG}</div>
+    <div class="controls" role="group" aria-label="Step-through controls">
+      <button class="btn btn-primary" id="playPause">▶ Play</button>
+      <button class="btn" id="stepBack">‹ Step Back</button>
+      <button class="btn" id="stepForward">Step Forward ›</button>
+      <button class="btn" id="resetBtn">⟲ Reset</button>
+      <span class="step-readout" id="readout" aria-live="polite">step 0 / ${steps.length-1}</span>
+    </div>
+    <div class="caption" id="caption" aria-live="polite">${steps[0].caption}</div>
+  </div>
+</section>
+
+<section class="playground">
+  <div class="wrap">
+    <p class="section-kicker">Playground</p>
+    <h2>${mod.playH2 || 'Run it yourself'}</h2>
+    <p>${mod.playIntro}</p>
+    <div class="playground-grid">
+      <div>
+        <label class="editor-label" for="code">${mod.playFile || 'Demo.java'}</label>
+        <textarea class="editor" id="code" spellcheck="false">${escapeAttr(mod.playCode)}</textarea>
+      </div>
+      <div>
+        <label class="output-label" for="out">JVM output</label>
+        <div class="output" id="out"><span class="sys">// press Run to execute on the simulated JVM</span></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-primary" id="runBtn">▶ Run</button>
+      <button class="btn" id="clearBtn">Clear output</button>
+    </div>
+  </div>
+</section>
+
+<section class="gotchas">
+  <div class="wrap">
+    <p class="section-kicker">Coming from another language</p>
+    <h2>${mod.gotchasH2 || 'What will surprise you'}</h2>
+      ${callouts}
+  </div>
+</section>
+
+<section class="exercises">
+  <div class="wrap">
+    <p class="section-kicker">Exercises</p>
+    <h2>${mod.exercisesH2 || 'Make it stick'}</h2>
+      ${exercises}
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Module ${mod.num} of the Java for Developers course · standalone &amp; offline${next ? ' · <span style="color:var(--accent-cyan)">next: '+next.title+'</span>' : ''}</div>
+</footer>
+
+<script>
+${runtime}
+</script>
+<script>
+/* PWA: service worker + install prompt */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('../sw.js').catch(()=>{}));
+}
+(function(){
+  let deferred = null;
+  const btn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; if (btn) btn.hidden = false; });
+  if (btn) btn.addEventListener('click', async () => { if (!deferred) return; btn.hidden = true; deferred.prompt(); await deferred.userChoice; deferred = null; });
+  window.addEventListener('appinstalled', () => { if (btn) btn.hidden = true; });
+})();
+</script>
+</body>
+</html>`;
+}
+
+function escapeAttr(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+module.exports = { renderModule };
