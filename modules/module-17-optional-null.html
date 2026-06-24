@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 17 — Optional & the Billion-Dollar Bug</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0f0f1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Java Course">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<style>
+:root {
+  --bg-primary: #0f0f1a;
+  --bg-surface: #1a1a2e;
+  --bg-elevated: #242442;
+  --text-primary: #e8e8e8;
+  --text-secondary: #a0a0b8;
+  --text-muted: #6b6b80;
+  --accent-cyan: #00d4ff;
+  --accent-amber: #ffb627;
+  --accent-emerald: #06d6a0;
+  --accent-coral: #ef476f;
+  --accent-purple: #b088f9;
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+  --radius: 8px;
+  --transition: 400ms ease-out;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+.module-nav { position: sticky; top: 0; z-index: 50; background: rgba(15,15,26,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--bg-elevated); }
+.module-nav .wrap { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; padding-bottom: 14px; gap: 16px; }
+.module-nav .badge { font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.12em; color: var(--bg-primary); background: var(--accent-cyan); padding: 3px 9px; border-radius: 999px; font-weight: 700; }
+.module-nav .title { font-family: var(--font-display); font-weight: 600; font-size: 1rem; }
+.module-nav .title small { display:block; color: var(--text-muted); font-family: var(--font-body); font-weight: 400; font-size: 0.72rem; }
+.module-nav .links { display: flex; gap: 10px; flex-shrink: 0; }
+.module-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; padding: 6px 12px; border: 1px solid var(--bg-elevated); border-radius: var(--radius); transition: var(--transition); }
+.module-nav a:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+.module-nav a[aria-disabled="true"] { opacity: 0.35; pointer-events: none; }
+.hero { padding: 64px 0 36px; }
+.hero h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 6vw, 3.4rem); line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; }
+.hero h1 .grad { background: linear-gradient(100deg, var(--accent-cyan), var(--accent-purple)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p.lede { font-size: 1.15rem; color: var(--text-secondary); max-width: 62ch; }
+section { padding: 40px 0; border-top: 1px solid var(--bg-elevated); }
+.section-kicker { font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent-cyan); margin-bottom: 8px; }
+section h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.5rem, 4vw, 2.1rem); margin-bottom: 14px; letter-spacing: -0.01em; }
+section h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; margin: 24px 0 10px; }
+section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; }
+section p strong { color: var(--text-primary); }
+.key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
+.panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
+.tok-key { color: var(--accent-cyan); }
+.tok-str { color: var(--accent-amber); }
+.tok-com { color: var(--text-muted); font-style: italic; }
+.tok-num { color: var(--accent-emerald); }
+.tok-type { color: var(--accent-purple); }
+.tok-fn { color: #7ee787; }
+.tok-anno { color: var(--accent-coral); }
+.diagram-wrap { background: var(--bg-surface); border:1px solid var(--bg-elevated); border-radius: var(--radius); padding: 18px; margin: 18px 0; overflow-x: auto; }
+.stage rect { transition: fill var(--transition), stroke var(--transition); }
+.stage text { font-family: var(--font-code); fill: var(--text-secondary); }
+.stage.lit rect { fill: var(--bg-elevated); stroke: var(--accent-cyan); }
+.stage.lit text { fill: var(--text-primary); }
+.flow-arrow { stroke: var(--text-muted); stroke-width: 2; marker-end: url(#arrow); transition: stroke var(--transition); }
+.flow-arrow.lit { stroke: var(--accent-cyan); }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0; }
+.btn { font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; color: var(--text-primary); background: var(--bg-elevated); border: 1px solid transparent; padding: 8px 14px; border-radius: var(--radius); cursor: pointer; transition: var(--transition); }
+.btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.btn:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; }
+.btn-primary { background: var(--accent-cyan); color: var(--bg-primary); font-weight: 600; }
+.btn-primary:hover { background: #36ddff; color: var(--bg-primary); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.step-readout { font-family: var(--font-code); font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
+.caption { background: #12121f; border-left: 3px solid var(--accent-cyan); padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; min-height: 64px; font-size: 0.92rem; color: var(--text-secondary); transition: var(--transition); }
+.caption b { color: var(--accent-cyan); }
+.playground-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.editor-label, .output-label { font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; display: block; }
+textarea.editor { width: 100%; min-height: 240px; resize: vertical; background: #12121f; color: var(--text-primary); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 14px; font-family: var(--font-code); font-size: 0.84rem; line-height: 1.6; tab-size: 2; }
+textarea.editor:focus { outline: none; border-color: var(--accent-cyan); }
+.output { background: #0a0a12; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 14px; font-family: var(--font-code); font-size: 0.84rem; line-height: 1.6; min-height: 240px; white-space: pre-wrap; color: var(--accent-emerald); overflow-y: auto; }
+.output .err { color: var(--accent-coral); }
+.output .sys { color: var(--text-muted); }
+.callout { border-radius: var(--radius); padding: 16px 18px; margin: 14px 0; border: 1px solid var(--bg-elevated); background: var(--bg-surface); border-left-width: 4px; }
+.callout .lang-tag { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; font-family: var(--font-code); }
+.callout .lang-tag .dot { width: 9px; height: 9px; border-radius: 50%; }
+.callout p { margin: 0; font-size: 0.92rem; }
+.callout-python { border-left-color: #4584b6; }
+.callout-python .lang-tag { color: #6ea8d8; } .callout-python .dot { background: #4584b6; }
+.callout-js { border-left-color: var(--accent-amber); }
+.callout-js .lang-tag { color: var(--accent-amber); } .callout-js .dot { background: var(--accent-amber); }
+.callout-go { border-left-color: #00add8; }
+.callout-go .lang-tag { color: #4fd2f0; } .callout-go .dot { background: #00add8; }
+.callout-csharp { border-left-color: var(--accent-purple); }
+.callout-csharp .lang-tag { color: var(--accent-purple); } .callout-csharp .dot { background: var(--accent-purple); }
+.exercise { background: var(--bg-surface); border:1px solid var(--bg-elevated); border-radius: var(--radius); padding: 18px; margin: 14px 0; }
+.exercise h3 { margin-top: 0; }
+.exercise .prompt { color: var(--text-secondary); }
+details.hint { margin-top: 12px; }
+details.hint summary { cursor: pointer; color: var(--accent-amber); font-size: 0.88rem; font-weight: 500; list-style: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--bg-elevated); border-radius: var(--radius); transition: var(--transition); }
+details.hint summary:hover { border-color: var(--accent-amber); }
+details.hint summary::-webkit-details-marker { display: none; }
+details.hint[open] summary { margin-bottom: 10px; }
+details.hint .hint-body { font-size: 0.9rem; color: var(--text-secondary); padding-left: 4px; }
+footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+.install-btn { position: fixed; right: 16px; bottom: 16px; z-index: 60; font-family: var(--font-body); font-weight: 600; font-size: 0.9rem; color: var(--bg-primary); background: var(--accent-cyan); border: none; padding: 12px 18px; border-radius: 999px; box-shadow: 0 6px 20px rgba(0,0,0,0.45); cursor: pointer; }
+.install-btn:active { transform: scale(0.96); }
+@media (max-width: 680px) { .grid-2, .playground-grid { grid-template-columns: 1fr; } .module-nav .title { font-size: 0.85rem; } .hero { padding: 40px 0 24px; } }
+@media (max-width: 430px) {
+  .wrap { padding: 0 16px; }
+  .btn { padding: 11px 14px; font-size: 0.9rem; }            /* >=44px tap targets */
+  .module-nav .links a { padding: 9px 11px; }
+  .module-nav .wrap { gap: 10px; }
+  .controls { gap: 10px; }
+  pre.code { font-size: 0.78rem; padding: 14px; }
+  textarea.editor, .output { font-size: 0.8rem; min-height: 200px; }
+  .step-readout { width: 100%; margin-left: 0; order: 5; }
+  details.hint summary { padding: 10px 14px; }
+  .install-btn { right: 12px; bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 0ms !important; animation-duration: 0ms !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<nav class="module-nav">
+  <div class="wrap">
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span class="badge">MODULE 17</span>
+      <span class="title">Optional<small>Java for Developers · Track 3: Modern Java</small></span>
+    </div>
+    <div class="links"><a href="module-16-lambdas-streams.html">‹ Prev</a><a href="module-18-records-sealed.html">Next ›</a></div>
+  </div>
+</nav>
+
+<button class="install-btn" id="installBtn" hidden aria-label="Install this course as an app">⤓ Install app</button>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Make <span class="grad">“might be absent”</span> part of the type</h1>
+    <p class="lede">Tony Hoare called null his “billion-dollar mistake.” Java can't remove null, but Optional lets a method's signature say “I might not return a value” — turning silent NullPointerExceptions into choices you make on purpose.</p>
+  </div>
+</header>
+
+<section class="concept">
+  <div class="wrap">
+    <p class="section-kicker">Concept</p>
+    <h2>A box that holds a value, or nothing</h2>
+    <p>An <span class='key'>Optional&lt;T&gt;</span> is a container that's either present (holds a T) or empty. Returning <span class='key'>Optional&lt;User&gt;</span> instead of <span class='key'>User</span> (which might be null) forces the caller to confront absence at compile time, not via a 2am stack trace.</p><pre class="code" data-src="Optional&lt;User&gt; found = repo.findById(42);
+
+// Don’t: found.get() blows up if empty
+String name = found
+    .map(User::name)            // transform if present
+    .orElse(&quot;(unknown)&quot;);       // fallback if empty
+
+// Or branch explicitly
+found.ifPresentOrElse(
+    u -&gt; render(u),
+    () -&gt; show404());"></pre><p>Use <span class='key'>map</span>, <span class='key'>filter</span>, <span class='key'>orElse</span>, and <span class='key'>ifPresent</span> to flow through the box without ever touching null. Reserve <span class='key'>Optional</span> for return types — not fields or parameters — and never call <span class='key'>get()</span> without checking.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: findById(42) then Optional.of then map(User::name) then orElse(...) then value"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">findById(42)</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">maybe null</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">Optional.of</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">wrap</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">map(User::name)</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">if present</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">orElse(...)</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fallback</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">value</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">never null</text></g></svg></div>
+    
+  </div>
+</section>
+
+<section class="step-through">
+  <div class="wrap">
+    <p class="section-kicker">Step-through</p>
+    <h2>Flow a lookup through the box</h2>
+    <p>Watch a lookup that might find nothing travel through an Optional without a single null check exploding.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: findById(42) then Optional.of then map(User::name) then orElse(...) then value"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">findById(42)</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">maybe null</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">Optional.of</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">wrap</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">map(User::name)</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">if present</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">orElse(...)</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fallback</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">value</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">never null</text></g></svg></div>
+    <div class="controls" role="group" aria-label="Step-through controls">
+      <button class="btn btn-primary" id="playPause">▶ Play</button>
+      <button class="btn" id="stepBack">‹ Step Back</button>
+      <button class="btn" id="stepForward">Step Forward ›</button>
+      <button class="btn" id="resetBtn">⟲ Reset</button>
+      <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
+    </div>
+    <div class="caption" id="caption" aria-live="polite">We ask a repository for user 42 — it may or may not exist.</div>
+  </div>
+</section>
+
+<section class="playground">
+  <div class="wrap">
+    <p class="section-kicker">Playground</p>
+    <h2>Present or fallback</h2>
+    <p>A simple model of isPresent / orElse — the value you get is never null.</p>
+    <div class="playground-grid">
+      <div>
+        <label class="editor-label" for="code">Optionals.java</label>
+        <textarea class="editor" id="code" spellcheck="false">boolean present = true;
+String value    = "Ada";
+String fallback = "(unknown)";
+System.out.println("isPresent() = " + present);
+System.out.println("orElse gives: " + value);
+System.out.println("No surprise NullPointerException.");</textarea>
+      </div>
+      <div>
+        <label class="output-label" for="out">JVM output</label>
+        <div class="output" id="out"><span class="sys">// press Run to execute on the simulated JVM</span></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-primary" id="runBtn">▶ Run</button>
+      <button class="btn" id="clearBtn">Clear output</button>
+    </div>
+  </div>
+</section>
+
+<section class="gotchas">
+  <div class="wrap">
+    <p class="section-kicker">Coming from another language</p>
+    <h2>What will surprise you</h2>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Python uses <span class='key'>None</span> plus <span class='key'>Optional[T]</span> type hints. Java's <span class='key'>Optional</span> is a real object with methods (<span class='key'>map</span>, <span class='key'>orElse</span>), closer to a one-element container than to a bare <span class='key'>None</span> sentinel.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>Where JS reaches for <span class='key'>?.</span> and <span class='key'>??</span> on possibly-<span class='key'>undefined</span> values, Java wraps the value in <span class='key'>Optional</span> and chains <span class='key'>map</span>/<span class='key'>orElse</span>. Same goal — no null explosions — different shape.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Closest to C#'s nullable reference types (<span class='key'>User?</span>) plus the null-conditional operators. C# bakes nullability into the type system; Java bolts it on with the <span class='key'>Optional</span> wrapper, which is why Java says “return types only.”</p></div>
+  </div>
+</section>
+
+<section class="exercises">
+  <div class="wrap">
+    <p class="section-kicker">Exercises</p>
+    <h2>Make it stick</h2>
+      <div class="exercise"><h3>1 &middot; The anti-pattern</h3><p class="prompt">Why is <span class='key'>optional.get()</span> right after <span class='key'>optional.isPresent()</span> frowned upon — and what's better?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">It rebuilds the null-check ceremony Optional was meant to remove, and forgetting the guard throws <span class='key'>NoSuchElementException</span>. Prefer <span class='key'>map</span>/<span class='key'>orElse</span>/<span class='key'>ifPresent</span>, which can't be misused that way.</div></details></div>
+      <div class="exercise"><h3>2 &middot; Where not to use it</h3><p class="prompt">Is <span class='key'>Optional&lt;String&gt;</span> a good type for a class <em>field</em>? Why or why not?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Generally no. <span class='key'>Optional</span> isn't <span class='key'>Serializable</span>, adds an allocation per field, and muddies object state. It's designed for <b>return values</b>; for fields, a plain nullable reference (well-documented) is idiomatic.</div></details></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Module 17 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Records, Sealed Types & Pattern Matching</span></div>
+</footer>
+
+<script>
+
+"use strict";
+const JAVA_KEYWORDS = new Set("abstract assert boolean break byte case catch char class const continue default do double else enum extends final finally float for goto if implements import instanceof int interface long native new package private protected public return short static strictfp super switch synchronized this throw throws transient try void volatile while var record sealed permits yield".split(" "));
+const JAVA_TYPES = new Set("String System Object Integer Double Boolean List Map Set ArrayList HashMap LinkedList Optional Math Thread Runnable Stream Collectors Comparator Exception RuntimeException".split(" "));
+function escapeHtml(s){ return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function highlightJava(src){
+  let out=""; const re=/(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*")|(@\w+)|(\b\d[\d_]*\.?\d*[fFlLdD]?\b)|([A-Za-z_$][\w$]*)|([^A-Za-z_$0-9]+)/g; let m;
+  while((m=re.exec(src))!==null){
+    if(m[1]) out+='<span class="tok-com">'+escapeHtml(m[1])+'</span>';
+    else if(m[2]) out+='<span class="tok-str">'+escapeHtml(m[2])+'</span>';
+    else if(m[3]) out+='<span class="tok-anno">'+escapeHtml(m[3])+'</span>';
+    else if(m[4]) out+='<span class="tok-num">'+escapeHtml(m[4])+'</span>';
+    else if(m[5]){ const w=m[5];
+      if(JAVA_KEYWORDS.has(w)) out+='<span class="tok-key">'+w+'</span>';
+      else if(JAVA_TYPES.has(w)||/^[A-Z]/.test(w)) out+='<span class="tok-type">'+w+'</span>';
+      else { const rest=src.slice(re.lastIndex); out+=/^\s*\(/.test(rest)?'<span class="tok-fn">'+w+'</span>':escapeHtml(w); }
+    } else out+=escapeHtml(m[6]);
+  }
+  return out;
+}
+document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
+
+const STEPS = [{"lit":[],"caption":"We ask a repository for user 42 — it may or may not exist."},{"lit":["a-0"],"caption":"The raw result <b>might be null</b>; the old way would blow up downstream."},{"lit":["a-0","a-1","b-0"],"caption":"Instead the value is <b>wrapped</b> in an Optional — present or empty, but never a bare null."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"<b>map(User::name)</b> runs only if a value is present; on empty it simply stays empty."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"<b>orElse(“(unknown)”)</b> supplies a fallback if the box is empty."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"You always get a real, non-null value out — absence was handled on purpose."}];
+let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
+const $=id=>document.getElementById(id);
+const caption=$('caption'), readout=$('readout');
+const playPauseBtn=$('playPause'), stepBackBtn=$('stepBack'), stepForwardBtn=$('stepForward'), resetBtn=$('resetBtn');
+function renderStep(){
+  document.querySelectorAll('#pipeAnim .stage').forEach(el=>el.classList.remove('lit'));
+  document.querySelectorAll('#pipeAnim .flow-arrow').forEach(el=>el.classList.remove('lit'));
+  STEPS[stepIdx].lit.forEach(id=>{const el=$(id); if(el) el.classList.add('lit');});
+  caption.innerHTML=STEPS[stepIdx].caption;
+  readout.textContent='step '+stepIdx+' / '+(STEPS.length-1);
+  stepBackBtn.disabled=stepIdx===0; stepForwardBtn.disabled=stepIdx===STEPS.length-1;
+}
+function setPlaying(on){
+  playing=on; playPauseBtn.textContent=on?'\u275A\u275A Pause':'\u25B6 Play';
+  if(on){ if(stepIdx===STEPS.length-1){stepIdx=0;renderStep();} lastTick=performance.now(); rafId=requestAnimationFrame(tick); }
+  else if(rafId){ cancelAnimationFrame(rafId); rafId=null; }
+}
+function tick(now){ if(!playing) return; if(now-lastTick>=STEP_MS){ lastTick=now; if(stepIdx<STEPS.length-1){stepIdx++;renderStep();} if(stepIdx===STEPS.length-1){setPlaying(false);return;} } rafId=requestAnimationFrame(tick); }
+playPauseBtn.addEventListener('click',()=>setPlaying(!playing));
+stepForwardBtn.addEventListener('click',()=>{setPlaying(false); if(stepIdx<STEPS.length-1){stepIdx++;renderStep();}});
+stepBackBtn.addEventListener('click',()=>{setPlaying(false); if(stepIdx>0){stepIdx--;renderStep();}});
+resetBtn.addEventListener('click',()=>{setPlaying(false); stepIdx=0; renderStep();});
+renderStep();
+
+// ── Mini Java simulator: decls, println/print, + - * / %, comparisons, string concat ──
+function runJava(src){
+  const lines=src.split('\n'); const vars=Object.create(null); const out=[]; let errored=null;
+  function findTop(s, ops){
+    let depth=0, inStr=false;
+    for(let i=0;i<s.length;i++){ const c=s[i];
+      if(c==='"'&&s[i-1]!=='\\') inStr=!inStr;
+      if(inStr) continue;
+      if(c==='(') depth++; else if(c===')') depth--;
+      else if(depth===0){ for(const op of ops){ if(s.substr(i,op.length)===op){ return {op,i}; } } }
+    }
+    return null;
+  }
+  function splitTop(s,op){ const res=[]; let depth=0,inStr=false,cur='';
+    for(let i=0;i<s.length;i++){ const c=s[i];
+      if(c==='"'&&s[i-1]!=='\\') inStr=!inStr;
+      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--; else if(c===op&&depth===0){res.push(cur);cur='';continue;} }
+      cur+=c; }
+    res.push(cur); return res; }
+  function evalExpr(expr){
+    expr=expr.trim();
+    const cmp=findTop(expr,['>=','<=','==','!=']) || findTop(expr,['>','<']);
+    if(cmp){ const l=evalExpr(expr.slice(0,cmp.i)); const r=evalExpr(expr.slice(cmp.i+cmp.op.length));
+      const lv=l.value, rv=r.value; let b;
+      switch(cmp.op){case'>=':b=lv>=rv;break;case'<=':b=lv<=rv;break;case'==':b=lv===rv;break;case'!=':b=lv!==rv;break;case'>':b=lv>rv;break;case'<':b=lv<rv;break;}
+      return {type:'boolean',value:b}; }
+    const parts=splitTop(expr,'+');
+    if(parts.length>1){ let acc=evalExpr(parts[0]);
+      for(let i=1;i<parts.length;i++){ const rhs=evalExpr(parts[i]);
+        if(acc.type==='String'||rhs.type==='String') acc={type:'String',value:toStr(acc)+toStr(rhs)};
+        else acc={type:'num',value:acc.value+rhs.value}; }
+      return acc; }
+    const mul=splitTop(expr,'*'); if(mul.length>1) return mul.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value*b.value}));
+    const mod=splitTop(expr,'%'); if(mod.length>1) return mod.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value%b.value}));
+    const sub=splitTop(expr,'-'); if(sub.length>1&&sub[0].trim()!=='') return sub.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value-b.value}));
+    const div=splitTop(expr,'/'); if(div.length>1) return div.map(evalExpr).reduce((a,b)=>({type:'num',value:Math.trunc(a.value/b.value)}));
+    return evalAtom(expr);
+  }
+  function evalAtom(t){ t=t.trim();
+    if(t.startsWith('(')&&t.endsWith(')')) return evalExpr(t.slice(1,-1));
+    if(/^".*"$/.test(t)) return {type:'String',value:t.slice(1,-1).replace(/\\n/g,'\n').replace(/\\t/g,'\t').replace(/\\"/g,'"')};
+    if(/^-?\d+$/.test(t)) return {type:'num',value:parseInt(t,10)};
+    if(/^-?\d*\.\d+$/.test(t)) return {type:'num',value:parseFloat(t)};
+    if(t==='true'||t==='false') return {type:'boolean',value:t==='true'};
+    if(t in vars) return vars[t];
+    throw new Error("cannot resolve symbol '"+t+"'");
+  }
+  function toStr(v){ if(v.type==='boolean') return v.value?'true':'false'; return String(v.value); }
+  try{
+    for(let raw of lines){
+      let line=raw.replace(/\/\/.*$/,'').trim(); if(!line) continue;
+      if(!line.endsWith(';')) throw new Error("missing ';' on: "+line);
+      line=line.slice(0,-1).trim(); let m;
+      if((m=line.match(/^System\.out\.(println|print)\s*\((.*)\)$/s))){
+        const arg=m[2].trim(); const val=arg===''?{type:'String',value:''}:evalExpr(arg);
+        out.push(toStr(val)+(m[1]==='println'?'\n':'')); continue; }
+      if((m=line.match(/^(int|double|String|boolean|var|long|float)\s+([A-Za-z_$][\w$]*)\s*=\s*(.+)$/s))){ vars[m[2]]=evalExpr(m[3]); continue; }
+      if((m=line.match(/^([A-Za-z_$][\w$]*)\s*=\s*(.+)$/s))){ if(!(m[1] in vars)) throw new Error("'"+m[1]+"' was not declared"); vars[m[1]]=evalExpr(m[2]); continue; }
+      throw new Error("don't know how to run: "+line);
+    }
+  }catch(e){ errored=e.message; }
+  return {text:out.join(''), error:errored};
+}
+const outEl=$('out');
+$('runBtn').addEventListener('click',()=>{
+  const res=runJava($('code').value); let html='';
+  if(res.text) html+=escapeHtml(res.text);
+  if(res.error) html+='<span class="err">\nError: '+escapeHtml(res.error)+'</span>';
+  if(!res.text&&!res.error) html='<span class="sys">// (no output)</span>';
+  outEl.innerHTML=html||'<span class="sys">// (no output)</span>';
+});
+$('clearBtn').addEventListener('click',()=>{ outEl.innerHTML='<span class="sys">// press Run to execute on the simulated JVM</span>'; });
+
+</script>
+<script>
+/* PWA: service worker + install prompt */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('../sw.js').catch(()=>{}));
+}
+(function(){
+  let deferred = null;
+  const btn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; if (btn) btn.hidden = false; });
+  if (btn) btn.addEventListener('click', async () => { if (!deferred) return; btn.hidden = true; deferred.prompt(); await deferred.userChoice; deferred = null; });
+  window.addEventListener('appinstalled', () => { if (btn) btn.hidden = true; });
+})();
+</script>
+</body>
+</html>

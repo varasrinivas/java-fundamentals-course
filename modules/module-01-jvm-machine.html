@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 01 — The JVM: Your Code's Real Computer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0f0f1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Java Course">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<style>
+:root {
+  --bg-primary: #0f0f1a;
+  --bg-surface: #1a1a2e;
+  --bg-elevated: #242442;
+  --text-primary: #e8e8e8;
+  --text-secondary: #a0a0b8;
+  --text-muted: #6b6b80;
+  --accent-cyan: #00d4ff;
+  --accent-amber: #ffb627;
+  --accent-emerald: #06d6a0;
+  --accent-coral: #ef476f;
+  --accent-purple: #b088f9;
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+  --radius: 8px;
+  --transition: 400ms ease-out;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+
+/* ── Nav ── */
+.module-nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(15,15,26,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--bg-elevated);
+}
+.module-nav .wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 14px; padding-bottom: 14px; gap: 16px;
+}
+.module-nav .badge {
+  font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.12em;
+  color: var(--bg-primary); background: var(--accent-cyan);
+  padding: 3px 9px; border-radius: 999px; font-weight: 700;
+}
+.module-nav .title { font-family: var(--font-display); font-weight: 600; font-size: 1rem; }
+.module-nav .title small { display:block; color: var(--text-muted); font-family: var(--font-body); font-weight: 400; font-size: 0.72rem; }
+.module-nav .links { display: flex; gap: 10px; flex-shrink: 0; }
+.module-nav a {
+  color: var(--text-secondary); text-decoration: none; font-size: 0.85rem;
+  padding: 6px 12px; border: 1px solid var(--bg-elevated); border-radius: var(--radius);
+  transition: var(--transition);
+}
+.module-nav a:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+.module-nav a[aria-disabled="true"] { opacity: 0.35; pointer-events: none; }
+
+/* ── Hero ── */
+.hero { padding: 64px 0 36px; }
+.hero h1 {
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px;
+}
+.hero h1 .grad {
+  background: linear-gradient(100deg, var(--accent-cyan), var(--accent-purple));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero p.lede { font-size: 1.15rem; color: var(--text-secondary); max-width: 60ch; }
+
+/* ── Sections ── */
+section { padding: 40px 0; border-top: 1px solid var(--bg-elevated); }
+.section-kicker {
+  font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--accent-cyan); margin-bottom: 8px;
+}
+section h2 {
+  font-family: var(--font-display); font-weight: 600; font-size: clamp(1.5rem, 4vw, 2.1rem);
+  margin-bottom: 14px; letter-spacing: -0.01em;
+}
+section h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; margin: 24px 0 10px; }
+section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; }
+section p strong { color: var(--text-primary); }
+.key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
+
+/* ── Cards / panels ── */
+.panel {
+  background: var(--bg-surface); border: 1px solid var(--bg-elevated);
+  border-radius: var(--radius); padding: 22px;
+}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ── Code blocks ── */
+pre.code {
+  background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius);
+  padding: 16px 18px; overflow-x: auto; font-family: var(--font-code);
+  font-size: 0.86rem; line-height: 1.6; margin: 12px 0;
+}
+.tok-key { color: var(--accent-cyan); }
+.tok-str { color: var(--accent-amber); }
+.tok-com { color: var(--text-muted); font-style: italic; }
+.tok-num { color: var(--accent-emerald); }
+.tok-type { color: var(--accent-purple); }
+.tok-fn { color: #7ee787; }
+.tok-anno { color: var(--accent-coral); }
+
+/* ── SVG diagram ── */
+.diagram-wrap { background: var(--bg-surface); border:1px solid var(--bg-elevated); border-radius: var(--radius); padding: 18px; margin: 18px 0; }
+.stage rect { transition: fill var(--transition), stroke var(--transition); }
+.stage text { font-family: var(--font-code); fill: var(--text-secondary); }
+.stage.lit rect { fill: var(--bg-elevated); stroke: var(--accent-cyan); }
+.stage.lit text { fill: var(--text-primary); }
+.flow-arrow { stroke: var(--text-muted); stroke-width: 2; marker-end: url(#arrow); transition: stroke var(--transition); }
+.flow-arrow.lit { stroke: var(--accent-cyan); }
+
+/* ── Controls ── */
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0; }
+.btn {
+  font-family: var(--font-body); font-size: 0.85rem; font-weight: 500;
+  color: var(--text-primary); background: var(--bg-elevated); border: 1px solid transparent;
+  padding: 8px 14px; border-radius: var(--radius); cursor: pointer; transition: var(--transition);
+}
+.btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.btn:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; }
+.btn-primary { background: var(--accent-cyan); color: var(--bg-primary); font-weight: 600; }
+.btn-primary:hover { background: #36ddff; color: var(--bg-primary); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.step-readout {
+  font-family: var(--font-code); font-size: 0.8rem; color: var(--text-muted);
+  margin-left: auto;
+}
+.caption {
+  background: #12121f; border-left: 3px solid var(--accent-cyan);
+  padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; min-height: 64px;
+  font-size: 0.92rem; color: var(--text-secondary); transition: var(--transition);
+}
+.caption b { color: var(--accent-cyan); }
+
+/* ── Playground ── */
+.playground-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.editor-label, .output-label {
+  font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; display: block;
+}
+textarea.editor {
+  width: 100%; min-height: 240px; resize: vertical;
+  background: #12121f; color: var(--text-primary); border: 1px solid var(--bg-elevated);
+  border-radius: var(--radius); padding: 14px; font-family: var(--font-code);
+  font-size: 0.84rem; line-height: 1.6; tab-size: 2;
+}
+textarea.editor:focus { outline: none; border-color: var(--accent-cyan); }
+.output {
+  background: #0a0a12; border: 1px solid var(--bg-elevated); border-radius: var(--radius);
+  padding: 14px; font-family: var(--font-code); font-size: 0.84rem; line-height: 1.6;
+  min-height: 240px; white-space: pre-wrap; color: var(--accent-emerald); overflow-y: auto;
+}
+.output .err { color: var(--accent-coral); }
+.output .sys { color: var(--text-muted); }
+
+/* ── Callouts ── */
+.callout {
+  border-radius: var(--radius); padding: 16px 18px; margin: 14px 0;
+  border: 1px solid var(--bg-elevated); background: var(--bg-surface);
+  border-left-width: 4px;
+}
+.callout .lang-tag {
+  display: inline-flex; align-items: center; gap: 7px; font-weight: 600;
+  font-size: 0.85rem; margin-bottom: 6px; font-family: var(--font-code);
+}
+.callout .lang-tag .dot { width: 9px; height: 9px; border-radius: 50%; }
+.callout p { margin: 0; font-size: 0.92rem; }
+.callout-python { border-left-color: #4584b6; }
+.callout-python .lang-tag { color: #6ea8d8; } .callout-python .dot { background: #4584b6; }
+.callout-js { border-left-color: var(--accent-amber); }
+.callout-js .lang-tag { color: var(--accent-amber); } .callout-js .dot { background: var(--accent-amber); }
+.callout-go { border-left-color: #00add8; }
+.callout-go .lang-tag { color: #4fd2f0; } .callout-go .dot { background: #00add8; }
+.callout-csharp { border-left-color: var(--accent-purple); }
+.callout-csharp .lang-tag { color: var(--accent-purple); } .callout-csharp .dot { background: var(--accent-purple); }
+
+/* ── Exercises ── */
+.exercise { background: var(--bg-surface); border:1px solid var(--bg-elevated); border-radius: var(--radius); padding: 18px; margin: 14px 0; }
+.exercise h3 { margin-top: 0; }
+.exercise .prompt { color: var(--text-secondary); }
+details.hint { margin-top: 12px; }
+details.hint summary {
+  cursor: pointer; color: var(--accent-amber); font-size: 0.88rem; font-weight: 500;
+  list-style: none; display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border: 1px solid var(--bg-elevated); border-radius: var(--radius);
+  transition: var(--transition);
+}
+details.hint summary:hover { border-color: var(--accent-amber); }
+details.hint summary::-webkit-details-marker { display: none; }
+details.hint[open] summary { margin-bottom: 10px; }
+details.hint .hint-body { font-size: 0.9rem; color: var(--text-secondary); padding-left: 4px; }
+
+footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+
+/* ── Install button ── */
+.install-btn { position: fixed; right: 16px; bottom: 16px; z-index: 60; font-family: var(--font-body); font-weight: 600; font-size: 0.9rem; color: var(--bg-primary); background: var(--accent-cyan); border: none; padding: 12px 18px; border-radius: 999px; box-shadow: 0 6px 20px rgba(0,0,0,0.45); cursor: pointer; }
+.install-btn:active { transform: scale(0.96); }
+
+/* ── Responsive ── */
+@media (max-width: 680px) {
+  .grid-2, .playground-grid { grid-template-columns: 1fr; }
+  .module-nav .title { font-size: 0.85rem; }
+  .hero { padding: 40px 0 24px; }
+}
+@media (max-width: 430px) {
+  .wrap { padding: 0 16px; }
+  .btn { padding: 11px 14px; font-size: 0.9rem; }
+  .module-nav .links a { padding: 9px 11px; }
+  .module-nav .wrap { gap: 10px; }
+  .controls { gap: 10px; }
+  pre.code { font-size: 0.78rem; padding: 14px; }
+  textarea.editor, .output { font-size: 0.8rem; min-height: 200px; }
+  .step-readout { width: 100%; margin-left: 0; order: 5; }
+  details.hint summary { padding: 10px 14px; }
+  .install-btn { right: 12px; bottom: 12px; }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0ms !important; animation-duration: 0ms !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════ NAV ════ -->
+<nav class="module-nav">
+  <div class="wrap">
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span class="badge">MODULE 01</span>
+      <span class="title">The JVM<small>Java for Developers · Track 1: The Machine</small></span>
+    </div>
+    <div class="links">
+      <a href="../index.html" aria-disabled="false">Index</a>
+      <a href="module-02-memory-model.html">Next ›</a>
+    </div>
+  </div>
+</nav>
+
+<button class="install-btn" id="installBtn" hidden aria-label="Install this course as an app">⤓ Install app</button>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Your code's <span class="grad">real computer</span></h1>
+    <p class="lede">You don't run Java on your laptop. You run it on a machine that doesn't physically
+    exist — the JVM. Understanding that imaginary computer explains almost everything strange about
+    Java: the compile step, "write once run anywhere," startup lag, and why it gets <em>faster</em> the
+    longer it runs.</p>
+  </div>
+</header>
+
+<!-- ════ CONCEPT ════ -->
+<section class="concept">
+  <div class="wrap">
+    <p class="section-kicker">Concept</p>
+    <h2>Two compilers and an imaginary machine</h2>
+    <p>In Python or JavaScript, your source is handed more-or-less directly to an interpreter. In Go or
+    C++, it's compiled all the way down to native machine code for <em>your</em> CPU. Java sits in the
+    middle, and that middle is the whole point.</p>
+
+    <p>Java is compiled <strong>twice</strong>. First, <span class="key">javac</span> turns your
+    <span class="key">.java</span> source into <strong>bytecode</strong> — a compact instruction set for
+    a CPU that was never manufactured. Then the <strong>JVM</strong> (Java Virtual Machine) loads that
+    bytecode and, while the program runs, a <strong>Just-In-Time (JIT) compiler</strong> translates the
+    hot parts into real native code on the fly.</p>
+
+    <div class="diagram-wrap">
+      <svg id="pipeline" viewBox="0 0 860 220" role="img" aria-label="Java compilation and execution pipeline from source code to native CPU instructions">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path>
+          </marker>
+        </defs>
+        <!-- stage 0: source -->
+        <g class="stage" id="st-0">
+          <rect x="8" y="70" width="120" height="80" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect>
+          <text x="68" y="100" text-anchor="middle" font-size="12">Hello.java</text>
+          <text x="68" y="120" text-anchor="middle" font-size="10" fill="#6b6b80">source</text>
+        </g>
+        <line class="flow-arrow" id="fl-0" x1="132" y1="110" x2="178" y2="110"></line>
+        <!-- stage 1: javac -->
+        <g class="stage" id="st-1">
+          <rect x="182" y="70" width="120" height="80" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect>
+          <text x="242" y="100" text-anchor="middle" font-size="12">javac</text>
+          <text x="242" y="120" text-anchor="middle" font-size="10" fill="#6b6b80">compiler</text>
+        </g>
+        <line class="flow-arrow" id="fl-1" x1="306" y1="110" x2="352" y2="110"></line>
+        <!-- stage 2: bytecode -->
+        <g class="stage" id="st-2">
+          <rect x="356" y="70" width="120" height="80" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect>
+          <text x="416" y="100" text-anchor="middle" font-size="12">Hello.class</text>
+          <text x="416" y="120" text-anchor="middle" font-size="10" fill="#6b6b80">bytecode</text>
+        </g>
+        <line class="flow-arrow" id="fl-2" x1="480" y1="110" x2="526" y2="110"></line>
+        <!-- stage 3: JVM -->
+        <g class="stage" id="st-3">
+          <rect x="530" y="46" width="150" height="128" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect>
+          <text x="605" y="68" text-anchor="middle" font-size="12" fill="#b088f9">JVM</text>
+          <text x="605" y="92" text-anchor="middle" font-size="9.5" fill="#6b6b80">ClassLoader</text>
+          <text x="605" y="112" text-anchor="middle" font-size="9.5" fill="#6b6b80">Verifier</text>
+          <text x="605" y="132" text-anchor="middle" font-size="9.5" fill="#6b6b80">Interpreter</text>
+          <text x="605" y="152" text-anchor="middle" font-size="9.5" fill="#6b6b80">JIT compiler</text>
+        </g>
+        <line class="flow-arrow" id="fl-3" x1="684" y1="110" x2="730" y2="110"></line>
+        <!-- stage 4: CPU -->
+        <g class="stage" id="st-4">
+          <rect x="734" y="70" width="118" height="80" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect>
+          <text x="793" y="100" text-anchor="middle" font-size="12" fill="#06d6a0">CPU</text>
+          <text x="793" y="120" text-anchor="middle" font-size="10" fill="#6b6b80">native code</text>
+        </g>
+      </svg>
+    </div>
+
+    <p>Because bytecode targets the imaginary machine and not your CPU, the <em>same</em>
+    <span class="key">.class</span> file runs unchanged on Windows, macOS, Linux, ARM, or x86 — as long
+    as a JVM exists for that platform. That's "write once, run anywhere," and it's a property of
+    bytecode, not magic.</p>
+
+    <div class="callout callout-csharp">
+      <span class="lang-tag"><span class="dot"></span>The closest cousin</span>
+      <p>.NET works almost identically: C# compiles to <em>IL</em> (bytecode), which the CLR runs with its
+      own JIT. If you know the CLR, you already understand the JVM's shape — just swap the names.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════ STEP-THROUGH ════ -->
+<section class="step-through">
+  <div class="wrap">
+    <p class="section-kicker">Step-through</p>
+    <h2>Watch one program travel the pipeline</h2>
+    <p>Step through what happens to <span class="key">Hello.java</span> from the moment you save it to the
+    moment characters hit your terminal. Use the controls — or let it play.</p>
+
+    <div class="diagram-wrap">
+      <!-- mirrors the concept SVG but is the animated target -->
+      <svg id="pipeline2" viewBox="0 0 860 200" role="img" aria-label="Animated pipeline highlighting each stage as the program is compiled and run">
+        <g class="stage" id="a-0"><rect x="8" y="60" width="120" height="80" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="68" y="95" text-anchor="middle" font-size="12">Hello.java</text><text x="68" y="115" text-anchor="middle" font-size="10" fill="#6b6b80">edit + save</text></g>
+        <line class="flow-arrow" id="b-0" x1="132" y1="100" x2="178" y2="100"></line>
+        <g class="stage" id="a-1"><rect x="182" y="60" width="120" height="80" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="242" y="95" text-anchor="middle" font-size="12">javac</text><text x="242" y="115" text-anchor="middle" font-size="10" fill="#6b6b80">compile</text></g>
+        <line class="flow-arrow" id="b-1" x1="306" y1="100" x2="352" y2="100"></line>
+        <g class="stage" id="a-2"><rect x="356" y="60" width="120" height="80" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="416" y="95" text-anchor="middle" font-size="12">Hello.class</text><text x="416" y="115" text-anchor="middle" font-size="10" fill="#6b6b80">bytecode</text></g>
+        <line class="flow-arrow" id="b-2" x1="480" y1="100" x2="526" y2="100"></line>
+        <g class="stage" id="a-3"><rect x="530" y="60" width="150" height="80" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="605" y="95" text-anchor="middle" font-size="12" fill="#b088f9">JVM loads + JITs</text><text x="605" y="115" text-anchor="middle" font-size="10" fill="#6b6b80">execute</text></g>
+        <line class="flow-arrow" id="b-3" x1="684" y1="100" x2="730" y2="100"></line>
+        <g class="stage" id="a-4"><rect x="734" y="60" width="118" height="80" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="793" y="95" text-anchor="middle" font-size="12" fill="#06d6a0">stdout</text><text x="793" y="115" text-anchor="middle" font-size="10" fill="#6b6b80">"Hello!"</text></g>
+      </svg>
+    </div>
+
+    <div class="controls" role="group" aria-label="Step-through controls">
+      <button class="btn btn-primary" id="playPause">▶ Play</button>
+      <button class="btn" id="stepBack">‹ Step Back</button>
+      <button class="btn" id="stepForward">Step Forward ›</button>
+      <button class="btn" id="resetBtn">⟲ Reset</button>
+      <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
+    </div>
+    <div class="caption" id="caption" aria-live="polite">Press <b>Play</b> — or step through manually. Nothing has happened yet; the source file is just sitting on disk.</div>
+  </div>
+</section>
+
+<!-- ════ PLAYGROUND ════ -->
+<section class="playground">
+  <div class="wrap">
+    <p class="section-kicker">Playground</p>
+    <h2>Run a tiny Java program</h2>
+    <p>This is a <em>simulated</em> JVM running in your browser — it understands a slice of Java:
+    <span class="key">System.out.println</span>, <span class="key">int</span>/<span class="key">String</span>
+    variables, <span class="key">+</span> for math and string concatenation. Edit the code and press
+    <strong>Run</strong> to see the output the real JVM would produce.</p>
+
+    <div class="playground-grid">
+      <div>
+        <label class="editor-label" for="code">Hello.java</label>
+        <textarea class="editor" id="code" spellcheck="false">int boxes = 3;
+int perBox = 12;
+String item = "donuts";
+
+System.out.println("Java runs on a virtual machine.");
+System.out.println(boxes * perBox + " " + item);
+System.out.println("Write once, run anywhere.");</textarea>
+      </div>
+      <div>
+        <label class="output-label" for="out">JVM output</label>
+        <div class="output" id="out"><span class="sys">// press Run to execute on the simulated JVM</span></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-primary" id="runBtn">▶ Run</button>
+      <button class="btn" id="clearBtn">Clear output</button>
+    </div>
+  </div>
+</section>
+
+<!-- ════ GOTCHAS ════ -->
+<section class="gotchas">
+  <div class="wrap">
+    <p class="section-kicker">Coming from another language</p>
+    <h2>What will surprise you</h2>
+
+    <div class="callout callout-python">
+      <span class="lang-tag"><span class="dot"></span>Coming from Python</span>
+      <p>There's no <em>"just run the file."</em> You must compile first (<span class="key">javac Hello.java</span>)
+      then run the result (<span class="key">java Hello</span>). CPython also makes bytecode (<span class="key">.pyc</span>),
+      but hides it. Java makes it explicit — and ships that bytecode, not your source.</p>
+    </div>
+
+    <div class="callout callout-js">
+      <span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span>
+      <p>V8 already JITs your JS, so the "gets faster as it runs" idea is familiar. The difference: Java has a
+      real, separate <strong>compile step</strong> with type checking up front. Many bugs that are runtime
+      <span class="key">TypeError</span>s in JS are caught by <span class="key">javac</span> before the program ever starts.</p>
+    </div>
+
+    <div class="callout callout-go">
+      <span class="lang-tag"><span class="dot"></span>Coming from Go</span>
+      <p>Go compiles straight to a single native binary — no VM, instant startup. Java trades that for
+      portability and a world-class JIT: a long-running Java service can hit throughput a static binary
+      struggles to match, at the cost of slower cold starts and a runtime to ship.</p>
+    </div>
+
+    <div class="callout callout-csharp">
+      <span class="lang-tag"><span class="dot"></span>Coming from C#</span>
+      <p>You're basically home already. <span class="key">javac</span> ≈ Roslyn, bytecode ≈ IL, JVM ≈ CLR,
+      JAR ≈ assembly. The biggest day-one differences are tooling (Maven/Gradle vs MSBuild) and that Java's
+      checked exceptions have no C# equivalent.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════ EXERCISES ════ -->
+<section class="exercises">
+  <div class="wrap">
+    <p class="section-kicker">Exercises</p>
+    <h2>Make it stick</h2>
+
+    <div class="exercise">
+      <h3>1 · Predict the commands</h3>
+      <p class="prompt">You have <span class="key">Greeter.java</span> containing a class named
+      <span class="key">Greeter</span>. Write the exact two terminal commands that compile it and then run
+      it. What new file appears after the first command?</p>
+      <details class="hint">
+        <summary>💡 Show hint</summary>
+        <div class="hint-body">Compile with <span class="key">javac Greeter.java</span> — this produces
+        <span class="key">Greeter.class</span> (the bytecode). Run with <span class="key">java Greeter</span>
+        (note: <em>no</em> <span class="key">.class</span> extension — you name the class, not the file).</div>
+      </details>
+    </div>
+
+    <div class="exercise">
+      <h3>2 · Why is the second run faster?</h3>
+      <p class="prompt">A teammate benchmarks a tight loop and notices it runs slowly for the first few
+      thousand iterations, then suddenly speeds up — within the <em>same</em> program run. No code changed.
+      What happened?</p>
+      <details class="hint">
+        <summary>💡 Show hint</summary>
+        <div class="hint-body">The JVM starts by <strong>interpreting</strong> bytecode. Once it sees a method
+        is "hot" (called often), the <strong>JIT compiler</strong> translates it to optimized native code,
+        and subsequent iterations run at near-native speed. This warm-up is why JVM benchmarks discard the
+        first runs.</div>
+      </details>
+    </div>
+
+    <div class="exercise">
+      <h3>3 · One JAR, many machines</h3>
+      <p class="prompt">You build a <span class="key">.jar</span> on your x86 Windows laptop and email it to a
+      colleague on an ARM Mac. It runs without recompiling. In Go, the same trick fails. Explain the
+      difference in one sentence.</p>
+      <details class="hint">
+        <summary>💡 Show hint</summary>
+        <div class="hint-body">The JAR contains <strong>bytecode</strong> for the platform-independent JVM, so
+        any JVM can run it; a Go binary contains <strong>native machine code</strong> compiled for one
+        specific OS + CPU architecture.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Module 01 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Stack, Heap &amp; the Garbage Collector</span></div>
+</footer>
+
+<script>
+"use strict";
+
+/* ════════════════════════════════════════════════════════════
+   1) Syntax highlighter — lightweight, Java-aware, no deps
+   ════════════════════════════════════════════════════════════ */
+const JAVA_KEYWORDS = new Set("abstract assert boolean break byte case catch char class const continue default do double else enum extends final finally float for goto if implements import instanceof int interface long native new package private protected public return short static strictfp super switch synchronized this throw throws transient try void volatile while var record sealed permits yield".split(" "));
+const JAVA_TYPES = new Set("String System Object Integer Double Boolean List Map Set ArrayList HashMap Optional Math Thread Runnable".split(" "));
+
+function escapeHtml(s){ return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function highlightJava(src){
+  // Tokenize in one pass over comments, strings, then words/numbers.
+  let out = "";
+  const re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*")|(@\w+)|(\b\d[\d_]*\.?\d*[fFlLdD]?\b)|([A-Za-z_$][\w$]*)|([^A-Za-z_$0-9]+)/g;
+  let m;
+  while ((m = re.exec(src)) !== null) {
+    if (m[1]) out += `<span class="tok-com">${escapeHtml(m[1])}</span>`;
+    else if (m[2]) out += `<span class="tok-str">${escapeHtml(m[2])}</span>`;
+    else if (m[3]) out += `<span class="tok-anno">${escapeHtml(m[3])}</span>`;
+    else if (m[4]) out += `<span class="tok-num">${escapeHtml(m[4])}</span>`;
+    else if (m[5]) {
+      const w = m[5];
+      if (JAVA_KEYWORDS.has(w)) out += `<span class="tok-key">${w}</span>`;
+      else if (JAVA_TYPES.has(w) || /^[A-Z]/.test(w)) out += `<span class="tok-type">${w}</span>`;
+      else {
+        // function call if followed by (
+        const rest = src.slice(re.lastIndex);
+        out += /^\s*\(/.test(rest) ? `<span class="tok-fn">${w}</span>` : escapeHtml(w);
+      }
+    }
+    else out += escapeHtml(m[6]);
+  }
+  return out;
+}
+
+/* ════════════════════════════════════════════════════════════
+   2) Step-through state machine (Play/Pause/Step/Reset)
+   ════════════════════════════════════════════════════════════ */
+const STEPS = [
+  { lit: [],                caption: 'Nothing has happened yet — <b>Hello.java</b> is just text on disk.' },
+  { lit: ['a-0'],           caption: 'You save <b>Hello.java</b>. It is human-readable source: classes, methods, statements.' },
+  { lit: ['a-0','b-0','a-1'], caption: '<b>javac</b> reads the source, <b>type-checks</b> it, and reports errors. No types out of place? It proceeds.' },
+  { lit: ['a-1','b-1','a-2'], caption: 'Out comes <b>Hello.class</b> — compact <b>bytecode</b> for the imaginary JVM CPU. This is what you ship.' },
+  { lit: ['a-2','b-2','a-3'], caption: 'The <b>JVM</b> loads the class, <b>verifies</b> the bytecode is safe, interprets it, and JIT-compiles hot code to native.' },
+  { lit: ['a-3','b-3','a-4'], caption: 'Native instructions run on the real CPU and <b>"Hello!"</b> reaches stdout. Same .class would run on any platform.' },
+];
+
+let stepIdx = 0;
+let playing = false;
+let rafId = null;
+let lastTick = 0;
+const STEP_MS = 1400;
+
+const $ = id => document.getElementById(id);
+const caption = $('caption'), readout = $('readout');
+const playPauseBtn = $('playPause'), stepBackBtn = $('stepBack'),
+      stepForwardBtn = $('stepForward'), resetBtn = $('resetBtn');
+
+function renderStep(){
+  // clear all
+  document.querySelectorAll('#pipeline2 .stage').forEach(el => el.classList.remove('lit'));
+  document.querySelectorAll('#pipeline2 .flow-arrow').forEach(el => el.classList.remove('lit'));
+  STEPS[stepIdx].lit.forEach(id => { const el = $(id); if (el) el.classList.add('lit'); });
+  caption.innerHTML = STEPS[stepIdx].caption;
+  readout.textContent = `step ${stepIdx} / ${STEPS.length - 1}`;
+  stepBackBtn.disabled = stepIdx === 0;
+  stepForwardBtn.disabled = stepIdx === STEPS.length - 1;
+}
+
+function setPlaying(on){
+  playing = on;
+  playPauseBtn.textContent = on ? '❚❚ Pause' : '▶ Play';
+  if (on) {
+    if (stepIdx === STEPS.length - 1) stepIdx = 0, renderStep();
+    lastTick = performance.now();
+    rafId = requestAnimationFrame(tick);
+  } else if (rafId) {
+    cancelAnimationFrame(rafId); rafId = null;
+  }
+}
+
+function tick(now){
+  if (!playing) return;
+  if (now - lastTick >= STEP_MS) {
+    lastTick = now;
+    if (stepIdx < STEPS.length - 1) { stepIdx++; renderStep(); }
+    if (stepIdx === STEPS.length - 1) { setPlaying(false); return; }
+  }
+  rafId = requestAnimationFrame(tick);
+}
+
+playPauseBtn.addEventListener('click', () => setPlaying(!playing));
+stepForwardBtn.addEventListener('click', () => { setPlaying(false); if (stepIdx < STEPS.length-1){ stepIdx++; renderStep(); } });
+stepBackBtn.addEventListener('click', () => { setPlaying(false); if (stepIdx > 0){ stepIdx--; renderStep(); } });
+resetBtn.addEventListener('click', () => { setPlaying(false); stepIdx = 0; renderStep(); });
+renderStep();
+
+/* ════════════════════════════════════════════════════════════
+   3) Mini Java simulator for the playground
+   Supports: int/String/double/boolean/var decls, reassignment,
+   System.out.println / print, + (math & string concat), * - /.
+   ════════════════════════════════════════════════════════════ */
+function runJava(src){
+  const lines = src.split('\n');
+  const vars = Object.create(null);
+  const out = [];
+  let errored = null;
+
+  // Evaluate an expression string -> {type, value}
+  function evalExpr(expr){
+    expr = expr.trim();
+    // Split on top-level '+' while respecting quotes and parens.
+    const parts = splitTop(expr, '+');
+    if (parts.length > 1) {
+      let acc = evalExpr(parts[0]);
+      for (let i = 1; i < parts.length; i++){
+        const rhs = evalExpr(parts[i]);
+        if (acc.type === 'String' || rhs.type === 'String') {
+          acc = { type:'String', value: toStr(acc) + toStr(rhs) };
+        } else {
+          acc = { type:'num', value: acc.value + rhs.value };
+        }
+      }
+      return acc;
+    }
+    // multiplicative
+    const mul = splitTop(expr, '*');
+    if (mul.length > 1) return mul.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value*b.value}));
+    const sub = splitTop(expr, '-');
+    if (sub.length > 1) return sub.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value-b.value}));
+    const div = splitTop(expr, '/');
+    if (div.length > 1) return div.map(evalExpr).reduce((a,b)=>({type:'num',value:Math.trunc(a.value/b.value)}));
+    return evalAtom(expr);
+  }
+
+  function evalAtom(t){
+    t = t.trim();
+    if (t.startsWith('(') && t.endsWith(')')) return evalExpr(t.slice(1,-1));
+    if (/^".*"$/.test(t)) return { type:'String', value: t.slice(1,-1).replace(/\\n/g,'\n').replace(/\\t/g,'\t').replace(/\\"/g,'"') };
+    if (/^-?\d+$/.test(t)) return { type:'num', value: parseInt(t,10) };
+    if (/^-?\d*\.\d+$/.test(t)) return { type:'num', value: parseFloat(t) };
+    if (t === 'true' || t === 'false') return { type:'boolean', value: t==='true' };
+    if (t in vars) return vars[t];
+    throw new Error(`cannot resolve symbol '${t}'`);
+  }
+
+  function toStr(v){
+    if (v.type === 'boolean') return v.value ? 'true':'false';
+    return String(v.value);
+  }
+
+  // split respecting "..." and (...) nesting
+  function splitTop(s, op){
+    const res = []; let depth=0, inStr=false, cur='';
+    for (let i=0;i<s.length;i++){
+      const c = s[i];
+      if (c === '"' && s[i-1] !== '\\') inStr = !inStr;
+      if (!inStr){
+        if (c === '(') depth++;
+        else if (c === ')') depth--;
+        else if (c === op && depth === 0){ res.push(cur); cur=''; continue; }
+      }
+      cur += c;
+    }
+    res.push(cur);
+    return res;
+  }
+
+  try {
+    for (let raw of lines){
+      let line = raw.replace(/\/\/.*$/, '').trim();
+      if (!line) continue;
+      if (!line.endsWith(';')) throw new Error(`missing ';' on: ${line}`);
+      line = line.slice(0, -1).trim();
+
+      let m;
+      // println / print
+      if ((m = line.match(/^System\.out\.(println|print)\s*\((.*)\)$/s))){
+        const arg = m[2].trim();
+        const val = arg === '' ? {type:'String',value:''} : evalExpr(arg);
+        out.push(toStr(val) + (m[1] === 'println' ? '\n' : ''));
+        continue;
+      }
+      // declaration: <type> name = expr
+      if ((m = line.match(/^(int|double|String|boolean|var|long|float)\s+([A-Za-z_$][\w$]*)\s*=\s*(.+)$/s))){
+        vars[m[2]] = evalExpr(m[3]);
+        continue;
+      }
+      // reassignment: name = expr
+      if ((m = line.match(/^([A-Za-z_$][\w$]*)\s*=\s*(.+)$/s))){
+        if (!(m[1] in vars)) throw new Error(`'${m[1]}' was not declared`);
+        vars[m[1]] = evalExpr(m[2]);
+        continue;
+      }
+      throw new Error(`don't know how to run: ${line}`);
+    }
+  } catch(e){
+    errored = e.message;
+  }
+  return { text: out.join(''), error: errored };
+}
+
+const outEl = $('out');
+$('runBtn').addEventListener('click', () => {
+  const res = runJava($('code').value);
+  let html = '';
+  if (res.text) html += escapeHtml(res.text);
+  if (res.error){
+    html += `<span class="err">\nError: ${escapeHtml(res.error)}</span>`;
+  }
+  if (!res.text && !res.error) html = '<span class="sys">// (no output)</span>';
+  outEl.innerHTML = html || '<span class="sys">// (no output)</span>';
+});
+$('clearBtn').addEventListener('click', () => {
+  outEl.innerHTML = '<span class="sys">// press Run to execute on the simulated JVM</span>';
+});
+</script>
+<script>
+/* PWA: service worker + install prompt */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('../sw.js').catch(()=>{}));
+}
+(function(){
+  let deferred = null;
+  const btn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; if (btn) btn.hidden = false; });
+  if (btn) btn.addEventListener('click', async () => { if (!deferred) return; btn.hidden = true; deferred.prompt(); await deferred.userChoice; deferred = null; });
+  window.addEventListener('appinstalled', () => { if (btn) btn.hidden = true; });
+})();
+</script>
+</body>
+</html>

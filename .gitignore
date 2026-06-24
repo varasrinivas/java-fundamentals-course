@@ -1,0 +1,32 @@
+# Claude Code local config (machine paths / permissions — not course content)
+.claude/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.vscode/
+.idea/
+
+# Node (the module generator lives outside this repo)
+node_modules/
+
+# Temp / build / test artifacts
+*.log
+*.tmp
+_icon.html
+*.png.tmp
+.playwright-mcp/
+scratchpad/
+
+# Secrets / credentials (defensive — none are committed)
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+**/credentials
+**/aws-exports.*
+**/*secret*.json
+**/*secrets*.json
