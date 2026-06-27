@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 45 — State</title>
+<title>Module 46 — Abstract Factory</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 45</span>
-      <span class="title">State<small>Java for Developers · Track 6: Design Patterns</small></span>
+      <span class="badge">MODULE 46</span>
+      <span class="title">Abstract Factory<small>Java for Developers · Track 7: More Design Patterns</small></span>
     </div>
-    <div class="links"><a href="module-44-template-method.html">‹ Prev</a><a href="module-46-abstract-factory.html">Next ›</a></div>
+    <div class="links"><a href="module-45-state.html">‹ Prev</a><a href="module-47-prototype.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,25 +147,24 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>Behavior that <span class="grad">changes with the mode</span></h1>
-    <p class="lede">Real-world picture: a traffic light. Green lets you go, yellow says slow down, red stops you — the same light behaves completely differently depending on its current state, and it follows fixed transitions. The State pattern lets an object change its behavior when its internal state changes, as if it changed class.</p>
+    <h1>A factory for <span class="grad">matching families</span></h1>
+    <p class="lede">Real-world picture: a furniture showroom. Order from the “Victorian” catalogue and the sofa, chair, and table all match. Order “Modern” and you get a different matching set. Abstract Factory creates whole families of related objects that are guaranteed to go together — without naming their concrete classes.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>Each state is its own object</h2>
-    <p>The naive version is a giant <span class='key'>switch(status)</span> repeated in every method — brittle and sprawling. The <strong>State</strong> pattern makes each state a class implementing a shared interface; the context delegates behavior to its current state object, and states decide the transitions.</p><pre class="code" data-src="interface LightState { LightState next(); }
-class Green  implements LightState { public LightState next(){ return new Yellow(); } }
-class Yellow implements LightState { public LightState next(){ return new Red(); } }
-class Red    implements LightState { public LightState next(){ return new Green(); } }
+    <h2>One factory, a coordinated set of products</h2>
+    <p>Factory Method (module 35) makes one product. Abstract Factory makes a <em>family</em>. You define a factory interface with several create-methods, and each concrete factory produces a matching set. Classic use: UI toolkits where every widget must match the OS look.</p><pre class="code" data-src="interface GUIFactory { Button button(); Checkbox checkbox(); }
+class MacFactory implements GUIFactory {
+    public Button button(){ return new MacButton(); }
+    public Checkbox checkbox(){ return new MacCheckbox(); }   // matches the button
+}
 
-class TrafficLight {
-    private LightState state = new Green();
-    void change(){ state = state.next(); }   // behavior + transition delegated
-}"></pre><p>State turns tangled conditionals into small, focused classes and makes the legal transitions explicit. You’ll meet it in workflow engines (draft → review → published), vending machines, TCP connection states, and game character modes.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: TrafficLight then state field then Green/Yellow/Red then change() then next state"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">TrafficLight</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">context</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">state field</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">current state</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Green/Yellow/Red</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">state classes</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">change()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">delegates</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">next state</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">transition</text></g></svg></div>
+GUIFactory f = onMac ? new MacFactory() : new WinFactory();
+Button b = f.button();        // guaranteed to match f.checkbox()"></pre><p>Pick the factory once and the whole app produces a consistent family — no risk of a Mac button next to a Windows checkbox. The trade-off: adding a new <em>product</em> means changing every factory. Reach for it when products come in interchangeable, themed sets.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: pick factory then button() then checkbox() then same family then swap factory"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">pick factory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">Mac / Win</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">button()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">product 1</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">checkbox()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">product 2</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">same family</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">they match</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">swap factory</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">new family</text></g></svg></div>
     
   </div>
 </section>
@@ -173,9 +172,9 @@ class TrafficLight {
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>Same object, shifting behavior</h2>
-    <p>Step through how delegating to a state object replaces a sprawling status switch.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: TrafficLight then state field then Green/Yellow/Red then change() then next state"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">TrafficLight</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">context</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">state field</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">current state</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Green/Yellow/Red</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">state classes</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">change()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">delegates</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">next state</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">transition</text></g></svg></div>
+    <h2>Build a matching set</h2>
+    <p>Step through how one chosen factory hands you a family of products that are guaranteed to fit together.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: pick factory then button() then checkbox() then same family then swap factory"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">pick factory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">Mac / Win</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">button()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">product 1</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">checkbox()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">product 2</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">same family</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">they match</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">swap factory</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">new family</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -183,26 +182,25 @@ class TrafficLight {
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">An object should behave differently depending on its mode.</div>
+    <div class="caption" id="caption" aria-live="polite">You need a set of UI widgets that all match one OS theme.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>A traffic light cycle</h2>
-    <p>Each state has its own duration; together they form one cycle. Model the totals.</p>
+    <h2>One family, all matching</h2>
+    <p>Products from one factory share a style id. Model the “they all match” guarantee.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">State.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// Each state behaves differently (durations in seconds)
-int greenTime  = 30;
-int yellowTime = 5;
-int redTime    = 25;
-int fullCycle = greenTime + yellowTime + redTime;
-System.out.println("green/yellow/red = " + greenTime + "/" + yellowTime + "/" + redTime);
-System.out.println("full cycle = " + fullCycle + "s");
-System.out.println("same object, behavior set by its state.");</textarea>
+        <label class="editor-label" for="code">AbstractFactory.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// A Modern factory (style 2) makes a matching set
+int sofa  = 2;     // 2 = Modern
+int chair = 2;     // same factory -&gt; same style
+int table = 2;
+System.out.println("sofa/chair/table style = " + sofa + "/" + chair + "/" + table);
+System.out.println("all match (one family)? " + (sofa == chair));
+System.out.println("Switch factory -&gt; a whole new matching set.");</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -220,9 +218,9 @@ System.out.println("same object, behavior set by its state.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Often done by swapping a state object, or with a dict mapping state → handler function. Enums plus a transition table are a common lightweight version; the OO State pattern is the same idea as classes.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>Finite-state-machine libraries (e.g. XState) formalize this, but a plain object whose methods are swapped per state captures it. Replaces the dreaded <span class='key'>switch(status)</span> sprawl just like in Java.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Identical pattern — a state interface with one class per state and a context that delegates. Workflow and game frameworks in .NET use it heavily, same as Java’s workflow engines.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Often a factory class (or even a module) whose functions return a matching set — duck typing removes the interface ceremony. The “pick one provider, get a consistent family” idea is identical.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>A factory object whose methods return matching parts (e.g. a theme object that builds matching components). No <span class='key'>interface</span> keyword, same coordination guarantee.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Nearly identical; DI containers frequently act as abstract factories, resolving a coordinated set of services for one configuration.</p></div>
   </div>
 </section>
 
@@ -230,13 +228,13 @@ System.out.println("same object, behavior set by its state.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; What smell does it fix?</h3><p class="prompt">You see the same <span class='key'>switch(status)</span> copy-pasted across five methods. Why is State a good remedy?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">That duplicated conditional is the smell. State moves each branch into its own class, so behavior for a status lives in one place and the methods just delegate. Adding a status becomes adding a class, not editing five switches.</div></details></div>
-      <div class="exercise"><h3>2 &middot; State vs Strategy</h3><p class="prompt">State and Strategy have the same class diagram. What’s the key difference in how the object changes?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">In <b>Strategy</b>, the client picks the algorithm and it usually stays put. In <b>State</b>, the object <b>transitions itself</b> between states over time (often the states decide the next state), changing its own behavior as it runs.</div></details></div>
+      <div class="exercise"><h3>1 &middot; Factory Method vs Abstract Factory</h3><p class="prompt">What’s the core difference between Factory Method (35) and Abstract Factory?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Factory Method creates <b>one</b> product via a single overridable method. Abstract Factory creates a <b>family</b> of related products via an object with several create-methods, guaranteeing the products match each other.</div></details></div>
+      <div class="exercise"><h3>2 &middot; The trade-off</h3><p class="prompt">Adding a new product type (say a <span class='key'>Slider</span>) to an Abstract Factory is painful. Why?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Every concrete factory must implement the new <span class='key'>slider()</span> method, so you touch them all. Abstract Factory makes adding a new <em>family</em> easy but adding a new <em>product</em> hard — the opposite of what you might expect.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 45 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Abstract Factory</span></div>
+  <div class="wrap">Module 46 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Prototype</span></div>
 </footer>
 
 <script>
@@ -262,7 +260,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"An object should behave differently depending on its mode."},{"lit":["a-0"],"caption":"The <b>TrafficLight</b> (context) holds a current state object."},{"lit":["a-0","a-1","b-0"],"caption":"Each state — <b>Green, Yellow, Red</b> — is its own class."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"Behavior is <b>delegated</b> to whichever state is current."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"<span class=\"key\">change()</span> asks the state for the <b>next</b> one."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"The object <b>transitions</b> — no giant if/else on a status flag."}];
+const STEPS = [{"lit":[],"caption":"You need a set of UI widgets that all match one OS theme."},{"lit":["a-0"],"caption":"Pick one concrete factory — <b>MacFactory</b> or WinFactory."},{"lit":["a-0","a-1","b-0"],"caption":"Ask it for a button — you get a <b>Mac button</b>."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"Ask the <b>same factory</b> for a checkbox — a Mac checkbox."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"Every product from one factory belongs to one <b>matching family</b>."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"Swap the factory and the <b>whole family</b> changes consistently."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');

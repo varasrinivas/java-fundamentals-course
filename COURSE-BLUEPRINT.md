@@ -79,6 +79,21 @@ system, tooling, idioms, and the reasons behind them.
 | 44 | template-method  | Template Method                    | ✅ built |
 | 45 | state            | State                              | ✅ built |
 
+### Track 7 — More Design Patterns (the rest of the GoF)
+| #  | Slug             | Title                              | Status |
+|----|------------------|------------------------------------|--------|
+| 46 | abstract-factory | Abstract Factory                   | ✅ built |
+| 47 | prototype        | Prototype                          | ✅ built |
+| 48 | bridge           | Bridge                             | ✅ built |
+| 49 | composite        | Composite                          | ✅ built |
+| 50 | flyweight        | Flyweight                          | ✅ built |
+| 51 | chain-of-responsibility | Chain of Responsibility     | ✅ built |
+| 52 | iterator         | Iterator                           | ✅ built |
+| 53 | mediator         | Mediator                           | ✅ built |
+| 54 | memento          | Memento                            | ✅ built |
+| 55 | visitor          | Visitor                            | ✅ built |
+| 56 | interpreter      | Interpreter                        | ✅ built |
+
 ## Design System (canonical — keep in sync with CLAUDE.md tokens)
 
 **Palette** — deep indigo surfaces, high-contrast text, five accents used semantically:

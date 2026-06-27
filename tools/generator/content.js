@@ -49,6 +49,17 @@ const NAV = [
   { num:'43', slug:'command',               title:'Command' },
   { num:'44', slug:'template-method',       title:'Template Method' },
   { num:'45', slug:'state',                 title:'State' },
+  { num:'46', slug:'abstract-factory',      title:'Abstract Factory' },
+  { num:'47', slug:'prototype',             title:'Prototype' },
+  { num:'48', slug:'bridge',                title:'Bridge' },
+  { num:'49', slug:'composite',             title:'Composite' },
+  { num:'50', slug:'flyweight',             title:'Flyweight' },
+  { num:'51', slug:'chain-of-responsibility',title:'Chain of Responsibility' },
+  { num:'52', slug:'iterator',              title:'Iterator' },
+  { num:'53', slug:'mediator',              title:'Mediator' },
+  { num:'54', slug:'memento',               title:'Memento' },
+  { num:'55', slug:'visitor',               title:'Visitor' },
+  { num:'56', slug:'interpreter',           title:'Interpreter' },
 ];
 
 const T1 = 'Track 1: The Machine', T2 = 'Track 2: The Language', T3 = 'Track 3: Modern Java', T4 = 'Track 4: The Ecosystem', T5 = 'Track 5: Real-World Java';
@@ -1058,5 +1069,6 @@ CONTENT['33'] = {
 
 Object.assign(CONTENT, require('./content-oop').MODS);
 Object.assign(CONTENT, require('./content-patterns').MODS);
+Object.assign(CONTENT, require('./content-patterns2').MODS);
 
 module.exports = { NAV, CONTENT };

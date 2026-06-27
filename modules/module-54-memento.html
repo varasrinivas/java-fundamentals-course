@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 45 — State</title>
+<title>Module 54 — Memento</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 45</span>
-      <span class="title">State<small>Java for Developers · Track 6: Design Patterns</small></span>
+      <span class="badge">MODULE 54</span>
+      <span class="title">Memento<small>Java for Developers · Track 7: More Design Patterns</small></span>
     </div>
-    <div class="links"><a href="module-44-template-method.html">‹ Prev</a><a href="module-46-abstract-factory.html">Next ›</a></div>
+    <div class="links"><a href="module-53-mediator.html">‹ Prev</a><a href="module-55-visitor.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,25 +147,26 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>Behavior that <span class="grad">changes with the mode</span></h1>
-    <p class="lede">Real-world picture: a traffic light. Green lets you go, yellow says slow down, red stops you — the same light behaves completely differently depending on its current state, and it follows fixed transitions. The State pattern lets an object change its behavior when its internal state changes, as if it changed class.</p>
+    <h1>Save a snapshot, <span class="grad">roll back later</span></h1>
+    <p class="lede">Real-world picture: a save point in a video game. Before the boss fight you save; if it goes badly, you reload exactly where you were. Memento captures an object’s state so you can restore it later — the machinery behind undo and checkpoints.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>Each state is its own object</h2>
-    <p>The naive version is a giant <span class='key'>switch(status)</span> repeated in every method — brittle and sprawling. The <strong>State</strong> pattern makes each state a class implementing a shared interface; the context delegates behavior to its current state object, and states decide the transitions.</p><pre class="code" data-src="interface LightState { LightState next(); }
-class Green  implements LightState { public LightState next(){ return new Yellow(); } }
-class Yellow implements LightState { public LightState next(){ return new Red(); } }
-class Red    implements LightState { public LightState next(){ return new Green(); } }
+    <h2>Capture state without breaking encapsulation</h2>
+    <p>You want to snapshot an object’s state and restore it later, but without exposing its private fields to the outside world. The object itself creates a <strong>memento</strong> (an opaque snapshot) and can restore from one. A <em>caretaker</em> holds mementos but can’t read inside them.</p><pre class="code" data-src="class Editor {
+    private String text = &quot;&quot;;
+    Memento save(){ return new Memento(text); }         // snapshot self
+    void restore(Memento m){ this.text = m.state(); }    // roll back
+}
+record Memento(String state) {}     // opaque saved state
 
-class TrafficLight {
-    private LightState state = new Green();
-    void change(){ state = state.next(); }   // behavior + transition delegated
-}"></pre><p>State turns tangled conditionals into small, focused classes and makes the legal transitions explicit. You’ll meet it in workflow engines (draft → review → published), vending machines, TCP connection states, and game character modes.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: TrafficLight then state field then Green/Yellow/Red then change() then next state"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">TrafficLight</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">context</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">state field</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">current state</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Green/Yellow/Red</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">state classes</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">change()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">delegates</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">next state</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">transition</text></g></svg></div>
+Memento checkpoint = editor.save();
+editor.type(&quot;oops&quot;);
+editor.restore(checkpoint);          // undo back to the snapshot"></pre><p>Push mementos onto a stack and you have multi-level undo (pair it with Command, module 43, for redo). The cost is memory — full snapshots of large state add up — so real editors often store <em>diffs</em> instead of complete copies.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: object state then save() then memento then change on then restore()"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">object state</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">now</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">save()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">snapshot</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">memento</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">opaque copy</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">change on</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">mutate freely</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">restore()</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">roll back</text></g></svg></div>
     
   </div>
 </section>
@@ -173,9 +174,9 @@ class TrafficLight {
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>Same object, shifting behavior</h2>
-    <p>Step through how delegating to a state object replaces a sprawling status switch.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: TrafficLight then state field then Green/Yellow/Red then change() then next state"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">TrafficLight</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">context</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">state field</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">current state</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Green/Yellow/Red</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">state classes</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">change()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">delegates</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">next state</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">transition</text></g></svg></div>
+    <h2>Snapshot, change, restore</h2>
+    <p>Step through capturing state and rolling back to it — the core of undo.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: object state then save() then memento then change on then restore()"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">object state</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">now</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">save()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">snapshot</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">memento</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">opaque copy</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">change on</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">mutate freely</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">restore()</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">roll back</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -183,26 +184,26 @@ class TrafficLight {
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">An object should behave differently depending on its mode.</div>
+    <div class="caption" id="caption" aria-live="polite">You want to undo: capture a state now and return to it later.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>A traffic light cycle</h2>
-    <p>Each state has its own duration; together they form one cycle. Model the totals.</p>
+    <h2>Undo to the snapshot</h2>
+    <p>Save a value, change it, then restore. Model the round-trip back to the snapshot.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">State.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// Each state behaves differently (durations in seconds)
-int greenTime  = 30;
-int yellowTime = 5;
-int redTime    = 25;
-int fullCycle = greenTime + yellowTime + redTime;
-System.out.println("green/yellow/red = " + greenTime + "/" + yellowTime + "/" + redTime);
-System.out.println("full cycle = " + fullCycle + "s");
-System.out.println("same object, behavior set by its state.");</textarea>
+        <label class="editor-label" for="code">Memento.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// Save a snapshot, change state, then restore it
+int score = 100;
+int saved = score;     // memento captures the state
+score = 250;           // play on...
+score = saved;         // restore from the memento
+System.out.println("saved snapshot = " + saved);
+System.out.println("after restore  = " + score);
+System.out.println("back to saved? " + (score == saved));</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -220,9 +221,9 @@ System.out.println("same object, behavior set by its state.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Often done by swapping a state object, or with a dict mapping state → handler function. Enums plus a transition table are a common lightweight version; the OO State pattern is the same idea as classes.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>Finite-state-machine libraries (e.g. XState) formalize this, but a plain object whose methods are swapped per state captures it. Replaces the dreaded <span class='key'>switch(status)</span> sprawl just like in Java.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Identical pattern — a state interface with one class per state and a context that delegates. Workflow and game frameworks in .NET use it heavily, same as Java’s workflow engines.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Copy state into a snapshot (a dict, a dataclass, or via <span class='key'>copy.deepcopy</span>); <span class='key'>pickle</span> serializes deep state. The opaque-snapshot idea maps directly.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p><span class='key'>structuredClone</span> or spread snapshots capture state; Redux stores a history of states for time-travel debugging — Memento at scale.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Capture state in a <span class='key'>record</span> (immutable snapshot) or serialize for deep copies. Same caretaker/originator split.</p></div>
   </div>
 </section>
 
@@ -230,13 +231,13 @@ System.out.println("same object, behavior set by its state.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; What smell does it fix?</h3><p class="prompt">You see the same <span class='key'>switch(status)</span> copy-pasted across five methods. Why is State a good remedy?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">That duplicated conditional is the smell. State moves each branch into its own class, so behavior for a status lives in one place and the methods just delegate. Adding a status becomes adding a class, not editing five switches.</div></details></div>
-      <div class="exercise"><h3>2 &middot; State vs Strategy</h3><p class="prompt">State and Strategy have the same class diagram. What’s the key difference in how the object changes?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">In <b>Strategy</b>, the client picks the algorithm and it usually stays put. In <b>State</b>, the object <b>transitions itself</b> between states over time (often the states decide the next state), changing its own behavior as it runs.</div></details></div>
+      <div class="exercise"><h3>1 &middot; Who can read the memento?</h3><p class="prompt">Why should the caretaker (e.g. an undo-history list) NOT be able to read a memento’s contents?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">To preserve <b>encapsulation</b> — only the originating object should understand and use its own saved state. The caretaker just stores and returns mementos; if it could read/modify them it would couple to the object’s internals.</div></details></div>
+      <div class="exercise"><h3>2 &middot; The memory cost</h3><p class="prompt">Full-snapshot undo on a large document gets expensive. What’s a common optimization?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Store <b>diffs/deltas</b> (just what changed) instead of complete copies, or limit history depth. Reconstruct a past state by applying/reversing the recorded changes rather than keeping every full snapshot.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 45 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Abstract Factory</span></div>
+  <div class="wrap">Module 54 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Visitor</span></div>
 </footer>
 
 <script>
@@ -262,7 +263,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"An object should behave differently depending on its mode."},{"lit":["a-0"],"caption":"The <b>TrafficLight</b> (context) holds a current state object."},{"lit":["a-0","a-1","b-0"],"caption":"Each state — <b>Green, Yellow, Red</b> — is its own class."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"Behavior is <b>delegated</b> to whichever state is current."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"<span class=\"key\">change()</span> asks the state for the <b>next</b> one."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"The object <b>transitions</b> — no giant if/else on a status flag."}];
+const STEPS = [{"lit":[],"caption":"You want to undo: capture a state now and return to it later."},{"lit":["a-0"],"caption":"The object’s <b>current state</b> is what we’ll snapshot."},{"lit":["a-0","a-1","b-0"],"caption":"<span class=\"key\">save()</span> produces a <b>memento</b> — a snapshot."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"The memento holds the state <b>opaquely</b> (the caretaker can’t peek inside)."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"The object keeps <b>changing</b> afterwards."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"<span class=\"key\">restore(memento)</span> <b>rolls it back</b> to the saved snapshot."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');

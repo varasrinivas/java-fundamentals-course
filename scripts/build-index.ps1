@@ -66,6 +66,19 @@ $tracks = [ordered]@{
     @{ n="44"; slug="template-method";       t="Template Method" },
     @{ n="45"; slug="state";                 t="State" }
   )
+  "Track 7 — More Design Patterns" = @(
+    @{ n="46"; slug="abstract-factory";        t="Abstract Factory" },
+    @{ n="47"; slug="prototype";               t="Prototype" },
+    @{ n="48"; slug="bridge";                  t="Bridge" },
+    @{ n="49"; slug="composite";               t="Composite" },
+    @{ n="50"; slug="flyweight";               t="Flyweight" },
+    @{ n="51"; slug="chain-of-responsibility"; t="Chain of Responsibility" },
+    @{ n="52"; slug="iterator";                t="Iterator" },
+    @{ n="53"; slug="mediator";                t="Mediator" },
+    @{ n="54"; slug="memento";                 t="Memento" },
+    @{ n="55"; slug="visitor";                 t="Visitor" },
+    @{ n="56"; slug="interpreter";             t="Interpreter" }
+  )
 }
 
 function ModuleExists($n, $slug) {

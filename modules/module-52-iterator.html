@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 45 — State</title>
+<title>Module 52 — Iterator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 45</span>
-      <span class="title">State<small>Java for Developers · Track 6: Design Patterns</small></span>
+      <span class="badge">MODULE 52</span>
+      <span class="title">Iterator<small>Java for Developers · Track 7: More Design Patterns</small></span>
     </div>
-    <div class="links"><a href="module-44-template-method.html">‹ Prev</a><a href="module-46-abstract-factory.html">Next ›</a></div>
+    <div class="links"><a href="module-51-chain-of-responsibility.html">‹ Prev</a><a href="module-53-mediator.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,25 +147,24 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>Behavior that <span class="grad">changes with the mode</span></h1>
-    <p class="lede">Real-world picture: a traffic light. Green lets you go, yellow says slow down, red stops you — the same light behaves completely differently depending on its current state, and it follows fixed transitions. The State pattern lets an object change its behavior when its internal state changes, as if it changed class.</p>
+    <h1>Walk a collection <span class="grad">without peeking inside</span></h1>
+    <p class="lede">Real-world picture: pressing “next” on a music playlist. You move song by song without knowing or caring whether the playlist is stored as an array, a linked list, or shuffled on the fly. Iterator gives a standard way to traverse a collection without exposing how it’s built.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>Each state is its own object</h2>
-    <p>The naive version is a giant <span class='key'>switch(status)</span> repeated in every method — brittle and sprawling. The <strong>State</strong> pattern makes each state a class implementing a shared interface; the context delegates behavior to its current state object, and states decide the transitions.</p><pre class="code" data-src="interface LightState { LightState next(); }
-class Green  implements LightState { public LightState next(){ return new Yellow(); } }
-class Yellow implements LightState { public LightState next(){ return new Red(); } }
-class Red    implements LightState { public LightState next(){ return new Green(); } }
+    <h2>A cursor with hasNext() and next()</h2>
+    <p>An <strong>iterator</strong> is a little cursor object that knows how to walk one collection. Callers ask <span class='key'>hasNext()</span> and <span class='key'>next()</span> and never touch the underlying array or tree. Java builds this in: implement <span class='key'>Iterable</span> and your type works with the for-each loop.</p><pre class="code" data-src="List&lt;String&gt; names = List.of(&quot;Ada&quot;, &quot;Alan&quot;, &quot;Grace&quot;);
+Iterator&lt;String&gt; it = names.iterator();
+while (it.hasNext()) {
+    String n = it.next();     // advance without touching internal storage
+}
 
-class TrafficLight {
-    private LightState state = new Green();
-    void change(){ state = state.next(); }   // behavior + transition delegated
-}"></pre><p>State turns tangled conditionals into small, focused classes and makes the legal transitions explicit. You’ll meet it in workflow engines (draft → review → published), vending machines, TCP connection states, and game character modes.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: TrafficLight then state field then Green/Yellow/Red then change() then next state"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">TrafficLight</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">context</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">state field</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">current state</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Green/Yellow/Red</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">state classes</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">change()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">delegates</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">next state</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">transition</text></g></svg></div>
+// for-each is just sugar over the iterator:
+for (String n : names) { /* ... */ }"></pre><p>Because the traversal is decoupled from the structure, the same loop works over an <span class='key'>ArrayList</span>, a <span class='key'>HashSet</span>, or your own custom tree. You can even have multiple independent iterators over one collection, and lazy iterators that compute items on demand (the spirit of Streams, module 21).</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: iterator() then hasNext() then next() then repeat then done"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">iterator()</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get a cursor</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">hasNext()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">more?</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">next()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">one item</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">repeat</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">walk along</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">done</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">internals hidden</text></g></svg></div>
     
   </div>
 </section>
@@ -173,9 +172,9 @@ class TrafficLight {
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>Same object, shifting behavior</h2>
-    <p>Step through how delegating to a state object replaces a sprawling status switch.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: TrafficLight then state field then Green/Yellow/Red then change() then next state"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">TrafficLight</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">context</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">state field</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">current state</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Green/Yellow/Red</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">state classes</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">change()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">delegates</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">next state</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">transition</text></g></svg></div>
+    <h2>Step a cursor through the items</h2>
+    <p>Step through a traversal that never reveals whether the collection is an array or a tree.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: iterator() then hasNext() then next() then repeat then done"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">iterator()</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get a cursor</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">hasNext()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">more?</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">next()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">one item</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">repeat</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">walk along</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">done</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">internals hidden</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -183,26 +182,28 @@ class TrafficLight {
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">An object should behave differently depending on its mode.</div>
+    <div class="caption" id="caption" aria-live="polite">You want to walk a collection without knowing its internal structure.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>A traffic light cycle</h2>
-    <p>Each state has its own duration; together they form one cycle. Model the totals.</p>
+    <h2>Traverse to the end</h2>
+    <p>Each next() advances the cursor one step. Model visiting every item.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">State.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// Each state behaves differently (durations in seconds)
-int greenTime  = 30;
-int yellowTime = 5;
-int redTime    = 25;
-int fullCycle = greenTime + yellowTime + redTime;
-System.out.println("green/yellow/red = " + greenTime + "/" + yellowTime + "/" + redTime);
-System.out.println("full cycle = " + fullCycle + "s");
-System.out.println("same object, behavior set by its state.");</textarea>
+        <label class="editor-label" for="code">Iterator.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// Step through items with next(), without knowing the structure
+int items   = 4;
+int visited = 0;
+visited = visited + 1;   // next()
+visited = visited + 1;
+visited = visited + 1;
+visited = visited + 1;
+System.out.println("items = " + items);
+System.out.println("visited via next() = " + visited);
+System.out.println("traversed all? " + (visited == items));</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -220,9 +221,9 @@ System.out.println("same object, behavior set by its state.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Often done by swapping a state object, or with a dict mapping state → handler function. Enums plus a transition table are a common lightweight version; the OO State pattern is the same idea as classes.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>Finite-state-machine libraries (e.g. XState) formalize this, but a plain object whose methods are swapped per state captures it. Replaces the dreaded <span class='key'>switch(status)</span> sprawl just like in Java.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Identical pattern — a state interface with one class per state and a context that delegates. Workflow and game frameworks in .NET use it heavily, same as Java’s workflow engines.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>First-class in the language: <span class='key'>__iter__</span>/<span class='key'>__next__</span>, and <b>generators</b> (<span class='key'>yield</span>) make lazy iterators trivial. <span class='key'>for x in coll</span> is the same as Java’s for-each over an Iterable.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p><span class='key'>Symbol.iterator</span> + generators give the same protocol, consumed by <span class='key'>for...of</span>. Implement the iterator protocol and your object works everywhere arrays do.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p><span class='key'>IEnumerable&lt;T&gt;</span>/<span class='key'>IEnumerator&lt;T&gt;</span> with <span class='key'>yield return</span> for lazy iterators, consumed by <span class='key'>foreach</span> — a near-exact mirror of Java’s Iterable/Iterator.</p></div>
   </div>
 </section>
 
@@ -230,13 +231,13 @@ System.out.println("same object, behavior set by its state.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; What smell does it fix?</h3><p class="prompt">You see the same <span class='key'>switch(status)</span> copy-pasted across five methods. Why is State a good remedy?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">That duplicated conditional is the smell. State moves each branch into its own class, so behavior for a status lives in one place and the methods just delegate. Adding a status becomes adding a class, not editing five switches.</div></details></div>
-      <div class="exercise"><h3>2 &middot; State vs Strategy</h3><p class="prompt">State and Strategy have the same class diagram. What’s the key difference in how the object changes?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">In <b>Strategy</b>, the client picks the algorithm and it usually stays put. In <b>State</b>, the object <b>transitions itself</b> between states over time (often the states decide the next state), changing its own behavior as it runs.</div></details></div>
+      <div class="exercise"><h3>1 &middot; Why hide the structure?</h3><p class="prompt">How does returning an Iterator let a library switch a collection from an array to a tree without breaking callers?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Callers only use <span class='key'>hasNext()</span>/<span class='key'>next()</span>, never the internal storage. As long as the new structure provides an iterator, the same loops keep working — the traversal is decoupled from the representation.</div></details></div>
+      <div class="exercise"><h3>2 &middot; Concurrent modification</h3><p class="prompt">You remove from a list while iterating it with for-each and get a <span class='key'>ConcurrentModificationException</span>. Why, and the fix?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The iterator detects the list changed underneath it. Use the iterator’s own <span class='key'>it.remove()</span>, or collect items to remove and delete them after the loop (or use <span class='key'>removeIf</span>).</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 45 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Abstract Factory</span></div>
+  <div class="wrap">Module 52 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Mediator</span></div>
 </footer>
 
 <script>
@@ -262,7 +263,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"An object should behave differently depending on its mode."},{"lit":["a-0"],"caption":"The <b>TrafficLight</b> (context) holds a current state object."},{"lit":["a-0","a-1","b-0"],"caption":"Each state — <b>Green, Yellow, Red</b> — is its own class."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"Behavior is <b>delegated</b> to whichever state is current."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"<span class=\"key\">change()</span> asks the state for the <b>next</b> one."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"The object <b>transitions</b> — no giant if/else on a status flag."}];
+const STEPS = [{"lit":[],"caption":"You want to walk a collection without knowing its internal structure."},{"lit":["a-0"],"caption":"Ask the collection for an <b>iterator</b> (a cursor)."},{"lit":["a-0","a-1","b-0"],"caption":"<span class=\"key\">hasNext()</span> asks whether <b>more items</b> remain."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"<span class=\"key\">next()</span> returns the current item and <b>advances</b>."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"<b>Repeat</b> until you’ve walked them all."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"The collection’s <b>internal structure stayed hidden</b> the whole time."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');

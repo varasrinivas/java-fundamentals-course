@@ -7,7 +7,7 @@ the *reasons* Java does things the way it does.
 **▶ Live:** https://learnings.varasrinivas.com/java-fundamentals-course/ — installable as an offline app (PWA).
 
 ## Highlights
-- **45 modules** across 6 tracks, from the JVM to design patterns.
+- **56 modules** across 7 tracks, from the JVM to the complete Gang of Four design patterns.
 - **Standalone HTML** — every module is one self-contained file. No build step, no bundler, fully offline.
 - **Interactive** — each module has an animated step-through (play / pause / step / reset), a runnable
   playground backed by a tiny in-browser Java simulator, and a custom syntax highlighter.
@@ -24,6 +24,7 @@ the *reasons* Java does things the way it does.
 | 4 · The Ecosystem | Build Tools · Testing |
 | 5 · Real-World Java | Spring & DI · Persistence (JDBC/JPA) · JSON (Jackson) · HTTP Client · Logging |
 | 6 · Design Patterns | Singleton · Factory Method · Builder · Adapter · Decorator · Facade · Proxy · Strategy · Observer · Command · Template Method · State |
+| 7 · More Design Patterns | Abstract Factory · Prototype · Bridge · Composite · Flyweight · Chain of Responsibility · Iterator · Mediator · Memento · Visitor · Interpreter |
 
 See [COURSE-BLUEPRINT.md](COURSE-BLUEPRINT.md) for the full index and design system.
 
