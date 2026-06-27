@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 09 — Packages & Access Control</title>
+<title>Module 26 — Threads, Executors & Virtual Threads</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 09</span>
-      <span class="title">Packages<small>Java for Developers · Track 2: The Language</small></span>
+      <span class="badge">MODULE 26</span>
+      <span class="title">Concurrency<small>Java for Developers · Track 3: Modern Java</small></span>
     </div>
-    <div class="links"><a href="module-08-enums.html">‹ Prev</a><a href="module-10-strings.html">Next ›</a></div>
+    <div class="links"><a href="module-25-annotations-reflection.html">‹ Prev</a><a href="module-27-build-tools.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,24 +147,26 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>Who can <span class="grad">see</span> your code</h1>
-    <p class="lede">Packages give every Java type a globally unique name and a unit of encapsulation. The four access levels — public, protected, package-private, private — decide who may touch what. Get them right and your API surface stays small on purpose.</p>
+    <h1>Don’t manage threads — <span class="grad">submit tasks</span></h1>
+    <p class="lede">Raw threads are expensive and easy to leak. Modern Java hands you an executor: submit a task, get a Future. And Java 21's virtual threads make it cheap to run millions of blocking tasks at once — rewriting the rules for server code.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>Four levels, from wide open to sealed shut</h2>
-    <p>A <span class='key'>package</span> is a namespace, mirrored by folders: <span class='key'>com.acme.billing.Invoice</span> lives in <span class='key'>com/acme/billing/Invoice.java</span>. Within and across packages, four modifiers gate access:</p><pre class="code" data-src="package com.acme.billing;
+    <h2>Tasks go to a pool; you get a Future</h2>
+    <p>Instead of <span class='key'>new Thread(...).start()</span>, you submit a task to an <strong>ExecutorService</strong> that owns a pool of worker threads. You get back a <span class='key'>Future</span> — a handle to the eventual result. The pool reuses threads, so you're not paying to create one per task.</p><pre class="code" data-src="try (var pool = Executors.newFixedThreadPool(2)) {
+    Future&lt;Integer&gt; f = pool.submit(() -&gt; expensive());
+    Integer result = f.get();     // blocks until ready
+}
 
-public class Invoice {       // visible everywhere
-    public int id;            // any code, any package
-    protected int draftNo;    // subclasses + same package
-    int internalCode;         // package-private (no keyword)
-    private int secret;       // this class only
-}"></pre><p>The default — <strong>no modifier</strong> — is <em>package-private</em>, not public; it's Java's quiet encouragement to keep things internal. Make fields <span class='key'>private</span> and expose behavior through methods. The newer <strong>module system</strong> (JPMS, <span class='key'>module-info.java</span>) adds a layer above packages, letting a jar declare which packages it <span class='key'>exports</span>.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: private then package-private then protected then public then exports"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">private</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">this class</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">package-private</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">same package</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">protected</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">+ subclasses</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">public</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">everyone</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">exports</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">module level</text></g></svg></div>
+// Java 21: a thread per task, cheaply
+try (var vt = Executors.newVirtualThreadPerTaskExecutor()) {
+    for (int i = 0; i &lt; 1_000_000; i++)
+        vt.submit(() -&gt; handle(request));   // millions, fine
+}"></pre><p><strong>Virtual threads</strong> are lightweight threads scheduled by the JVM onto a few OS threads. A blocking call (I/O, <span class='key'>sleep</span>) parks the virtual thread without tying up an OS thread — so the simple blocking style scales to massive concurrency.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: submit task then work queue then executor then run then Future"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">submit task</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">Runnable</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">work queue</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">buffered</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">executor</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">thread pool</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">run</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">on a worker</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">Future</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">result</text></g></svg></div>
     
   </div>
 </section>
@@ -172,9 +174,9 @@ public class Invoice {       // visible everywhere
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>Widening the circle of access</h2>
-    <p>Step outward from the most private to the most public, seeing exactly who gains visibility at each level.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: private then package-private then protected then public then exports"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">private</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">this class</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">package-private</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">same package</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">protected</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">+ subclasses</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">public</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">everyone</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">exports</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">module level</text></g></svg></div>
+    <h2>A task’s journey through an executor</h2>
+    <p>Submit a task and follow it into the pool and back out as a Future. Then imagine a million of them on virtual threads.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: submit task then work queue then executor then run then Future"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">submit task</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">Runnable</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">work queue</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">buffered</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">executor</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">thread pool</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">run</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">on a worker</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">Future</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">result</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -182,25 +184,24 @@ public class Invoice {       // visible everywhere
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">We have a field and want to decide who may access it.</div>
+    <div class="caption" id="caption" aria-live="polite">You have a unit of work — a <span class="key">Runnable</span> or <span class="key">Callable</span> — to run off the main thread.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>Rank the access levels</h2>
-    <p>Model each access level as a “reach” score — how widely the member is visible — from 1 (private) to 4 (public).</p>
+    <h2>Tasks, threads, and rounds</h2>
+    <p>A back-of-envelope model: how many sequential rounds a fixed pool needs for a batch of tasks.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">Access.java</label>
-        <textarea class="editor" id="code" spellcheck="false">int privateReach        = 1;   // this class only
-int packagePrivateReach = 2;   // same package (the default)
-int protectedReach      = 3;   // + subclasses elsewhere
-int publicReach         = 4;   // anywhere
-System.out.println("public wider than private? " + (publicReach &gt; privateReach));
-System.out.println("default level (no keyword) reach = " + packagePrivateReach);
-System.out.println("Narrowest that still works is best.");</textarea>
+        <label class="editor-label" for="code">Pool.java</label>
+        <textarea class="editor" id="code" spellcheck="false">int tasks   = 4;
+int threads = 2;
+int rounds  = tasks / threads;
+System.out.println(tasks + " tasks on a pool of " + threads + " threads");
+System.out.println("=&gt; about " + rounds + " sequential rounds");
+System.out.println("Virtual threads: a thread PER task, millions cheap.");</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -218,9 +219,9 @@ System.out.println("Narrowest that still works is best.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Python relies on convention — a leading underscore <em>asks</em> you not to touch it but nothing enforces it. Java's modifiers are compiler-enforced: <span class='key'>private</span> genuinely cannot be accessed from outside.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>Where JS uses <span class='key'>#private</span> fields and module exports, Java uses four access levels plus package structure. Java's <b>default is closed</b> (package-private), whereas a JS module member is private until you explicitly <span class='key'>export</span> it — same instinct, different default scope.</p></div>
-      <div class="callout callout-go"><span class="lang-tag"><span class="dot"></span>Coming from Go</span><p>Go encodes visibility in capitalization (<span class='key'>Exported</span> vs <span class='key'>unexported</span>) at the package boundary — effectively just public vs package-private. Java adds <span class='key'>protected</span> and <span class='key'>private</span> for finer control.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Java threads run truly in parallel — there's no GIL — so CPU-bound work scales across cores natively. Virtual threads resemble <span class='key'>asyncio</span> tasks, but you write ordinary blocking code instead of <span class='key'>async</span>/<span class='key'>await</span>.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>No single event loop here — Java is multi-threaded with shared, mutable memory, so you must guard shared state (<span class='key'>synchronized</span>, <span class='key'>java.util.concurrent</span>). Virtual threads give async-like scale while keeping a straight-line, blocking coding style.</p></div>
+      <div class="callout callout-go"><span class="lang-tag"><span class="dot"></span>Coming from Go</span><p>Virtual threads are Java's answer to goroutines: cheap, JVM-scheduled, millions at a time. The executor + <span class='key'>Future</span> pairing is close to spawning goroutines and reading a channel for the result.</p></div>
   </div>
 </section>
 
@@ -228,13 +229,13 @@ System.out.println("Narrowest that still works is best.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; What does no keyword mean?</h3><p class="prompt">A field is declared <span class='key'>int total;</span> with no access modifier. Who can access it?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Any class in the <b>same package</b> — that's package-private, Java's default. It is <em>not</em> public; classes in other packages cannot see it.</div></details></div>
-      <div class="exercise"><h3>2 &middot; Least privilege</h3><p class="prompt">You're unsure whether a helper method should be <span class='key'>public</span> or <span class='key'>private</span>. What's the safe default and why?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Start <span class='key'>private</span> (or package-private). You can always widen access later without breaking callers; narrowing a public API is a breaking change. Keep the public surface as small as possible.</div></details></div>
+      <div class="exercise"><h3>1 &middot; Why not new Thread per request?</h3><p class="prompt">A server does <span class='key'>new Thread(...).start()</span> per request and falls over under load. What's the executor fix?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Platform threads are heavy (~1MB stack each) and unbounded creation exhausts memory. Use a bounded <span class='key'>ExecutorService</span> to cap and reuse them — or virtual threads, which are light enough for one-per-request.</div></details></div>
+      <div class="exercise"><h3>2 &middot; What does get() do?</h3><p class="prompt">You submit a task and immediately call <span class='key'>future.get()</span>. Did you gain any concurrency?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Barely — <span class='key'>get()</span> blocks until the result is ready, so calling it immediately serializes you again. Submit all tasks first, then collect results, to actually overlap their work.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 09 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Strings & Text</span></div>
+  <div class="wrap">Module 26 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Maven, Gradle & the Classpath</span></div>
 </footer>
 
 <script>
@@ -260,7 +261,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"We have a field and want to decide who may access it."},{"lit":["a-0"],"caption":"<b>private</b>: only code inside the same class can see it — the tightest scope."},{"lit":["a-0","a-1","b-0"],"caption":"<b>package-private</b> (no keyword): any class in the same package, the Java default."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"<b>protected</b>: adds subclasses, even in other packages."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"<b>public</b>: any class anywhere on the classpath can reach it."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"Above packages, a module’s <b>exports</b> decides which packages are even visible to other jars."}];
+const STEPS = [{"lit":[],"caption":"You have a unit of work — a <span class=\"key\">Runnable</span> or <span class=\"key\">Callable</span> — to run off the main thread."},{"lit":["a-0"],"caption":"You <b>submit</b> the task to an executor rather than creating a thread yourself."},{"lit":["a-0","a-1","b-0"],"caption":"It lands in a <b>work queue</b>, buffered until a worker is free."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"The <b>executor</b>’s thread pool picks it up — threads are reused across many tasks."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"A worker <b>runs</b> the task; with virtual threads, blocking parks cheaply instead of hogging an OS thread."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"You hold a <b>Future</b> — call <span class=\"key\">get()</span> to await the result when you need it."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');
@@ -298,30 +299,37 @@ function runJava(src){
     }
     return null;
   }
-  function splitTop(s,op){ const res=[]; let depth=0,inStr=false,cur='';
+  function scanTop(s, ops){ // split left-to-right on single-char ops, honoring quotes/parens; skips a leading (unary) operator
+    const toks=[], found=[]; let depth=0,inStr=false,cur='';
     for(let i=0;i<s.length;i++){ const c=s[i];
       if(c==='"'&&s[i-1]!=='\\') inStr=!inStr;
-      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--; else if(c===op&&depth===0){res.push(cur);cur='';continue;} }
+      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--;
+        else if(depth===0 && ops.indexOf(c)>=0 && cur.trim()!==''){ toks.push(cur); found.push(c); cur=''; continue; } }
       cur+=c; }
-    res.push(cur); return res; }
+    toks.push(cur); return {toks, found}; }
+  function multiplicative(expr){ // * / % left-to-right (same precedence)
+    const {toks, found}=scanTop(expr, ['*','/','%']);
+    let acc=evalAtom(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=evalAtom(toks[i+1]), o=found[i];
+      if(o==='*') acc={type:'num',value:acc.value*r.value};
+      else if(o==='/') acc={type:'num',value:Math.trunc(acc.value/r.value)};
+      else acc={type:'num',value:acc.value%r.value}; }
+    return acc; }
+  function additive(expr){ // + - left-to-right ('+' concatenates if either side is a String)
+    const {toks, found}=scanTop(expr, ['+','-']);
+    let acc=multiplicative(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=multiplicative(toks[i+1]);
+      if(found[i]==='+') acc=(acc.type==='String'||r.type==='String') ? {type:'String',value:toStr(acc)+toStr(r)} : {type:'num',value:acc.value+r.value};
+      else acc={type:'num',value:acc.value-r.value}; }
+    return acc; }
   function evalExpr(expr){
     expr=expr.trim();
     const cmp=findTop(expr,['>=','<=','==','!=']) || findTop(expr,['>','<']);
-    if(cmp){ const l=evalExpr(expr.slice(0,cmp.i)); const r=evalExpr(expr.slice(cmp.i+cmp.op.length));
+    if(cmp){ const l=additive(expr.slice(0,cmp.i)); const r=additive(expr.slice(cmp.i+cmp.op.length));
       const lv=l.value, rv=r.value; let b;
       switch(cmp.op){case'>=':b=lv>=rv;break;case'<=':b=lv<=rv;break;case'==':b=lv===rv;break;case'!=':b=lv!==rv;break;case'>':b=lv>rv;break;case'<':b=lv<rv;break;}
       return {type:'boolean',value:b}; }
-    const parts=splitTop(expr,'+');
-    if(parts.length>1){ let acc=evalExpr(parts[0]);
-      for(let i=1;i<parts.length;i++){ const rhs=evalExpr(parts[i]);
-        if(acc.type==='String'||rhs.type==='String') acc={type:'String',value:toStr(acc)+toStr(rhs)};
-        else acc={type:'num',value:acc.value+rhs.value}; }
-      return acc; }
-    const mul=splitTop(expr,'*'); if(mul.length>1) return mul.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value*b.value}));
-    const mod=splitTop(expr,'%'); if(mod.length>1) return mod.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value%b.value}));
-    const sub=splitTop(expr,'-'); if(sub.length>1&&sub[0].trim()!=='') return sub.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value-b.value}));
-    const div=splitTop(expr,'/'); if(div.length>1) return div.map(evalExpr).reduce((a,b)=>({type:'num',value:Math.trunc(a.value/b.value)}));
-    return evalAtom(expr);
+    return additive(expr);
   }
   function evalAtom(t){ t=t.trim();
     if(t.startsWith('(')&&t.endsWith(')')) return evalExpr(t.slice(1,-1));

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 07 — Interfaces & Abstract Classes</title>
+<title>Module 25 — Annotations & Reflection</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 07</span>
-      <span class="title">Interfaces<small>Java for Developers · Track 2: The Language</small></span>
+      <span class="badge">MODULE 25</span>
+      <span class="title">Annotations<small>Java for Developers · Track 3: Modern Java</small></span>
     </div>
-    <div class="links"><a href="module-06-inheritance.html">‹ Prev</a><a href="module-08-encapsulation.html">Next ›</a></div>
+    <div class="links"><a href="module-24-datetime.html">‹ Prev</a><a href="module-26-concurrency.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,41 +147,36 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>Program to a <span class="grad">contract</span>, not a class</h1>
-    <p class="lede">An interface is a promise: “whatever you are, you can do these things.” It's how Java achieves polymorphism without inheritance, lets a class play many roles, and powers everything from Comparable to the Streams API.</p>
+    <h1>Metadata the code can <span class="grad">read about itself</span></h1>
+    <p class="lede">Annotations attach metadata to code; reflection reads classes, fields, and methods at runtime. Together they power the frameworks you'll actually use — Spring, JUnit, Jackson — which wire things up by inspecting your annotated types.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>One contract, many implementations</h2>
-    <p>An <strong>interface</strong> declares method signatures with no bodies (mostly). Any class can <span class='key'>implements</span> it, promising to supply those methods. Callers depend on the interface, so they work with <em>any</em> implementation — present or future.</p><pre class="code" data-src="interface Shape {
-    double area();           // contract, no body
-}
+    <h2>Tags on code, and an API to inspect them</h2>
+    <p>An <strong>annotation</strong> like <span class='key'>@Override</span> or <span class='key'>@Test</span> is metadata. Its <span class='key'>@Retention</span> says how long it survives: <span class='key'>SOURCE</span> (compiler only), <span class='key'>CLASS</span> (in bytecode), or <span class='key'>RUNTIME</span> (readable while running). <strong>Reflection</strong> is the API that reads types at runtime and can act on those annotations.</p><pre class="code" data-src="@Retention(RetentionPolicy.RUNTIME)
+@interface Json { String name(); }     // a custom annotation
 
-class Circle implements Shape {
-    double r;
-    public double area() { return Math.PI * r * r; }
-}
-class Square implements Shape {
-    double side;
-    public double area() { return side * side; }
-}
+class User { @Json(name = &quot;full_name&quot;) String name; }
 
-Shape s = new Circle();      // a Circle, seen as a Shape
-double a = s.area();         // dynamic dispatch picks Circle.area"></pre><p>At the call site the JVM uses <strong>dynamic dispatch</strong>: it looks up the actual object's method at runtime. Prefer interfaces over abstract classes; use an <span class='key'>abstract class</span> only when you must share state or partial implementation. A class extends one class but can implement many interfaces.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: s.area() then actual type? then method table then Circle.area then result"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">s.area()</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">interface ref</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">actual type?</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">Circle</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">method table</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lookup area</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">Circle.area</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">run body</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">result</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">returned</text></g></svg></div>
-    <div class='callout callout-csharp'><span class='lang-tag'><span class='dot'></span>Same idea, familiar name</span><p>Java interfaces map almost one-to-one onto C# interfaces — down to <span class='key'>default</span> methods (C# 8's default interface methods). The Java twist: interfaces can't hold instance state.</p></div>
+// A framework reads it reflectively
+for (Field f : User.class.getDeclaredFields()) {
+    Json j = f.getAnnotation(Json.class);
+    if (j != null) System.out.println(f.getName() + &quot; -&gt; &quot; + j.name());
+}"></pre><p>This is how a serializer maps <span class='key'>name</span> to <span class='key'>"full_name"</span>, how JUnit finds <span class='key'>@Test</span> methods, and how Spring injects beans — all without you wiring it by hand. Reflection is powerful but slower and bypasses compile-time checks, so use it through frameworks, not as a default tool.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: @Json then @Retention then getClass() then read fields then invoke"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">@Json</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">annotation</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">@Retention</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">how long it lives</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">getClass()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">reflection</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">read fields</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">+ annotations</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">invoke</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">act on it</text></g></svg></div>
+    
   </div>
 </section>
 
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>How a call finds the right method</h2>
-    <p>You call area() on a Shape, but a Circle answers. Step through dynamic dispatch — the runtime mechanism behind every interface call.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: s.area() then actual type? then method table then Circle.area then result"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">s.area()</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">interface ref</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">actual type?</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">Circle</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">method table</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lookup area</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">Circle.area</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">run body</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">result</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">returned</text></g></svg></div>
+    <h2>How a framework wires your class</h2>
+    <p>Step through what a library like Jackson or JUnit does: read your annotated class reflectively, then act on what it finds.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: @Json then @Retention then getClass() then read fields then invoke"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">@Json</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">annotation</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">@Retention</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">how long it lives</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">getClass()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">reflection</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">read fields</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">+ annotations</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">invoke</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">act on it</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -189,29 +184,26 @@ double a = s.area();         // dynamic dispatch picks Circle.area"></pre><p>At 
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">We hold a <span class="key">Shape</span> and ask it for its area — but which area?</div>
+    <div class="caption" id="caption" aria-live="polite">You annotate a plain class and hand it to a framework — no wiring code of your own.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>Same question, different formulas</h2>
-    <p>Polymorphism means one message, many implementations. Here are two shapes answering “what is your area?” their own way.</p>
+    <h2>What reflection sees</h2>
+    <p>Reflection enumerates a class’s members at runtime. Model a class with some fields and methods and total what it would report.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">Shapes.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// Circle and Square both satisfy a Shape contract
-int squareSide = 5;
-int squareArea = squareSide * squareSide;
-
-int rectW = 4;
-int rectH = 6;
-int rectArea = rectW * rectH;
-
-System.out.println("Square area    = " + squareArea);
-System.out.println("Rectangle area = " + rectArea);
-System.out.println("One contract, two implementations.");</textarea>
+        <label class="editor-label" for="code">Reflect.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// Reflectively inspecting a class
+int declaredFields  = 2;
+int declaredMethods = 3;
+int totalMembers = declaredFields + declaredMethods;
+System.out.println("fields  reflection sees = " + declaredFields);
+System.out.println("methods reflection sees = " + declaredMethods);
+System.out.println("total members = " + totalMembers);
+System.out.println("Frameworks read these to wire your app.");</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -229,9 +221,9 @@ System.out.println("One contract, two implementations.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Python leans on duck typing — if it has <span class='key'>area()</span>, it works. Java wants the promise <em>declared</em>: a class must say <span class='key'>implements Shape</span>, and the compiler checks it. <span class='key'>Protocol</span>/<span class='key'>ABC</span> is the closest Python analog.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>JS has no real interfaces (TypeScript bolts them on, erased at runtime). Java interfaces exist at runtime — you can check <span class='key'>instanceof Shape</span> and dispatch on it.</p></div>
-      <div class="callout callout-go"><span class="lang-tag"><span class="dot"></span>Coming from Go</span><p>Go interfaces are <em>implicit</em>: satisfy the methods and you implement it. Java is <em>explicit</em>: you must write <span class='key'>implements</span>. Trade-off: Go is terser, Java makes the intent and errors clearer.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Reflection is Python's everyday <span class='key'>getattr</span>/<span class='key'>dir</span>/<span class='key'>inspect</span>, and annotations are like decorators plus <span class='key'>__annotations__</span>. Java's version is more ceremonious and type-checked, but the framework-magic use cases are identical.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>Closest to JS decorators (TC39 / TypeScript) plus <span class='key'>Reflect</span> and <span class='key'>Object.keys</span>. Java annotations are declarative metadata read via a rich reflection API — the engine behind Spring/JUnit much like decorators power Angular/Nest.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Annotations are C# <b>attributes</b>, and reflection maps almost one-to-one (<span class='key'>typeof(T)</span>, <span class='key'>GetFields()</span>, <span class='key'>GetCustomAttribute</span>). If you've used attributes to drive serialization or DI in .NET, Java works the same way.</p></div>
   </div>
 </section>
 
@@ -239,13 +231,13 @@ System.out.println("One contract, two implementations.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; Class vs interface</h3><p class="prompt">When should you reach for an <span class='key'>abstract class</span> instead of an <span class='key'>interface</span>?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">When implementations must <b>share state or common code</b>. Interfaces can't hold instance fields. If subclasses need a shared field or a fully written helper method tied to that state, an abstract class fits; otherwise prefer an interface.</div></details></div>
-      <div class="exercise"><h3>2 &middot; Many roles</h3><p class="prompt">Can one class implement both <span class='key'>Comparable</span> and <span class='key'>Runnable</span>? Can it extend two classes?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Yes to many interfaces — a class can <span class='key'>implements Comparable, Runnable</span>. No to two classes: Java has single class inheritance. Interfaces are how Java sidesteps the diamond problem.</div></details></div>
+      <div class="exercise"><h3>1 &middot; Why RUNTIME retention?</h3><p class="prompt">Your custom annotation is read by a framework while the app runs, but it “isn't there” reflectively. What's the likely cause?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Its <span class='key'>@Retention</span> is the default (<span class='key'>CLASS</span>) or <span class='key'>SOURCE</span>, so it isn't kept for runtime. Add <span class='key'>@Retention(RetentionPolicy.RUNTIME)</span> so reflection can see it.</div></details></div>
+      <div class="exercise"><h3>2 &middot; Reflection has a cost</h3><p class="prompt">Reflection can call any method by name at runtime. Name one downside that makes it a last resort for everyday code.</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">It bypasses compile-time type checking (errors surface at runtime), is slower than direct calls, and can break encapsulation. Great for frameworks; avoid it when a normal method call or interface would do.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 07 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Encapsulation & Immutability</span></div>
+  <div class="wrap">Module 25 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Threads, Executors & Virtual Threads</span></div>
 </footer>
 
 <script>
@@ -271,7 +263,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"We hold a <span class=\"key\">Shape</span> and ask it for its area — but which area?"},{"lit":["a-0"],"caption":"A variable of type <span class=\"key\">Shape</span> holds some object — we call <span class=\"key\">.area()</span> on it."},{"lit":["a-0","a-1","b-0"],"caption":"The reference is typed as <b>Shape</b>, but the JVM looks at the <b>actual object</b>: a Circle."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"It consults the object’s <b>method table</b> to find Circle’s implementation of <span class=\"key\">area</span>."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"<b>Circle.area()</b> runs — <span class=\"key\">πr²</span> — not Square’s or the interface’s."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"The computed area is returned. Swap in a Square and the same call site runs Square’s formula instead."}];
+const STEPS = [{"lit":[],"caption":"You annotate a plain class and hand it to a framework — no wiring code of your own."},{"lit":["a-0"],"caption":"An <b>annotation</b> like <span class=\"key\">@Json</span> tags a field with metadata."},{"lit":["a-0","a-1","b-0"],"caption":"Its <b>@Retention(RUNTIME)</b> keeps it readable while the program runs."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"The framework uses <b>reflection</b> — <span class=\"key\">User.class</span> — to inspect the type."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"It walks the <b>fields</b> and reads each one’s annotations."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"Acting on what it found, it <b>invokes</b> getters or sets values — serialization, injection, test discovery."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');

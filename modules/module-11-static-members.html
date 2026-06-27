@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 24 — Dependency Injection & Spring</title>
+<title>Module 11 — Static Members & Class Design</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 24</span>
-      <span class="title">Spring & DI<small>Java for Developers · Track 5: Real-World Java</small></span>
+      <span class="badge">MODULE 11</span>
+      <span class="title">Static<small>Java for Developers · Track 2: The Language</small></span>
     </div>
-    <div class="links"><a href="module-23-testing.html">‹ Prev</a><a href="module-25-persistence-jdbc.html">Next ›</a></div>
+    <div class="links"><a href="module-10-composition.html">‹ Prev</a><a href="module-12-solid-principles.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,26 +147,24 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>Don’t <span class="grad">new</span> your dependencies</h1>
-    <p class="lede">Real Java apps rarely call new on their collaborators. Instead a container creates objects and hands each one what it needs — dependency injection. Spring is the framework that popularized it, and understanding the pattern matters more than memorizing its annotations.</p>
+    <h1>State and behavior that belong to the <span class="grad">class, not the object</span></h1>
+    <p class="lede">Every Java program starts in a static method — main. Static members belong to the class itself, shared across all instances. Used well they give you constants, factories, and utilities; used carelessly they become global mutable state that wrecks testability.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>Inversion of control: the container wires you up</h2>
-    <p>Without DI, a class builds its own dependencies — <span class='key'>new EmailService()</span> — hard-wiring one implementation and making it untestable. With DI, the class declares what it needs (ideally an <em>interface</em>) and receives it, usually through its <strong>constructor</strong>. Who supplies it? The <strong>container</strong>.</p><pre class="code" data-src="@Component
-class OrderService {
-    private final Notifier notifier;          // depends on an interface
-    OrderService(Notifier notifier) {          // constructor injection
-        this.notifier = notifier;
-    }
+    <h2>One copy for the class, not one per object</h2>
+    <p>An <strong>instance</strong> field exists once per object; a <span class='key'>static</span> field exists <em>once per class</em>, shared by every instance. A <span class='key'>static</span> method has no <span class='key'>this</span> — it can’t touch instance state, which makes it perfect for stateless utilities and factory methods.</p><pre class="code" data-src="class Counter {
+    static int created = 0;          // one value, shared by the class
+    final int id;
+    Counter() { id = ++created; }    // each object gets a unique id
+    static Counter make() { return new Counter(); }  // factory method
 }
 
-@Component class EmailNotifier implements Notifier {}
-// Spring scans for @Component beans and injects EmailNotifier automatically."></pre><p>Spring scans for beans (<span class='key'>@Component</span>, <span class='key'>@Service</span>…), builds a dependency graph, and constructs everything in order into an <strong>application context</strong>. Because <span class='key'>OrderService</span> depends on the <span class='key'>Notifier</span> interface, a test can inject a fake — that swappability is the whole point. Prefer constructor injection over field injection: it makes dependencies explicit and objects immutable.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: @Component then scan then resolve then inject then context"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">@Component</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">declare bean</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">scan</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">find beans</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">resolve</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">graph deps</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">inject</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">constructor</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">context</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">app ready</text></g></svg></div>
+static final double PI = 3.14159;    // a constant: static + final"></pre><p>Good uses: <strong>constants</strong> (<span class='key'>static final</span>), <strong>factory methods</strong> (<span class='key'>List.of</span>, <span class='key'>Integer.valueOf</span>), and pure <strong>utilities</strong> (<span class='key'>Math.max</span>). A <strong>static initializer</strong> block runs once when the class loads. The danger: <em>static mutable state</em> is global state — it’s shared everywhere, hard to reset between tests, and unsafe under concurrency. Keep static things either constant or stateless.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: instance field then static field then static method then static final then static init"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">instance field</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">per object</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">static field</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">one, shared</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">static method</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">no this</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">static final</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">constant</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">static init</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">on class load</text></g></svg></div>
     
   </div>
 </section>
@@ -174,9 +172,9 @@ class OrderService {
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>How Spring assembles your app</h2>
-    <p>Step through what the container does at startup: discover beans, work out who needs whom, and wire them together.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: @Component then scan then resolve then inject then context"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">@Component</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">declare bean</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">scan</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">find beans</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">resolve</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">graph deps</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">inject</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">constructor</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">context</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">app ready</text></g></svg></div>
+    <h2>Where each kind of member lives</h2>
+    <p>Step through instance vs static members and when each is the right tool — ending with the global-state trap.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: instance field then static field then static method then static final then static init"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">instance field</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">per object</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">static field</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">one, shared</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">static method</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">no this</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">static final</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">constant</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">static init</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">on class load</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -184,25 +182,26 @@ class OrderService {
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">Your classes declare their dependencies but never create them.</div>
+    <div class="caption" id="caption" aria-live="polite">A class can hold two kinds of members: per-object and per-class.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>Why injection beats new</h2>
-    <p>Depending on an interface lets you swap implementations (real, fake, mock). Model how many you can plug in.</p>
+    <h2>Shared vs per-object state</h2>
+    <p>A static field is shared by the whole class; an instance field is private to each object. Model both counters.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">Wiring.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// Hard-wired with new: exactly one implementation
-int hardWired = 1;
-// Injected via an interface: real, fake, and mock all fit
-int injectable = 3;
-System.out.println("hard-wired implementations = " + hardWired);
-System.out.println("injectable implementations = " + injectable);
-System.out.println("more swappable (better for tests)? " + (injectable &gt; hardWired));</textarea>
+        <label class="editor-label" for="code">Static.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// static = one shared value; instance = one per object
+int myOwnCount = 1;        // each object has its own
+int sharedTotal = 0;       // the class shares this one
+sharedTotal = sharedTotal + 1;   // object A created
+sharedTotal = sharedTotal + 1;   // object B created
+System.out.println("this object\u2019s own count = " + myOwnCount);
+System.out.println("shared static total      = " + sharedTotal);
+System.out.println("static final MAX (constant) = " + 100);</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -220,9 +219,9 @@ System.out.println("more swappable (better for tests)? " + (injectable &gt; hard
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Python leans on duck typing and simple constructor arguments, with frameworks like FastAPI offering <span class='key'>Depends</span>. Spring is heavier and annotation-driven, but the core idea — pass dependencies in rather than constructing them — is identical.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>Closest to Angular's or NestJS's DI containers (which were Spring-inspired). Plain Node usually wires modules by hand; Spring automates that graph for you, resolving and constructing beans in dependency order.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Almost a direct map to .NET's built-in <span class='key'>IServiceCollection</span> DI: register services, inject via constructor. <span class='key'>@Component</span>/<span class='key'>@Service</span> ≈ <span class='key'>AddScoped</span>/<span class='key'>AddSingleton</span> registrations.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Java’s static fields ≈ Python class attributes, and static methods ≈ <span class='key'>@staticmethod</span> (a method bound to the class, no <span class='key'>self</span>). Java has no module-level functions — a free function becomes a <span class='key'>static</span> method on a class.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>JS classes have <span class='key'>static</span> fields/methods too, and module-scope values play the role Java gives <span class='key'>static</span>. The same warning applies in both: a shared mutable static/module variable is global state and a testing headache.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Nearly one-to-one: <span class='key'>static</span> fields/methods, <span class='key'>const</span>/<span class='key'>static readonly</span> for constants, and static constructors ≈ Java’s static initializer blocks. Same guidance about avoiding shared mutable static state.</p></div>
   </div>
 </section>
 
@@ -230,13 +229,13 @@ System.out.println("more swappable (better for tests)? " + (injectable &gt; hard
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; Why constructor injection?</h3><p class="prompt">Spring supports field injection (<span class='key'>@Autowired</span> on a field) and constructor injection. Why do teams prefer the constructor?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Constructor injection makes dependencies explicit and required, allows <span class='key'>final</span> (immutable) fields, and lets you instantiate the class in a plain unit test with <span class='key'>new</span> — no Spring needed. Field injection hides dependencies and needs reflection to set up in tests.</div></details></div>
-      <div class="exercise"><h3>2 &middot; Depend on what?</h3><p class="prompt">Should <span class='key'>OrderService</span> depend on <span class='key'>EmailNotifier</span> (a class) or <span class='key'>Notifier</span> (an interface)? Why does it matter for testing?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">On the <b>interface</b>. That lets the container inject the real <span class='key'>EmailNotifier</span> in production and a fake/mock in tests, with no change to <span class='key'>OrderService</span>. Depending on the concrete class re-couples you to one implementation.</div></details></div>
+      <div class="exercise"><h3>1 &middot; Static or instance?</h3><p class="prompt">A <span class='key'>formatCurrency(long cents)</span> helper uses no object state. Should it be static or an instance method?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>Static.</b> It depends only on its arguments, not on any object’s fields, so it needs no <span class='key'>this</span>. Making it static signals “pure utility” and lets callers use it without constructing an instance.</div></details></div>
+      <div class="exercise"><h3>2 &middot; The testing trap</h3><p class="prompt">A class keeps a <span class='key'>static Map</span> cache that tests mutate. Why do the tests start failing intermittently?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The static cache is shared across all tests and persists between them, so one test’s entries leak into another — order-dependent, flaky failures. Static mutable state is global state; prefer instance state you can recreate per test (or reset it explicitly).</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 24 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Databases: JDBC & JPA</span></div>
+  <div class="wrap">Module 11 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: SOLID Principles</span></div>
 </footer>
 
 <script>
@@ -262,7 +261,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"Your classes declare their dependencies but never create them."},{"lit":["a-0"],"caption":"Each class is marked a <b>bean</b> with <span class=\"key\">@Component</span> (or @Service, @Repository)."},{"lit":["a-0","a-1","b-0"],"caption":"At startup Spring <b>scans</b> the classpath and finds every bean."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"It <b>resolves</b> the dependency graph — which bean needs which other beans."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"It constructs each bean, <b>injecting</b> collaborators through their constructors."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"The fully wired <b>application context</b> is ready to serve requests."}];
+const STEPS = [{"lit":[],"caption":"A class can hold two kinds of members: per-object and per-class."},{"lit":["a-0"],"caption":"An <b>instance field</b> gets its own copy in every object you create."},{"lit":["a-0","a-1","b-0"],"caption":"A <b>static field</b> is a single value <b>shared</b> by the class and all its instances."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"A <b>static method</b> has no <span class=\"key\">this</span> — great for stateless utilities and factories."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"<b>static final</b> marks a true constant; a <b>static initializer</b> runs once when the class loads."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"Beware: <b>static mutable</b> state is global state — shared everywhere, hard to test, unsafe under threads."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');
@@ -300,30 +299,37 @@ function runJava(src){
     }
     return null;
   }
-  function splitTop(s,op){ const res=[]; let depth=0,inStr=false,cur='';
+  function scanTop(s, ops){ // split left-to-right on single-char ops, honoring quotes/parens; skips a leading (unary) operator
+    const toks=[], found=[]; let depth=0,inStr=false,cur='';
     for(let i=0;i<s.length;i++){ const c=s[i];
       if(c==='"'&&s[i-1]!=='\\') inStr=!inStr;
-      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--; else if(c===op&&depth===0){res.push(cur);cur='';continue;} }
+      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--;
+        else if(depth===0 && ops.indexOf(c)>=0 && cur.trim()!==''){ toks.push(cur); found.push(c); cur=''; continue; } }
       cur+=c; }
-    res.push(cur); return res; }
+    toks.push(cur); return {toks, found}; }
+  function multiplicative(expr){ // * / % left-to-right (same precedence)
+    const {toks, found}=scanTop(expr, ['*','/','%']);
+    let acc=evalAtom(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=evalAtom(toks[i+1]), o=found[i];
+      if(o==='*') acc={type:'num',value:acc.value*r.value};
+      else if(o==='/') acc={type:'num',value:Math.trunc(acc.value/r.value)};
+      else acc={type:'num',value:acc.value%r.value}; }
+    return acc; }
+  function additive(expr){ // + - left-to-right ('+' concatenates if either side is a String)
+    const {toks, found}=scanTop(expr, ['+','-']);
+    let acc=multiplicative(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=multiplicative(toks[i+1]);
+      if(found[i]==='+') acc=(acc.type==='String'||r.type==='String') ? {type:'String',value:toStr(acc)+toStr(r)} : {type:'num',value:acc.value+r.value};
+      else acc={type:'num',value:acc.value-r.value}; }
+    return acc; }
   function evalExpr(expr){
     expr=expr.trim();
     const cmp=findTop(expr,['>=','<=','==','!=']) || findTop(expr,['>','<']);
-    if(cmp){ const l=evalExpr(expr.slice(0,cmp.i)); const r=evalExpr(expr.slice(cmp.i+cmp.op.length));
+    if(cmp){ const l=additive(expr.slice(0,cmp.i)); const r=additive(expr.slice(cmp.i+cmp.op.length));
       const lv=l.value, rv=r.value; let b;
       switch(cmp.op){case'>=':b=lv>=rv;break;case'<=':b=lv<=rv;break;case'==':b=lv===rv;break;case'!=':b=lv!==rv;break;case'>':b=lv>rv;break;case'<':b=lv<rv;break;}
       return {type:'boolean',value:b}; }
-    const parts=splitTop(expr,'+');
-    if(parts.length>1){ let acc=evalExpr(parts[0]);
-      for(let i=1;i<parts.length;i++){ const rhs=evalExpr(parts[i]);
-        if(acc.type==='String'||rhs.type==='String') acc={type:'String',value:toStr(acc)+toStr(rhs)};
-        else acc={type:'num',value:acc.value+rhs.value}; }
-      return acc; }
-    const mul=splitTop(expr,'*'); if(mul.length>1) return mul.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value*b.value}));
-    const mod=splitTop(expr,'%'); if(mod.length>1) return mod.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value%b.value}));
-    const sub=splitTop(expr,'-'); if(sub.length>1&&sub[0].trim()!=='') return sub.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value-b.value}));
-    const div=splitTop(expr,'/'); if(div.length>1) return div.map(evalExpr).reduce((a,b)=>({type:'num',value:Math.trunc(a.value/b.value)}));
-    return evalAtom(expr);
+    return additive(expr);
   }
   function evalAtom(t){ t=t.trim();
     if(t.startsWith('(')&&t.endsWith(')')) return evalExpr(t.slice(1,-1));

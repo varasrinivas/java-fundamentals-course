@@ -305,30 +305,37 @@ function runJava(src){
     }
     return null;
   }
-  function splitTop(s,op){ const res=[]; let depth=0,inStr=false,cur='';
+  function scanTop(s, ops){ // split left-to-right on single-char ops, honoring quotes/parens; skips a leading (unary) operator
+    const toks=[], found=[]; let depth=0,inStr=false,cur='';
     for(let i=0;i<s.length;i++){ const c=s[i];
       if(c==='"'&&s[i-1]!=='\\') inStr=!inStr;
-      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--; else if(c===op&&depth===0){res.push(cur);cur='';continue;} }
+      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--;
+        else if(depth===0 && ops.indexOf(c)>=0 && cur.trim()!==''){ toks.push(cur); found.push(c); cur=''; continue; } }
       cur+=c; }
-    res.push(cur); return res; }
+    toks.push(cur); return {toks, found}; }
+  function multiplicative(expr){ // * / % left-to-right (same precedence)
+    const {toks, found}=scanTop(expr, ['*','/','%']);
+    let acc=evalAtom(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=evalAtom(toks[i+1]), o=found[i];
+      if(o==='*') acc={type:'num',value:acc.value*r.value};
+      else if(o==='/') acc={type:'num',value:Math.trunc(acc.value/r.value)};
+      else acc={type:'num',value:acc.value%r.value}; }
+    return acc; }
+  function additive(expr){ // + - left-to-right ('+' concatenates if either side is a String)
+    const {toks, found}=scanTop(expr, ['+','-']);
+    let acc=multiplicative(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=multiplicative(toks[i+1]);
+      if(found[i]==='+') acc=(acc.type==='String'||r.type==='String') ? {type:'String',value:toStr(acc)+toStr(r)} : {type:'num',value:acc.value+r.value};
+      else acc={type:'num',value:acc.value-r.value}; }
+    return acc; }
   function evalExpr(expr){
     expr=expr.trim();
     const cmp=findTop(expr,['>=','<=','==','!=']) || findTop(expr,['>','<']);
-    if(cmp){ const l=evalExpr(expr.slice(0,cmp.i)); const r=evalExpr(expr.slice(cmp.i+cmp.op.length));
+    if(cmp){ const l=additive(expr.slice(0,cmp.i)); const r=additive(expr.slice(cmp.i+cmp.op.length));
       const lv=l.value, rv=r.value; let b;
       switch(cmp.op){case'>=':b=lv>=rv;break;case'<=':b=lv<=rv;break;case'==':b=lv===rv;break;case'!=':b=lv!==rv;break;case'>':b=lv>rv;break;case'<':b=lv<rv;break;}
       return {type:'boolean',value:b}; }
-    const parts=splitTop(expr,'+');
-    if(parts.length>1){ let acc=evalExpr(parts[0]);
-      for(let i=1;i<parts.length;i++){ const rhs=evalExpr(parts[i]);
-        if(acc.type==='String'||rhs.type==='String') acc={type:'String',value:toStr(acc)+toStr(rhs)};
-        else acc={type:'num',value:acc.value+rhs.value}; }
-      return acc; }
-    const mul=splitTop(expr,'*'); if(mul.length>1) return mul.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value*b.value}));
-    const mod=splitTop(expr,'%'); if(mod.length>1) return mod.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value%b.value}));
-    const sub=splitTop(expr,'-'); if(sub.length>1&&sub[0].trim()!=='') return sub.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value-b.value}));
-    const div=splitTop(expr,'/'); if(div.length>1) return div.map(evalExpr).reduce((a,b)=>({type:'num',value:Math.trunc(a.value/b.value)}));
-    return evalAtom(expr);
+    return additive(expr);
   }
   function evalAtom(t){ t=t.trim();
     if(t.startsWith('(')&&t.endsWith(')')) return evalExpr(t.slice(1,-1));

@@ -19,33 +19,38 @@ $tracks = [ordered]@{
     @{ n="05"; slug="objects-classes";       t="Objects, Classes & Constructors" },
     @{ n="06"; slug="inheritance";           t="Inheritance & Polymorphism" },
     @{ n="07"; slug="interfaces";            t="Interfaces & Abstract Classes" },
-    @{ n="08"; slug="enums";                 t="Enums & Constant Types" },
-    @{ n="09"; slug="packages-access";       t="Packages & Access Control" },
-    @{ n="10"; slug="strings";               t="Strings & Text" },
-    @{ n="11"; slug="equals-hashcode";       t="The equals & hashCode Contract" },
-    @{ n="12"; slug="generics";              t="Generics & Type Erasure" },
-    @{ n="13"; slug="collections";           t="The Collections Framework" },
-    @{ n="14"; slug="exceptions";            t="Checked vs Unchecked Exceptions" },
-    @{ n="15"; slug="nested-classes";        t="Nested, Inner & Anonymous Classes" }
+    @{ n="08"; slug="encapsulation";         t="Encapsulation & Immutability" },
+    @{ n="09"; slug="polymorphism";          t="Polymorphism: Overloading vs Overriding" },
+    @{ n="10"; slug="composition";           t="Composition over Inheritance" },
+    @{ n="11"; slug="static-members";        t="Static Members & Class Design" },
+    @{ n="12"; slug="solid-principles";      t="SOLID Principles" },
+    @{ n="13"; slug="enums";                 t="Enums & Constant Types" },
+    @{ n="14"; slug="packages-access";       t="Packages & Access Control" },
+    @{ n="15"; slug="strings";               t="Strings & Text" },
+    @{ n="16"; slug="equals-hashcode";       t="The equals & hashCode Contract" },
+    @{ n="17"; slug="generics";              t="Generics & Type Erasure" },
+    @{ n="18"; slug="collections";           t="The Collections Framework" },
+    @{ n="19"; slug="exceptions";            t="Checked vs Unchecked Exceptions" },
+    @{ n="20"; slug="nested-classes";        t="Nested, Inner & Anonymous Classes" }
   )
   "Track 3 — Modern Java" = @(
-    @{ n="16"; slug="lambdas-streams";       t="Lambdas & the Streams API" },
-    @{ n="17"; slug="optional-null";         t="Optional & the Billion-Dollar Bug" },
-    @{ n="18"; slug="records-sealed";        t="Records, Sealed Types & Pattern Matching" },
-    @{ n="19"; slug="datetime";              t="Dates & Times (java.time)" },
-    @{ n="20"; slug="annotations-reflection";t="Annotations & Reflection" },
-    @{ n="21"; slug="concurrency";           t="Threads, Executors & Virtual Threads" }
+    @{ n="21"; slug="lambdas-streams";       t="Lambdas & the Streams API" },
+    @{ n="22"; slug="optional-null";         t="Optional & the Billion-Dollar Bug" },
+    @{ n="23"; slug="records-sealed";        t="Records, Sealed Types & Pattern Matching" },
+    @{ n="24"; slug="datetime";              t="Dates & Times (java.time)" },
+    @{ n="25"; slug="annotations-reflection";t="Annotations & Reflection" },
+    @{ n="26"; slug="concurrency";           t="Threads, Executors & Virtual Threads" }
   )
   "Track 4 — The Ecosystem" = @(
-    @{ n="22"; slug="build-tools";           t="Maven, Gradle & the Classpath" },
-    @{ n="23"; slug="testing";               t="JUnit & Modern Testing" }
+    @{ n="27"; slug="build-tools";           t="Maven, Gradle & the Classpath" },
+    @{ n="28"; slug="testing";               t="JUnit & Modern Testing" }
   )
   "Track 5 — Real-World Java" = @(
-    @{ n="24"; slug="spring-di";             t="Dependency Injection & Spring" },
-    @{ n="25"; slug="persistence-jdbc";      t="Databases: JDBC & JPA" },
-    @{ n="26"; slug="json-jackson";          t="JSON with Jackson" },
-    @{ n="27"; slug="http-client";           t="The HTTP Client (java.net.http)" },
-    @{ n="28"; slug="logging";               t="Logging Done Right" }
+    @{ n="29"; slug="spring-di";             t="Dependency Injection & Spring" },
+    @{ n="30"; slug="persistence-jdbc";      t="Databases: JDBC & JPA" },
+    @{ n="31"; slug="json-jackson";          t="JSON with Jackson" },
+    @{ n="32"; slug="http-client";           t="The HTTP Client (java.net.http)" },
+    @{ n="33"; slug="logging";               t="Logging Done Right" }
   )
 }
 

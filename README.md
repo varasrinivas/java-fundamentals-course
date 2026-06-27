@@ -7,7 +7,7 @@ the *reasons* Java does things the way it does.
 **▶ Live:** https://learnings.varasrinivas.com/java-fundamentals-course/ — installable as an offline app (PWA).
 
 ## Highlights
-- **28 modules** across 5 tracks, from the JVM to the real-world backend stack.
+- **33 modules** across 5 tracks, from the JVM to the real-world backend stack.
 - **Standalone HTML** — every module is one self-contained file. No build step, no bundler, fully offline.
 - **Interactive** — each module has an animated step-through (play / pause / step / reset), a runnable
   playground backed by a tiny in-browser Java simulator, and a custom syntax highlighter.
@@ -19,7 +19,7 @@ the *reasons* Java does things the way it does.
 | Track | Modules |
 |-------|---------|
 | 1 · The Machine | JVM · Memory & GC · Bytecode |
-| 2 · The Language | Types & Boxing · Objects · Inheritance · Interfaces · Enums · Packages · Strings · equals/hashCode · Generics · Collections · Exceptions · Nested Classes |
+| 2 · The Language | Types & Boxing · Objects · Inheritance · Interfaces · Encapsulation · Polymorphism (Overloading vs Overriding) · Composition over Inheritance · Static Members · SOLID Principles · Enums · Packages · Strings · equals/hashCode · Generics · Collections · Exceptions · Nested Classes |
 | 3 · Modern Java | Lambdas & Streams · Optional · Records & Pattern Matching · Date/Time · Annotations & Reflection · Concurrency |
 | 4 · The Ecosystem | Build Tools · Testing |
 | 5 · Real-World Java | Spring & DI · Persistence (JDBC/JPA) · JSON (Jackson) · HTTP Client · Logging |

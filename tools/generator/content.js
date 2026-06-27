@@ -11,27 +11,32 @@ const NAV = [
   { num:'05', slug:'objects-classes',       title:'Objects, Classes & Constructors' },
   { num:'06', slug:'inheritance',           title:'Inheritance & Polymorphism' },
   { num:'07', slug:'interfaces',            title:'Interfaces & Abstract Classes' },
-  { num:'08', slug:'enums',                 title:'Enums & Constant Types' },
-  { num:'09', slug:'packages-access',       title:'Packages & Access Control' },
-  { num:'10', slug:'strings',               title:'Strings & Text' },
-  { num:'11', slug:'equals-hashcode',       title:'The equals & hashCode Contract' },
-  { num:'12', slug:'generics',              title:'Generics & Type Erasure' },
-  { num:'13', slug:'collections',           title:'The Collections Framework' },
-  { num:'14', slug:'exceptions',            title:'Checked vs Unchecked Exceptions' },
-  { num:'15', slug:'nested-classes',        title:'Nested, Inner & Anonymous Classes' },
-  { num:'16', slug:'lambdas-streams',       title:'Lambdas & the Streams API' },
-  { num:'17', slug:'optional-null',         title:'Optional & the Billion-Dollar Bug' },
-  { num:'18', slug:'records-sealed',        title:'Records, Sealed Types & Pattern Matching' },
-  { num:'19', slug:'datetime',              title:'Dates & Times (java.time)' },
-  { num:'20', slug:'annotations-reflection',title:'Annotations & Reflection' },
-  { num:'21', slug:'concurrency',           title:'Threads, Executors & Virtual Threads' },
-  { num:'22', slug:'build-tools',           title:'Maven, Gradle & the Classpath' },
-  { num:'23', slug:'testing',               title:'JUnit & Modern Testing' },
-  { num:'24', slug:'spring-di',             title:'Dependency Injection & Spring' },
-  { num:'25', slug:'persistence-jdbc',      title:'Databases: JDBC & JPA' },
-  { num:'26', slug:'json-jackson',          title:'JSON with Jackson' },
-  { num:'27', slug:'http-client',           title:'The HTTP Client (java.net.http)' },
-  { num:'28', slug:'logging',               title:'Logging Done Right' },
+  { num:'08', slug:'encapsulation',         title:'Encapsulation & Immutability' },
+  { num:'09', slug:'polymorphism',          title:'Polymorphism: Overloading vs Overriding' },
+  { num:'10', slug:'composition',           title:'Composition over Inheritance' },
+  { num:'11', slug:'static-members',        title:'Static Members & Class Design' },
+  { num:'12', slug:'solid-principles',      title:'SOLID Principles' },
+  { num:'13', slug:'enums',                 title:'Enums & Constant Types' },
+  { num:'14', slug:'packages-access',       title:'Packages & Access Control' },
+  { num:'15', slug:'strings',               title:'Strings & Text' },
+  { num:'16', slug:'equals-hashcode',       title:'The equals & hashCode Contract' },
+  { num:'17', slug:'generics',              title:'Generics & Type Erasure' },
+  { num:'18', slug:'collections',           title:'The Collections Framework' },
+  { num:'19', slug:'exceptions',            title:'Checked vs Unchecked Exceptions' },
+  { num:'20', slug:'nested-classes',        title:'Nested, Inner & Anonymous Classes' },
+  { num:'21', slug:'lambdas-streams',       title:'Lambdas & the Streams API' },
+  { num:'22', slug:'optional-null',         title:'Optional & the Billion-Dollar Bug' },
+  { num:'23', slug:'records-sealed',        title:'Records, Sealed Types & Pattern Matching' },
+  { num:'24', slug:'datetime',              title:'Dates & Times (java.time)' },
+  { num:'25', slug:'annotations-reflection',title:'Annotations & Reflection' },
+  { num:'26', slug:'concurrency',           title:'Threads, Executors & Virtual Threads' },
+  { num:'27', slug:'build-tools',           title:'Maven, Gradle & the Classpath' },
+  { num:'28', slug:'testing',               title:'JUnit & Modern Testing' },
+  { num:'29', slug:'spring-di',             title:'Dependency Injection & Spring' },
+  { num:'30', slug:'persistence-jdbc',      title:'Databases: JDBC & JPA' },
+  { num:'31', slug:'json-jackson',          title:'JSON with Jackson' },
+  { num:'32', slug:'http-client',           title:'The HTTP Client (java.net.http)' },
+  { num:'33', slug:'logging',               title:'Logging Done Right' },
 ];
 
 const T1 = 'Track 1: The Machine', T2 = 'Track 2: The Language', T3 = 'Track 3: Modern Java', T4 = 'Track 4: The Ecosystem', T5 = 'Track 5: Real-World Java';
@@ -226,8 +231,8 @@ CONTENT['07'] = {
 };
 
 // ───────────────────────── 07 ─────────────────────────
-CONTENT['12'] = {
-  num:'12', slug:'generics', title:'Generics & Type Erasure', navShort:'Generics', track:T2,
+CONTENT['17'] = {
+  num:'17', slug:'generics', title:'Generics & Type Erasure', navShort:'Generics', track:T2,
   heroTitle:'Compile-time safety that <span class="grad">vanishes</span> at runtime',
   lede:"Generics let List<String> reject an Integer before your program runs. But the JVM never sees the <String> — it's erased to plain List. That erasure is the source of every weird generics rule you'll meet.",
   conceptH2:'The compiler knows; the runtime doesn’t',
@@ -263,8 +268,8 @@ CONTENT['12'] = {
 };
 
 // ───────────────────────── 08 ─────────────────────────
-CONTENT['13'] = {
-  num:'13', slug:'collections', title:'The Collections Framework', navShort:'Collections', track:T2,
+CONTENT['18'] = {
+  num:'18', slug:'collections', title:'The Collections Framework', navShort:'Collections', track:T2,
   heroTitle:'Lists, Sets and Maps, and <span class="grad">when to pick which</span>',
   lede:"Java ships a small, well-worn set of data structures behind three interfaces: List, Set, and Map. Knowing how HashMap finds a key in O(1) — and when it degrades — is core Java literacy.",
   conceptH2:'Three interfaces, a handful of workhorse classes',
@@ -300,8 +305,8 @@ CONTENT['13'] = {
 };
 
 // ───────────────────────── 09 ─────────────────────────
-CONTENT['14'] = {
-  num:'14', slug:'exceptions', title:'Checked vs Unchecked Exceptions', navShort:'Exceptions', track:T2,
+CONTENT['19'] = {
+  num:'19', slug:'exceptions', title:'Checked vs Unchecked Exceptions', navShort:'Exceptions', track:T2,
   heroTitle:'The compiler that <span class="grad">forces you to plan</span> for failure',
   lede:"Java is almost alone in having checked exceptions: failures the compiler won't let you ignore. Love them or hate them, you must know the difference between a checked IOException and an unchecked NullPointerException.",
   conceptH2:'Two families, one hierarchy',
@@ -337,8 +342,8 @@ CONTENT['14'] = {
 };
 
 // ───────────────────────── 10 ─────────────────────────
-CONTENT['16'] = {
-  num:'16', slug:'lambdas-streams', title:'Lambdas & the Streams API', navShort:'Lambdas & Streams', track:T3,
+CONTENT['21'] = {
+  num:'21', slug:'lambdas-streams', title:'Lambdas & the Streams API', navShort:'Lambdas & Streams', track:T3,
   heroTitle:'Describe the <span class="grad">what</span>, let Java do the loop',
   lede:"Lambdas gave Java functions-as-values; streams gave it a declarative pipeline for collections. Together they turn a noisy for-loop into a readable filter → map → collect — lazily, and often in parallel.",
   conceptH2:'A lazy pipeline of operations',
@@ -374,8 +379,8 @@ CONTENT['16'] = {
 };
 
 // ───────────────────────── 11 ─────────────────────────
-CONTENT['17'] = {
-  num:'17', slug:'optional-null', title:'Optional & the Billion-Dollar Bug', navShort:'Optional', track:T3,
+CONTENT['22'] = {
+  num:'22', slug:'optional-null', title:'Optional & the Billion-Dollar Bug', navShort:'Optional', track:T3,
   heroTitle:'Make <span class="grad">“might be absent”</span> part of the type',
   lede:"Tony Hoare called null his “billion-dollar mistake.” Java can't remove null, but Optional lets a method's signature say “I might not return a value” — turning silent NullPointerExceptions into choices you make on purpose.",
   conceptH2:'A box that holds a value, or nothing',
@@ -411,8 +416,8 @@ CONTENT['17'] = {
 };
 
 // ───────────────────────── 12 ─────────────────────────
-CONTENT['18'] = {
-  num:'18', slug:'records-sealed', title:'Records, Sealed Types & Pattern Matching', navShort:'Records', track:T3,
+CONTENT['23'] = {
+  num:'23', slug:'records-sealed', title:'Records, Sealed Types & Pattern Matching', navShort:'Records', track:T3,
   heroTitle:'Data classes, <span class="grad">without the boilerplate</span>',
   lede:"Modern Java fixed its most-mocked weakness: 40 lines of getters, equals, and hashCode for a simple data holder. Records, sealed types, and pattern matching turn that into a one-liner — and unlock exhaustive switches.",
   conceptH2:'Records carry data; sealed types bound the options',
@@ -448,8 +453,8 @@ CONTENT['18'] = {
 };
 
 // ───────────────────────── 13 ─────────────────────────
-CONTENT['21'] = {
-  num:'21', slug:'concurrency', title:'Threads, Executors & Virtual Threads', navShort:'Concurrency', track:T3,
+CONTENT['26'] = {
+  num:'26', slug:'concurrency', title:'Threads, Executors & Virtual Threads', navShort:'Concurrency', track:T3,
   heroTitle:'Don’t manage threads — <span class="grad">submit tasks</span>',
   lede:"Raw threads are expensive and easy to leak. Modern Java hands you an executor: submit a task, get a Future. And Java 21's virtual threads make it cheap to run millions of blocking tasks at once — rewriting the rules for server code.",
   conceptH2:'Tasks go to a pool; you get a Future',
@@ -485,8 +490,8 @@ CONTENT['21'] = {
 };
 
 // ───────────────────────── 14 ─────────────────────────
-CONTENT['22'] = {
-  num:'22', slug:'build-tools', title:'Maven, Gradle & the Classpath', navShort:'Build Tools', track:T4,
+CONTENT['27'] = {
+  num:'27', slug:'build-tools', title:'Maven, Gradle & the Classpath', navShort:'Build Tools', track:T4,
   heroTitle:'Where your code <span class="grad">finds its dependencies</span>',
   lede:"Java's superpower is its library ecosystem — reachable only through a build tool. Maven and Gradle resolve dependency trees, compile, test, and package, all hinging on one old idea you must understand: the classpath.",
   conceptH2:'Declare dependencies; the tool assembles the classpath',
@@ -522,8 +527,8 @@ CONTENT['22'] = {
 };
 
 // ───────────────────────── 15 ─────────────────────────
-CONTENT['23'] = {
-  num:'23', slug:'testing', title:'JUnit & Modern Testing', navShort:'Testing', track:T4,
+CONTENT['28'] = {
+  num:'28', slug:'testing', title:'JUnit & Modern Testing', navShort:'Testing', track:T4,
   heroTitle:'The <span class="grad">green bar</span> that lets you refactor fearlessly',
   lede:"JUnit is so central it ships in muscle memory: annotate a method @Test, arrange-act-assert, run. Add AssertJ for readable assertions and Mockito for fakes, and you have the safety net behind every confident Java change.",
   conceptH2:'Arrange, act, assert — one behavior per test',
@@ -596,8 +601,8 @@ CONTENT['06'] = {
 };
 
 // ───────────────────────── 08 Enums ─────────────────────────
-CONTENT['08'] = {
-  num:'08', slug:'enums', title:'Enums & Constant Types', navShort:'Enums', track:T2,
+CONTENT['13'] = {
+  num:'13', slug:'enums', title:'Enums & Constant Types', navShort:'Enums', track:T2,
   heroTitle:'A type with a <span class="grad">fixed set</span> of values',
   lede:"An enum is a class whose instances are a known, finite list — Monday through Sunday, not “any string that might be a day.” Java enums go far beyond C-style integer constants: they carry fields, methods, and even per-constant behavior.",
   conceptH2:'Type-safe constants that are real objects',
@@ -633,8 +638,8 @@ CONTENT['08'] = {
 };
 
 // ───────────────────────── 09 Packages & Access ─────────────────────────
-CONTENT['09'] = {
-  num:'09', slug:'packages-access', title:'Packages & Access Control', navShort:'Packages', track:T2,
+CONTENT['14'] = {
+  num:'14', slug:'packages-access', title:'Packages & Access Control', navShort:'Packages', track:T2,
   heroTitle:'Who can <span class="grad">see</span> your code',
   lede:"Packages give every Java type a globally unique name and a unit of encapsulation. The four access levels — public, protected, package-private, private — decide who may touch what. Get them right and your API surface stays small on purpose.",
   conceptH2:'Four levels, from wide open to sealed shut',
@@ -670,8 +675,8 @@ CONTENT['09'] = {
 };
 
 // ───────────────────────── 10 Strings ─────────────────────────
-CONTENT['10'] = {
-  num:'10', slug:'strings', title:'Strings & Text', navShort:'Strings', track:T2,
+CONTENT['15'] = {
+  num:'15', slug:'strings', title:'Strings & Text', navShort:'Strings', track:T2,
   heroTitle:'Immutable text and the <span class="grad">string pool</span>',
   lede:"Strings are objects, they're immutable, and identical literals are shared in a pool. That trio explains why == on strings is a trap, why heavy concatenation wants a StringBuilder, and why text blocks were such a welcome addition.",
   conceptH2:'Immutable, pooled, and built efficiently',
@@ -707,8 +712,8 @@ CONTENT['10'] = {
 };
 
 // ───────────────────────── 11 equals & hashCode ─────────────────────────
-CONTENT['11'] = {
-  num:'11', slug:'equals-hashcode', title:'The equals & hashCode Contract', navShort:'equals/hashCode', track:T2,
+CONTENT['16'] = {
+  num:'16', slug:'equals-hashcode', title:'The equals & hashCode Contract', navShort:'equals/hashCode', track:T2,
   heroTitle:'Why <span class="grad">==</span> lies, and equals tells the truth',
   lede:"Two objects can hold identical data yet be different instances. equals() defines value-equality; hashCode() must agree with it. Break their contract and HashMap silently loses your keys — one of Java's most common subtle bugs.",
   conceptH2:'Identity vs value, and the rule that ties them together',
@@ -744,8 +749,8 @@ CONTENT['11'] = {
 };
 
 // ───────────────────────── 15 Nested classes ─────────────────────────
-CONTENT['15'] = {
-  num:'15', slug:'nested-classes', title:'Nested, Inner & Anonymous Classes', navShort:'Nested Classes', track:T2,
+CONTENT['20'] = {
+  num:'20', slug:'nested-classes', title:'Nested, Inner & Anonymous Classes', navShort:'Nested Classes', track:T2,
   heroTitle:'Classes <span class="grad">inside</span> classes',
   lede:"Java lets a class live inside another. The kind you choose — static nested, inner, local, or anonymous — decides whether it can reach the enclosing instance's state. Knowing the difference demystifies older listener code and sets up lambdas.",
   conceptH2:'Four flavors, one question: do you hold the outer instance?',
@@ -781,8 +786,8 @@ CONTENT['15'] = {
 };
 
 // ───────────────────────── 19 Date & Time ─────────────────────────
-CONTENT['19'] = {
-  num:'19', slug:'datetime', title:'Dates & Times (java.time)', navShort:'Date & Time', track:T3,
+CONTENT['24'] = {
+  num:'24', slug:'datetime', title:'Dates & Times (java.time)', navShort:'Date & Time', track:T3,
   heroTitle:'A date/time API that <span class="grad">isn’t broken</span>',
   lede:"The old Date and Calendar were mutable, zero-indexed, thread-unsafe traps. Java 8's java.time replaced them with a clear, immutable model: LocalDate, LocalDateTime, Instant, Duration, and time zones that finally make sense.",
   conceptH2:'Immutable types for each kind of “when”',
@@ -818,8 +823,8 @@ CONTENT['19'] = {
 };
 
 // ───────────────────────── 20 Annotations & Reflection ─────────────────────────
-CONTENT['20'] = {
-  num:'20', slug:'annotations-reflection', title:'Annotations & Reflection', navShort:'Annotations', track:T3,
+CONTENT['25'] = {
+  num:'25', slug:'annotations-reflection', title:'Annotations & Reflection', navShort:'Annotations', track:T3,
   heroTitle:'Metadata the code can <span class="grad">read about itself</span>',
   lede:"Annotations attach metadata to code; reflection reads classes, fields, and methods at runtime. Together they power the frameworks you'll actually use — Spring, JUnit, Jackson — which wire things up by inspecting your annotated types.",
   conceptH2:'Tags on code, and an API to inspect them',
@@ -855,8 +860,8 @@ CONTENT['20'] = {
 };
 
 // ───────────────────────── 24 Dependency Injection & Spring ─────────────────────────
-CONTENT['24'] = {
-  num:'24', slug:'spring-di', title:'Dependency Injection & Spring', navShort:'Spring & DI', track:T5,
+CONTENT['29'] = {
+  num:'29', slug:'spring-di', title:'Dependency Injection & Spring', navShort:'Spring & DI', track:T5,
   heroTitle:'Don’t <span class="grad">new</span> your dependencies',
   lede:"Real Java apps rarely call new on their collaborators. Instead a container creates objects and hands each one what it needs — dependency injection. Spring is the framework that popularized it, and understanding the pattern matters more than memorizing its annotations.",
   conceptH2:'Inversion of control: the container wires you up',
@@ -892,8 +897,8 @@ CONTENT['24'] = {
 };
 
 // ───────────────────────── 25 Databases: JDBC & JPA ─────────────────────────
-CONTENT['25'] = {
-  num:'25', slug:'persistence-jdbc', title:'Databases: JDBC & JPA', navShort:'Persistence', track:T5,
+CONTENT['30'] = {
+  num:'30', slug:'persistence-jdbc', title:'Databases: JDBC & JPA', navShort:'Persistence', track:T5,
   heroTitle:'From <span class="grad">SQL rows</span> to Java objects',
   lede:"Every backend talks to a database. JDBC is Java's low-level driver API; JPA/Hibernate is the high-level mapping that turns rows into objects. Both rest on one non-negotiable rule: never build SQL with string concatenation.",
   conceptH2:'JDBC underneath, JPA on top',
@@ -929,8 +934,8 @@ CONTENT['25'] = {
 };
 
 // ───────────────────────── 26 JSON with Jackson ─────────────────────────
-CONTENT['26'] = {
-  num:'26', slug:'json-jackson', title:'JSON with Jackson', navShort:'JSON', track:T5,
+CONTENT['31'] = {
+  num:'31', slug:'json-jackson', title:'JSON with Jackson', navShort:'JSON', track:T5,
   heroTitle:'Java objects <span class="grad">⇄</span> JSON',
   lede:"APIs speak JSON; Java speaks objects. Jackson's ObjectMapper bridges the two — serialize a POJO to a JSON string, parse a string back into a typed object. It's the quiet workhorse under nearly every Spring REST endpoint.",
   conceptH2:'ObjectMapper: one object, two directions',
@@ -966,8 +971,8 @@ CONTENT['26'] = {
 };
 
 // ───────────────────────── 27 The HTTP Client ─────────────────────────
-CONTENT['27'] = {
-  num:'27', slug:'http-client', title:'The HTTP Client (java.net.http)', navShort:'HTTP Client', track:T5,
+CONTENT['32'] = {
+  num:'32', slug:'http-client', title:'The HTTP Client (java.net.http)', navShort:'HTTP Client', track:T5,
   heroTitle:'Call a service the <span class="grad">modern</span> way',
   lede:"For years calling HTTP in Java meant the clunky HttpURLConnection or a third-party library. Java 11's java.net.http changed that: a clean, immutable HttpClient with synchronous and async sends, built right into the JDK.",
   conceptH2:'Client, request, response — with async built in',
@@ -1003,8 +1008,8 @@ CONTENT['27'] = {
 };
 
 // ───────────────────────── 28 Logging Done Right ─────────────────────────
-CONTENT['28'] = {
-  num:'28', slug:'logging', title:'Logging Done Right', navShort:'Logging', track:T5,
+CONTENT['33'] = {
+  num:'33', slug:'logging', title:'Logging Done Right', navShort:'Logging', track:T5,
   heroTitle:'println is not a <span class="grad">logging strategy</span>',
   lede:"In production you can't attach a debugger — logs are how you see what happened. Java's ecosystem settled on SLF4J as a facade over backends like Logback. Levels, parameterized messages, and structure separate useful logs from noise.",
   conceptH2:'A facade, levels, and lazy messages',
@@ -1038,5 +1043,7 @@ CONTENT['28'] = {
      hint:"The stack trace. Pass the exception as the last argument instead: <span class='key'>log.error(\"failed for order {}\", orderId, e)</span>. SLF4J then logs the full trace, which <span class='key'>getMessage()</span> alone discards."},
   ],
 };
+
+Object.assign(CONTENT, require('./content-oop').MODS);
 
 module.exports = { NAV, CONTENT };

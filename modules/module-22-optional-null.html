@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 18 — Records, Sealed Types & Pattern Matching</title>
+<title>Module 22 — Optional & the Billion-Dollar Bug</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 18</span>
-      <span class="title">Records<small>Java for Developers · Track 3: Modern Java</small></span>
+      <span class="badge">MODULE 22</span>
+      <span class="title">Optional<small>Java for Developers · Track 3: Modern Java</small></span>
     </div>
-    <div class="links"><a href="module-17-optional-null.html">‹ Prev</a><a href="module-19-datetime.html">Next ›</a></div>
+    <div class="links"><a href="module-21-lambdas-streams.html">‹ Prev</a><a href="module-23-records-sealed.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,26 +147,27 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>Data classes, <span class="grad">without the boilerplate</span></h1>
-    <p class="lede">Modern Java fixed its most-mocked weakness: 40 lines of getters, equals, and hashCode for a simple data holder. Records, sealed types, and pattern matching turn that into a one-liner — and unlock exhaustive switches.</p>
+    <h1>Make <span class="grad">“might be absent”</span> part of the type</h1>
+    <p class="lede">Tony Hoare called null his “billion-dollar mistake.” Java can't remove null, but Optional lets a method's signature say “I might not return a value” — turning silent NullPointerExceptions into choices you make on purpose.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>Records carry data; sealed types bound the options</h2>
-    <p>A <strong>record</strong> is an immutable data carrier. One line generates the constructor, accessors, <span class='key'>equals</span>, <span class='key'>hashCode</span>, and <span class='key'>toString</span>. A <strong>sealed</strong> interface lists exactly which types may implement it — so the compiler can check a <span class='key'>switch</span> covers them all.</p><pre class="code" data-src="record Point(int x, int y) {}      // all the boilerplate, generated
+    <h2>A box that holds a value, or nothing</h2>
+    <p>An <span class='key'>Optional&lt;T&gt;</span> is a container that's either present (holds a T) or empty. Returning <span class='key'>Optional&lt;User&gt;</span> instead of <span class='key'>User</span> (which might be null) forces the caller to confront absence at compile time, not via a 2am stack trace.</p><pre class="code" data-src="Optional&lt;User&gt; found = repo.findById(42);
 
-sealed interface Shape permits Circle, Square {}
-record Circle(double r) implements Shape {}
-record Square(double s) implements Shape {}
+// Don’t: found.get() blows up if empty
+String name = found
+    .map(User::name)            // transform if present
+    .orElse(&quot;(unknown)&quot;);       // fallback if empty
 
-double area = switch (shape) {        // exhaustive: no default needed
-    case Circle c -&gt; Math.PI * c.r() * c.r();
-    case Square s -&gt; s.s() * s.s();
-};"></pre><p><strong>Pattern matching</strong> in <span class='key'>switch</span> tests the type and binds the value in one step — and with a sealed hierarchy the compiler <em>fails the build</em> if you forget a case. Records can be deconstructed too: <span class='key'>case Point(int x, int y)</span>.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: record Point then x, y then equals/hashCode then switch pattern then deconstruct"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">record Point</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">declare</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">x, y</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">components</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">equals/hashCode</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">auto-generated</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">switch pattern</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">match type</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">deconstruct</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">bind fields</text></g></svg></div>
+// Or branch explicitly
+found.ifPresentOrElse(
+    u -&gt; render(u),
+    () -&gt; show404());"></pre><p>Use <span class='key'>map</span>, <span class='key'>filter</span>, <span class='key'>orElse</span>, and <span class='key'>ifPresent</span> to flow through the box without ever touching null. Reserve <span class='key'>Optional</span> for return types — not fields or parameters — and never call <span class='key'>get()</span> without checking.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: findById(42) then Optional.of then map(User::name) then orElse(...) then value"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">findById(42)</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">maybe null</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">Optional.of</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">wrap</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">map(User::name)</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">if present</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">orElse(...)</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fallback</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">value</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">never null</text></g></svg></div>
     
   </div>
 </section>
@@ -174,9 +175,9 @@ double area = switch (shape) {        // exhaustive: no default needed
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>From one line to an exhaustive switch</h2>
-    <p>Step through what a record gives you for free, and how sealed types make a switch provably complete.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: record Point then x, y then equals/hashCode then switch pattern then deconstruct"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">record Point</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">declare</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">x, y</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">components</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">equals/hashCode</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">auto-generated</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">switch pattern</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">match type</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">deconstruct</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">bind fields</text></g></svg></div>
+    <h2>Flow a lookup through the box</h2>
+    <p>Watch a lookup that might find nothing travel through an Optional without a single null check exploding.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: findById(42) then Optional.of then map(User::name) then orElse(...) then value"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">findById(42)</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">maybe null</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">Optional.of</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">wrap</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">map(User::name)</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">if present</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">orElse(...)</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fallback</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">value</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">never null</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -184,25 +185,24 @@ double area = switch (shape) {        // exhaustive: no default needed
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">We want a simple immutable point with x and y.</div>
+    <div class="caption" id="caption" aria-live="polite">We ask a repository for user 42 — it may or may not exist.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>A record’s value</h2>
-    <p>Model a record’s components and a derived value. Real records add equals/hashCode automatically.</p>
+    <h2>Present or fallback</h2>
+    <p>A simple model of isPresent / orElse — the value you get is never null.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">Records.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// record Point(int x, int y)
-int x = 3;
-int y = 4;
-int distanceSquared = x * x + y * y;   // 9 + 16
-System.out.println("Point(" + x + ", " + y + ")");
-System.out.println("distanceSquared = " + distanceSquared);
-System.out.println("Two equal Points are .equals() for free.");</textarea>
+        <label class="editor-label" for="code">Optionals.java</label>
+        <textarea class="editor" id="code" spellcheck="false">boolean present = true;
+String value    = "Ada";
+String fallback = "(unknown)";
+System.out.println("isPresent() = " + present);
+System.out.println("orElse gives: " + value);
+System.out.println("No surprise NullPointerException.");</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -220,9 +220,9 @@ System.out.println("Two equal Points are .equals() for free.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>A <span class='key'>record</span> is Java's <span class='key'>@dataclass</span> (or <span class='key'>NamedTuple</span>): auto <span class='key'>__init__</span>, <span class='key'>__eq__</span>, <span class='key'>__repr__</span>. Records are immutable by default — like a frozen dataclass — and pattern matching mirrors Python 3.10's <span class='key'>match</span>.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>JS has no value-equality data type — two object literals are never <span class='key'>===</span> even with identical fields. A Java <span class='key'>record</span> gives real value equality and a generated <span class='key'>toString</span> out of the box.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Nearly identical to C# <span class='key'>record</span>s, including value equality and deconstruction. Java's sealed + switch patterns line up with C#'s pattern matching; the syntax differs but the ideas transfer directly.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Python uses <span class='key'>None</span> plus <span class='key'>Optional[T]</span> type hints. Java's <span class='key'>Optional</span> is a real object with methods (<span class='key'>map</span>, <span class='key'>orElse</span>), closer to a one-element container than to a bare <span class='key'>None</span> sentinel.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>Where JS reaches for <span class='key'>?.</span> and <span class='key'>??</span> on possibly-<span class='key'>undefined</span> values, Java wraps the value in <span class='key'>Optional</span> and chains <span class='key'>map</span>/<span class='key'>orElse</span>. Same goal — no null explosions — different shape.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Closest to C#'s nullable reference types (<span class='key'>User?</span>) plus the null-conditional operators. C# bakes nullability into the type system; Java bolts it on with the <span class='key'>Optional</span> wrapper, which is why Java says “return types only.”</p></div>
   </div>
 </section>
 
@@ -230,13 +230,13 @@ System.out.println("Two equal Points are .equals() for free.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; What you get free</h3><p class="prompt">List the members the compiler generates for <span class='key'>record User(String name, int age) {}</span>.</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">A canonical constructor <span class='key'>User(String, int)</span>; accessors <span class='key'>name()</span> and <span class='key'>age()</span>; plus <span class='key'>equals</span>, <span class='key'>hashCode</span>, and <span class='key'>toString</span> derived from both components. All fields are <span class='key'>final</span>.</div></details></div>
-      <div class="exercise"><h3>2 &middot; Why sealed helps</h3><p class="prompt">How does sealing <span class='key'>Shape permits Circle, Square</span> let you drop the <span class='key'>default</span> branch in a switch?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The compiler knows the <em>complete</em> set of subtypes, so it can verify your <span class='key'>switch</span> handles all of them. That makes <span class='key'>default</span> unnecessary — and turns a forgotten case into a compile error instead of a runtime surprise.</div></details></div>
+      <div class="exercise"><h3>1 &middot; The anti-pattern</h3><p class="prompt">Why is <span class='key'>optional.get()</span> right after <span class='key'>optional.isPresent()</span> frowned upon — and what's better?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">It rebuilds the null-check ceremony Optional was meant to remove, and forgetting the guard throws <span class='key'>NoSuchElementException</span>. Prefer <span class='key'>map</span>/<span class='key'>orElse</span>/<span class='key'>ifPresent</span>, which can't be misused that way.</div></details></div>
+      <div class="exercise"><h3>2 &middot; Where not to use it</h3><p class="prompt">Is <span class='key'>Optional&lt;String&gt;</span> a good type for a class <em>field</em>? Why or why not?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Generally no. <span class='key'>Optional</span> isn't <span class='key'>Serializable</span>, adds an allocation per field, and muddies object state. It's designed for <b>return values</b>; for fields, a plain nullable reference (well-documented) is idiomatic.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 18 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Dates & Times (java.time)</span></div>
+  <div class="wrap">Module 22 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Records, Sealed Types & Pattern Matching</span></div>
 </footer>
 
 <script>
@@ -262,7 +262,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"We want a simple immutable point with x and y."},{"lit":["a-0"],"caption":"<span class=\"key\">record Point(int x, int y) {}</span> — one line <b>declares</b> the whole data class."},{"lit":["a-0","a-1","b-0"],"caption":"The two <b>components</b> become final fields plus accessors <span class=\"key\">x()</span> and <span class=\"key\">y()</span>."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"<b>equals</b>, <b>hashCode</b>, and <b>toString</b> are generated from those components — value semantics for free."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"A <b>switch</b> pattern-matches on a sealed type, testing and binding in one step."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"Because the type is sealed, the compiler <b>deconstructs</b> every permitted case — miss one and the build fails."}];
+const STEPS = [{"lit":[],"caption":"We ask a repository for user 42 — it may or may not exist."},{"lit":["a-0"],"caption":"The raw result <b>might be null</b>; the old way would blow up downstream."},{"lit":["a-0","a-1","b-0"],"caption":"Instead the value is <b>wrapped</b> in an Optional — present or empty, but never a bare null."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"<b>map(User::name)</b> runs only if a value is present; on empty it simply stays empty."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"<b>orElse(“(unknown)”)</b> supplies a fallback if the box is empty."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"You always get a real, non-null value out — absence was handled on purpose."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');
@@ -300,30 +300,37 @@ function runJava(src){
     }
     return null;
   }
-  function splitTop(s,op){ const res=[]; let depth=0,inStr=false,cur='';
+  function scanTop(s, ops){ // split left-to-right on single-char ops, honoring quotes/parens; skips a leading (unary) operator
+    const toks=[], found=[]; let depth=0,inStr=false,cur='';
     for(let i=0;i<s.length;i++){ const c=s[i];
       if(c==='"'&&s[i-1]!=='\\') inStr=!inStr;
-      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--; else if(c===op&&depth===0){res.push(cur);cur='';continue;} }
+      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--;
+        else if(depth===0 && ops.indexOf(c)>=0 && cur.trim()!==''){ toks.push(cur); found.push(c); cur=''; continue; } }
       cur+=c; }
-    res.push(cur); return res; }
+    toks.push(cur); return {toks, found}; }
+  function multiplicative(expr){ // * / % left-to-right (same precedence)
+    const {toks, found}=scanTop(expr, ['*','/','%']);
+    let acc=evalAtom(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=evalAtom(toks[i+1]), o=found[i];
+      if(o==='*') acc={type:'num',value:acc.value*r.value};
+      else if(o==='/') acc={type:'num',value:Math.trunc(acc.value/r.value)};
+      else acc={type:'num',value:acc.value%r.value}; }
+    return acc; }
+  function additive(expr){ // + - left-to-right ('+' concatenates if either side is a String)
+    const {toks, found}=scanTop(expr, ['+','-']);
+    let acc=multiplicative(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=multiplicative(toks[i+1]);
+      if(found[i]==='+') acc=(acc.type==='String'||r.type==='String') ? {type:'String',value:toStr(acc)+toStr(r)} : {type:'num',value:acc.value+r.value};
+      else acc={type:'num',value:acc.value-r.value}; }
+    return acc; }
   function evalExpr(expr){
     expr=expr.trim();
     const cmp=findTop(expr,['>=','<=','==','!=']) || findTop(expr,['>','<']);
-    if(cmp){ const l=evalExpr(expr.slice(0,cmp.i)); const r=evalExpr(expr.slice(cmp.i+cmp.op.length));
+    if(cmp){ const l=additive(expr.slice(0,cmp.i)); const r=additive(expr.slice(cmp.i+cmp.op.length));
       const lv=l.value, rv=r.value; let b;
       switch(cmp.op){case'>=':b=lv>=rv;break;case'<=':b=lv<=rv;break;case'==':b=lv===rv;break;case'!=':b=lv!==rv;break;case'>':b=lv>rv;break;case'<':b=lv<rv;break;}
       return {type:'boolean',value:b}; }
-    const parts=splitTop(expr,'+');
-    if(parts.length>1){ let acc=evalExpr(parts[0]);
-      for(let i=1;i<parts.length;i++){ const rhs=evalExpr(parts[i]);
-        if(acc.type==='String'||rhs.type==='String') acc={type:'String',value:toStr(acc)+toStr(rhs)};
-        else acc={type:'num',value:acc.value+rhs.value}; }
-      return acc; }
-    const mul=splitTop(expr,'*'); if(mul.length>1) return mul.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value*b.value}));
-    const mod=splitTop(expr,'%'); if(mod.length>1) return mod.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value%b.value}));
-    const sub=splitTop(expr,'-'); if(sub.length>1&&sub[0].trim()!=='') return sub.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value-b.value}));
-    const div=splitTop(expr,'/'); if(div.length>1) return div.map(evalExpr).reduce((a,b)=>({type:'num',value:Math.trunc(a.value/b.value)}));
-    return evalAtom(expr);
+    return additive(expr);
   }
   function evalAtom(t){ t=t.trim();
     if(t.startsWith('(')&&t.endsWith(')')) return evalExpr(t.slice(1,-1));

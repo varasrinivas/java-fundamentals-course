@@ -24,39 +24,44 @@ system, tooling, idioms, and the reasons behind them.
 | 05 | objects-classes  | Objects, Classes & Constructors    | ✅ built |
 | 06 | inheritance      | Inheritance & Polymorphism         | ✅ built |
 | 07 | interfaces       | Interfaces & Abstract Classes      | ✅ built |
-| 08 | enums            | Enums & Constant Types             | ✅ built |
-| 09 | packages-access  | Packages & Access Control          | ✅ built |
-| 10 | strings          | Strings & Text                     | ✅ built |
-| 11 | equals-hashcode  | The equals & hashCode Contract     | ✅ built |
-| 12 | generics         | Generics & Type Erasure            | ✅ built |
-| 13 | collections      | The Collections Framework          | ✅ built |
-| 14 | exceptions       | Checked vs Unchecked Exceptions    | ✅ built |
-| 15 | nested-classes   | Nested, Inner & Anonymous Classes  | ✅ built |
+| 08 | encapsulation    | Encapsulation & Immutability       | ✅ built |
+| 09 | polymorphism     | Polymorphism: Overloading vs Overriding | ✅ built |
+| 10 | composition      | Composition over Inheritance       | ✅ built |
+| 11 | static-members   | Static Members & Class Design      | ✅ built |
+| 12 | solid-principles | SOLID Principles                   | ✅ built |
+| 13 | enums            | Enums & Constant Types             | ✅ built |
+| 14 | packages-access  | Packages & Access Control          | ✅ built |
+| 15 | strings          | Strings & Text                     | ✅ built |
+| 16 | equals-hashcode  | The equals & hashCode Contract     | ✅ built |
+| 17 | generics         | Generics & Type Erasure            | ✅ built |
+| 18 | collections      | The Collections Framework          | ✅ built |
+| 19 | exceptions       | Checked vs Unchecked Exceptions    | ✅ built |
+| 20 | nested-classes   | Nested, Inner & Anonymous Classes  | ✅ built |
 
 ### Track 3 — Modern Java (the good parts)
 | #  | Slug             | Title                              | Status |
 |----|------------------|------------------------------------|--------|
-| 16 | lambdas-streams  | Lambdas & the Streams API          | ✅ built |
-| 17 | optional-null    | Optional & the Billion-Dollar Bug  | ✅ built |
-| 18 | records-sealed   | Records, Sealed Types & Pattern Matching | ✅ built |
-| 19 | datetime         | Dates & Times (java.time)          | ✅ built |
-| 20 | annotations-reflection | Annotations & Reflection     | ✅ built |
-| 21 | concurrency      | Threads, Executors & Virtual Threads| ✅ built |
+| 21 | lambdas-streams  | Lambdas & the Streams API          | ✅ built |
+| 22 | optional-null    | Optional & the Billion-Dollar Bug  | ✅ built |
+| 23 | records-sealed   | Records, Sealed Types & Pattern Matching | ✅ built |
+| 24 | datetime         | Dates & Times (java.time)          | ✅ built |
+| 25 | annotations-reflection | Annotations & Reflection     | ✅ built |
+| 26 | concurrency      | Threads, Executors & Virtual Threads| ✅ built |
 
 ### Track 4 — The Ecosystem
 | #  | Slug             | Title                              | Status |
 |----|------------------|------------------------------------|--------|
-| 22 | build-tools      | Maven, Gradle & the Classpath      | ✅ built |
-| 23 | testing          | JUnit & Modern Testing             | ✅ built |
+| 27 | build-tools      | Maven, Gradle & the Classpath      | ✅ built |
+| 28 | testing          | JUnit & Modern Testing             | ✅ built |
 
 ### Track 5 — Real-World Java (the backend stack)
 | #  | Slug             | Title                              | Status |
 |----|------------------|------------------------------------|--------|
-| 24 | spring-di        | Dependency Injection & Spring      | ✅ built |
-| 25 | persistence-jdbc | Databases: JDBC & JPA              | ✅ built |
-| 26 | json-jackson     | JSON with Jackson                  | ✅ built |
-| 27 | http-client      | The HTTP Client (java.net.http)    | ✅ built |
-| 28 | logging          | Logging Done Right                 | ✅ built |
+| 29 | spring-di        | Dependency Injection & Spring      | ✅ built |
+| 30 | persistence-jdbc | Databases: JDBC & JPA              | ✅ built |
+| 31 | json-jackson     | JSON with Jackson                  | ✅ built |
+| 32 | http-client      | The HTTP Client (java.net.http)    | ✅ built |
+| 33 | logging          | Logging Done Right                 | ✅ built |
 
 ## Design System (canonical — keep in sync with CLAUDE.md tokens)
 

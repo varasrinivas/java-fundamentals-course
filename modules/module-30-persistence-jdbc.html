@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 11 — The equals & hashCode Contract</title>
+<title>Module 30 — Databases: JDBC & JPA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 11</span>
-      <span class="title">equals/hashCode<small>Java for Developers · Track 2: The Language</small></span>
+      <span class="badge">MODULE 30</span>
+      <span class="title">Persistence<small>Java for Developers · Track 5: Real-World Java</small></span>
     </div>
-    <div class="links"><a href="module-10-strings.html">‹ Prev</a><a href="module-12-generics.html">Next ›</a></div>
+    <div class="links"><a href="module-29-spring-di.html">‹ Prev</a><a href="module-31-json-jackson.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,25 +147,28 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>Why <span class="grad">==</span> lies, and equals tells the truth</h1>
-    <p class="lede">Two objects can hold identical data yet be different instances. equals() defines value-equality; hashCode() must agree with it. Break their contract and HashMap silently loses your keys — one of Java's most common subtle bugs.</p>
+    <h1>From <span class="grad">SQL rows</span> to Java objects</h1>
+    <p class="lede">Every backend talks to a database. JDBC is Java's low-level driver API; JPA/Hibernate is the high-level mapping that turns rows into objects. Both rest on one non-negotiable rule: never build SQL with string concatenation.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>Identity vs value, and the rule that ties them together</h2>
-    <p><span class='key'>==</span> asks “same object?” (identity). <span class='key'>equals()</span> asks “same value?” — but only if the class overrides it; the default <span class='key'>Object.equals</span> is just <span class='key'>==</span>. The <strong>contract</strong>: if <span class='key'>a.equals(b)</span>, then <span class='key'>a.hashCode() == b.hashCode()</span> <em>must</em> hold.</p><pre class="code" data-src="class Point {
-    final int x, y;
-    Point(int x, int y) { this.x = x; this.y = y; }
-    @Override public boolean equals(Object o) {
-        if (!(o instanceof Point p)) return false;
-        return x == p.x &amp;&amp; y == p.y;
+    <h2>JDBC underneath, JPA on top</h2>
+    <p>JDBC's flow: get a <span class='key'>Connection</span> from a pooled <span class='key'>DataSource</span>, run a <strong><span class='key'>PreparedStatement</span></strong> with <span class='key'>?</span> placeholders, read a <span class='key'>ResultSet</span>, and map each row to an object. The placeholders aren't a convenience — they're how you stop SQL injection.</p><pre class="code" data-src="// JDBC — note the parameterized query and try-with-resources
+var sql = &quot;SELECT name FROM users WHERE id = ?&quot;;
+try (var ps = conn.prepareStatement(sql)) {
+    ps.setInt(1, userId);                  // safe: never string-concat
+    try (var rs = ps.executeQuery()) {
+        while (rs.next()) use(rs.getString(&quot;name&quot;));
     }
-    @Override public int hashCode() { return Objects.hash(x, y); }
-}"></pre><p>Override both, together, using the same fields. Why? A <span class='key'>HashMap</span> first picks a bucket by <span class='key'>hashCode()</span>, then confirms with <span class='key'>equals()</span>. If equal objects produce different hashes, they land in different buckets and the map can't find what it stored. (This is exactly why <span class='key'>record</span>s, which generate both, are so handy.)</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: a == b then a.equals(b) then hashCode() then same bucket then found"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">a == b</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">identity</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">a.equals(b)</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">value</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">hashCode()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">must agree</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">same bucket</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">HashMap</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">found</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lookup works</text></g></svg></div>
+}
+
+// JPA — the same idea, mapped to an entity
+@Entity class User { @Id Long id; String name; }
+User u = entityManager.find(User.class, userId);"></pre><p>JPA/Hibernate maps <span class='key'>@Entity</span> classes to tables and generates the SQL for you, including lazy loading and caching. It's productive but leaky — you still need to understand the SQL it emits (watch for the N+1 query problem). Use JDBC (or a thin layer like jOOQ/Spring Data JDBC) when you want control; use JPA when you want speed of development.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: DataSource then Connection then PreparedStatement then ResultSet then map"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">DataSource</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">pool</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Connection</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">borrow</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">PreparedStatement</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">? params</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">ResultSet</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">rows</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">map</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">to objects</text></g></svg></div>
     
   </div>
 </section>
@@ -173,9 +176,9 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>How a HashMap relies on the contract</h2>
-    <p>Step through a map lookup to see exactly where hashCode and equals each do their job — and what breaks if they disagree.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: a == b then a.equals(b) then hashCode() then same bucket then found"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">a == b</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">identity</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">a.equals(b)</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">value</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">hashCode()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">must agree</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">same bucket</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">HashMap</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">found</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lookup works</text></g></svg></div>
+    <h2>A query from pool to object</h2>
+    <p>Step through one safe query: borrow a connection, bind parameters, read rows, and map them — releasing resources along the way.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: DataSource then Connection then PreparedStatement then ResultSet then map"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">DataSource</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">pool</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Connection</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">borrow</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">PreparedStatement</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">? params</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">ResultSet</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">rows</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">map</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">to objects</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -183,27 +186,25 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">We store a value under a key object, then look it up with an equal-but-different key.</div>
+    <div class="caption" id="caption" aria-live="polite">We need one user row from the database, by id.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>Equal values, agreeing hashes</h2>
-    <p>The contract in miniature: equal values must yield equal hash codes. Run it to see both agree.</p>
+    <h2>Reading a result set</h2>
+    <p>A result set is rows × columns. Model how many cells a query reads and whether it returned anything.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">EqualsHash.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// Two keys with the same logical value
-int valueA = 42;
-int valueB = 42;
-System.out.println("equals? " + (valueA == valueB));      // true
-// Their hash codes must agree, or HashMap breaks
-int hashA = valueA;
-int hashB = valueB;
-System.out.println("hashCodes agree? " + (hashA == hashB)); // true
-System.out.println("Equal objects MUST share a hashCode.");</textarea>
+        <label class="editor-label" for="code">Query.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// SELECT returns rows; each row has columns
+int rows    = 3;
+int columns = 4;
+int cellsRead = rows * columns;
+System.out.println("rows returned = " + rows);
+System.out.println("cells read    = " + cellsRead);
+System.out.println("result has rows? " + (rows &gt; 0));</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -221,9 +222,9 @@ System.out.println("Equal objects MUST share a hashCode.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Same idea: override <span class='key'>__eq__</span> and <span class='key'>__hash__</span> together, or sets and dicts misbehave. Java just makes it explicit on every class, and <span class='key'>Objects.hash(...)</span> mirrors Python's habit of hashing a tuple of fields.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>JS <span class='key'>Map</span>/<span class='key'>Set</span> use reference identity for object keys and offer no value-equality hook — so this whole contract is unfamiliar. In Java, equal-by-value objects can serve as the <em>same</em> key, which is powerful but demands a correct <span class='key'>hashCode</span>.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Directly analogous to overriding <span class='key'>Equals</span> and <span class='key'>GetHashCode</span> for <span class='key'>Dictionary</span> keys. Java's <span class='key'>record</span> ≈ C#'s <span class='key'>record</span>: both auto-generate a consistent pair so you don't have to.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>JDBC is Python's DB-API (<span class='key'>cursor.execute(sql, params)</span>) — same parameterized-query discipline. JPA/Hibernate ≈ SQLAlchemy ORM: productive object mapping, with the same need to mind the SQL it generates.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>JDBC's <span class='key'>PreparedStatement</span> is the parameterized query you'd write with <span class='key'>pg</span>/<span class='key'>mysql2</span>; JPA/Hibernate plays the role of Prisma/TypeORM. The placeholder-not-concatenation rule is identical across all of them.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>JDBC ≈ ADO.NET (<span class='key'>SqlConnection</span>, <span class='key'>SqlCommand</span> with parameters), and JPA/Hibernate ≈ Entity Framework. If you've used Dapper for control or EF for convenience, the JDBC-vs-JPA trade-off will feel familiar.</p></div>
   </div>
 </section>
 
@@ -231,13 +232,13 @@ System.out.println("Equal objects MUST share a hashCode.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; The vanishing key</h3><p class="prompt">You override <span class='key'>equals()</span> but forget <span class='key'>hashCode()</span>, then use the object as a <span class='key'>HashMap</span> key. What goes wrong?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The default <span class='key'>hashCode</span> is identity-based, so two equal objects usually get different hashes and different buckets. <span class='key'>get</span> looks in the wrong bucket and returns null — the entry is effectively lost.</div></details></div>
-      <div class="exercise"><h3>2 &middot; Hash quality</h3><p class="prompt">Is <span class='key'>hashCode() { return 1; }</span> a <em>correct</em> implementation? Is it a <em>good</em> one?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Correct (equal objects share it, so the contract holds) but terrible: every key collides into one bucket, degrading the map to a linked list — O(n) lookups. A good hash spreads values across buckets.</div></details></div>
+      <div class="exercise"><h3>1 &middot; The injection trap</h3><p class="prompt">Why is <span class='key'>"...WHERE id = " + userId</span> dangerous, and how does <span class='key'>PreparedStatement</span> fix it?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">String-concatenating user input lets an attacker inject SQL (e.g. <span class='key'>1 OR 1=1</span>). A <span class='key'>PreparedStatement</span> sends the SQL and the parameter separately, so the value is always treated as data, never executable SQL.</div></details></div>
+      <div class="exercise"><h3>2 &middot; N+1 surprise</h3><p class="prompt">With JPA, looping over 100 orders and reading each order's customer fires 101 queries. What's this called, and one way to avoid it?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The N+1 query problem — one query for the list, then one per item for the association. Fix it with an eager <span class='key'>JOIN FETCH</span> (or a batch/entity-graph) so the customers load in a single query.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 11 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Generics & Type Erasure</span></div>
+  <div class="wrap">Module 30 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: JSON with Jackson</span></div>
 </footer>
 
 <script>
@@ -263,7 +264,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"We store a value under a key object, then look it up with an equal-but-different key."},{"lit":["a-0"],"caption":"<span class=\"key\">==</span> on the two keys is <b>false</b> — they’re distinct objects."},{"lit":["a-0","a-1","b-0"],"caption":"A correct <b>equals()</b> reports they’re equal by value, which is what we want."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"<b>hashCode()</b> must return the same number for both, or the contract is broken."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"The map uses the hash to land in the <b>same bucket</b> where the entry was stored."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"Within the bucket, <span class=\"key\">equals()</span> confirms the match and the value is <b>found</b>."}];
+const STEPS = [{"lit":[],"caption":"We need one user row from the database, by id."},{"lit":["a-0"],"caption":"A pooled <b>DataSource</b> hands out connections so we don’t open one per query."},{"lit":["a-0","a-1","b-0"],"caption":"We borrow a <b>Connection</b> (and return it via try-with-resources when done)."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"A <b>PreparedStatement</b> with a <span class=\"key\">?</span> placeholder binds the id safely — no SQL injection."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"Executing yields a <b>ResultSet</b> we iterate row by row."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"Each row is <b>mapped</b> to a Java object (by hand in JDBC, automatically in JPA)."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');
@@ -301,30 +302,37 @@ function runJava(src){
     }
     return null;
   }
-  function splitTop(s,op){ const res=[]; let depth=0,inStr=false,cur='';
+  function scanTop(s, ops){ // split left-to-right on single-char ops, honoring quotes/parens; skips a leading (unary) operator
+    const toks=[], found=[]; let depth=0,inStr=false,cur='';
     for(let i=0;i<s.length;i++){ const c=s[i];
       if(c==='"'&&s[i-1]!=='\\') inStr=!inStr;
-      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--; else if(c===op&&depth===0){res.push(cur);cur='';continue;} }
+      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--;
+        else if(depth===0 && ops.indexOf(c)>=0 && cur.trim()!==''){ toks.push(cur); found.push(c); cur=''; continue; } }
       cur+=c; }
-    res.push(cur); return res; }
+    toks.push(cur); return {toks, found}; }
+  function multiplicative(expr){ // * / % left-to-right (same precedence)
+    const {toks, found}=scanTop(expr, ['*','/','%']);
+    let acc=evalAtom(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=evalAtom(toks[i+1]), o=found[i];
+      if(o==='*') acc={type:'num',value:acc.value*r.value};
+      else if(o==='/') acc={type:'num',value:Math.trunc(acc.value/r.value)};
+      else acc={type:'num',value:acc.value%r.value}; }
+    return acc; }
+  function additive(expr){ // + - left-to-right ('+' concatenates if either side is a String)
+    const {toks, found}=scanTop(expr, ['+','-']);
+    let acc=multiplicative(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=multiplicative(toks[i+1]);
+      if(found[i]==='+') acc=(acc.type==='String'||r.type==='String') ? {type:'String',value:toStr(acc)+toStr(r)} : {type:'num',value:acc.value+r.value};
+      else acc={type:'num',value:acc.value-r.value}; }
+    return acc; }
   function evalExpr(expr){
     expr=expr.trim();
     const cmp=findTop(expr,['>=','<=','==','!=']) || findTop(expr,['>','<']);
-    if(cmp){ const l=evalExpr(expr.slice(0,cmp.i)); const r=evalExpr(expr.slice(cmp.i+cmp.op.length));
+    if(cmp){ const l=additive(expr.slice(0,cmp.i)); const r=additive(expr.slice(cmp.i+cmp.op.length));
       const lv=l.value, rv=r.value; let b;
       switch(cmp.op){case'>=':b=lv>=rv;break;case'<=':b=lv<=rv;break;case'==':b=lv===rv;break;case'!=':b=lv!==rv;break;case'>':b=lv>rv;break;case'<':b=lv<rv;break;}
       return {type:'boolean',value:b}; }
-    const parts=splitTop(expr,'+');
-    if(parts.length>1){ let acc=evalExpr(parts[0]);
-      for(let i=1;i<parts.length;i++){ const rhs=evalExpr(parts[i]);
-        if(acc.type==='String'||rhs.type==='String') acc={type:'String',value:toStr(acc)+toStr(rhs)};
-        else acc={type:'num',value:acc.value+rhs.value}; }
-      return acc; }
-    const mul=splitTop(expr,'*'); if(mul.length>1) return mul.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value*b.value}));
-    const mod=splitTop(expr,'%'); if(mod.length>1) return mod.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value%b.value}));
-    const sub=splitTop(expr,'-'); if(sub.length>1&&sub[0].trim()!=='') return sub.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value-b.value}));
-    const div=splitTop(expr,'/'); if(div.length>1) return div.map(evalExpr).reduce((a,b)=>({type:'num',value:Math.trunc(a.value/b.value)}));
-    return evalAtom(expr);
+    return additive(expr);
   }
   function evalAtom(t){ t=t.trim();
     if(t.startsWith('(')&&t.endsWith(')')) return evalExpr(t.slice(1,-1));

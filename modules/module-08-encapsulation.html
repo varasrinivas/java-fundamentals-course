@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 15 — Nested, Inner & Anonymous Classes</title>
+<title>Module 08 — Encapsulation & Immutability</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 15</span>
-      <span class="title">Nested Classes<small>Java for Developers · Track 2: The Language</small></span>
+      <span class="badge">MODULE 08</span>
+      <span class="title">Encapsulation<small>Java for Developers · Track 2: The Language</small></span>
     </div>
-    <div class="links"><a href="module-14-exceptions.html">‹ Prev</a><a href="module-16-lambdas-streams.html">Next ›</a></div>
+    <div class="links"><a href="module-07-interfaces.html">‹ Prev</a><a href="module-09-polymorphism.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,28 +147,28 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>Classes <span class="grad">inside</span> classes</h1>
-    <p class="lede">Java lets a class live inside another. The kind you choose — static nested, inner, local, or anonymous — decides whether it can reach the enclosing instance's state. Knowing the difference demystifies older listener code and sets up lambdas.</p>
+    <h1>Hide the data, <span class="grad">expose the behavior</span></h1>
+    <p class="lede">Encapsulation is the pillar most people under-use. It isn't just “make fields private” — it's giving a class control over its own state so it can guarantee its invariants. Push it further and you get immutability: objects that can never be in a wrong state.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>Four flavors, one question: do you hold the outer instance?</h2>
-    <p>A <strong>static nested</strong> class is just a top-level class scoped inside another — no link to an outer instance. A non-static <strong>inner</strong> class holds a hidden reference to its enclosing object, so it can use its fields. A <strong>local</strong> class is declared inside a method; an <strong>anonymous</strong> class is a local class with no name, defined and instantiated at once.</p><pre class="code" data-src="class Outer {
-    int count = 1;
-    static class Helper {}          // static nested: no Outer needed
-    class Inner { int read() { return count; } } // sees Outer.count
-}
-
-// Anonymous class implementing an interface, inline
-Runnable r = new Runnable() {
-    public void run() { System.out.println(&quot;hi&quot;); }
-};
-// Lambda — the concise successor
-Runnable r2 = () -&gt; System.out.println(&quot;hi&quot;);"></pre><p>Anonymous classes (and lambdas) <strong>capture</strong> local variables, which must be <span class='key'>final</span> or effectively final. Prefer <span class='key'>static</span> nested classes unless you truly need the outer instance — a non-static inner class quietly keeps the outer object alive, a classic memory leak.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: static nested then inner then local then anonymous then lambda"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">static nested</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">no outer ref</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">inner</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">holds outer</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">local</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">in a method</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">anonymous</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">on the spot</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">lambda</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">concise form</text></g></svg></div>
+    <h2>A class should guard its own invariants</h2>
+    <p>Make fields <span class='key'>private</span> and let the class mediate every change through methods. That way a single place enforces the rules — a balance that can’t go negative, an email that must contain <span class='key'>@</span>. Callers get behavior, not raw access.</p><pre class="code" data-src="class Account {
+    private int balance;                    // hidden state
+    void deposit(int amt) {
+        if (amt &lt;= 0) throw new IllegalArgumentException();
+        balance += amt;                     // invariant enforced here
+    }
+    int balance() { return balance; }       // read-only view
+}"></pre><p><strong>Immutability</strong> takes this to its conclusion: make every field <span class='key'>final</span>, set it once in the constructor, and expose no setters. An immutable object is always valid, freely shareable across threads, and safe as a <span class='key'>Map</span> key. When a constructor would take many fields, a <strong>builder</strong> keeps construction readable while still producing an immutable result.</p><pre class="code" data-src="final class Money {
+    private final long cents;                // set once, never changes
+    Money(long cents) { this.cents = cents; }
+    Money plus(Money m) { return new Money(cents + m.cents); } // returns NEW
+}"></pre>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: private field then public method then validate then final fields then builder"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">private field</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">hidden state</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">public method</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">guarded access</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">validate</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">enforce invariant</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">final fields</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">immutable</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">builder</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">construct safely</text></g></svg></div>
     
   </div>
 </section>
@@ -176,9 +176,9 @@ Runnable r2 = () -&gt; System.out.println(&quot;hi&quot;);"></pre><p>Anonymous c
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>From named nested class to lambda</h2>
-    <p>Step along the spectrum from a fully independent nested class to a one-line lambda, watching what each can access.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: static nested then inner then local then anonymous then lambda"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">static nested</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">no outer ref</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">inner</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">holds outer</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">local</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">in a method</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">anonymous</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">on the spot</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">lambda</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">concise form</text></g></svg></div>
+    <h2>From exposed field to bulletproof object</h2>
+    <p>Step through how encapsulation tightens, ending at an immutable object that can never hold an invalid state.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: private field then public method then validate then final fields then builder"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">private field</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">hidden state</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">public method</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">guarded access</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">validate</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">enforce invariant</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">final fields</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">immutable</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">builder</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">construct safely</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -186,25 +186,25 @@ Runnable r2 = () -&gt; System.out.println(&quot;hi&quot;);"></pre><p>Anonymous c
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">We want a helper type that lives alongside a class’s logic.</div>
+    <div class="caption" id="caption" aria-live="polite">We start with a class that has some state to protect.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>Capturing an outer value</h2>
-    <p>An inner/anonymous class closes over an effectively-final outer value. Model the capture and use.</p>
+    <h2>A guarded setter in action</h2>
+    <p>A setter exists to enforce a rule. Here the “withdraw” guard rejects an overdraft, leaving state unchanged.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">Nested.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// An anonymous class / lambda captures this value
-int outerCount = 3;          // must be effectively final to capture
-int captured   = outerCount;  // the nested class closes over it
-int usedTwice  = captured * 2;
-System.out.println("outer value     = " + outerCount);
-System.out.println("captured &amp; used = " + usedTwice);
-System.out.println("Lambdas replaced most anonymous classes.");</textarea>
+        <label class="editor-label" for="code">Encapsulation.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// The invariant a setter would enforce: balance never goes negative
+int balance = 100;
+int withdrawal = 130;
+boolean allowed = withdrawal &lt;= balance;
+System.out.println("balance = " + balance);
+System.out.println("withdraw " + withdrawal + " allowed? " + allowed);
+System.out.println("balance after (rejected) = " + balance);</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -222,9 +222,9 @@ System.out.println("Lambdas replaced most anonymous classes.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Python nests functions and closures freely, capturing variables by reference. Java captures only <b>effectively final</b> locals (you can't reassign a captured variable), which prevents a whole class of confusing closure bugs.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>JS closures capture live, mutable variables; Java's capture is read-only by value-of-a-final. The anonymous-class form is verbose like a pre-arrow-function callback — and lambdas are Java's arrow-function moment.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Static nested ≈ a nested class; Java's inner class ≈ a C# nested class holding a manual outer reference (C# nested classes are implicitly static-like). Anonymous classes map onto C# anonymous delegates, and lambdas line up directly.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Python has no real <span class='key'>private</span> — a leading underscore is a convention and double-underscore only name-mangles. Java’s <span class='key'>private</span> is compiler-enforced, so encapsulation is a guarantee, not a polite request. Python’s <span class='key'>@property</span> ≈ Java getters/setters.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>Class <span class='key'>#private</span> fields are recent in JS and runtime-enforced; before them it was closures or convention. Java has had enforced access control from day one, and <span class='key'>final</span> gives true immutability that <span class='key'>Object.freeze</span> only approximates.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>C# properties (<span class='key'>get; private set;</span>) and <span class='key'>readonly</span>/<span class='key'>init</span> are the direct analogs. Java writes explicit getter methods instead of properties, and uses <span class='key'>final</span> where C# uses <span class='key'>readonly</span>.</p></div>
   </div>
 </section>
 
@@ -232,13 +232,13 @@ System.out.println("Lambdas replaced most anonymous classes.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; static or not?</h3><p class="prompt">You write a nested <span class='key'>Comparator</span> that never touches the outer instance's fields. Static nested or inner — and why?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>Static nested.</b> It doesn't need the enclosing instance, so making it inner would needlessly hold a reference to the outer object (preventing GC and wasting memory). Default to static unless you need the outer state.</div></details></div>
-      <div class="exercise"><h3>2 &middot; Capture rules</h3><p class="prompt">Why won't this compile: a lambda uses a local <span class='key'>int n</span> that the method reassigns later?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Captured locals must be <b>effectively final</b> — assigned once. Reassigning <span class='key'>n</span> makes it non-final, so the lambda can't capture it. Copy it into a new final variable, or avoid the reassignment.</div></details></div>
+      <div class="exercise"><h3>1 &middot; Why immutable?</h3><p class="prompt">Name two concrete benefits of making a small value class (like <span class='key'>Money</span>) immutable.</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">It’s always valid (no half-updated state), inherently <b>thread-safe</b> (no synchronization needed), and safe to use as a <span class='key'>HashMap</span> key or to share/cache freely — because its hash and value never change.</div></details></div>
+      <div class="exercise"><h3>2 &middot; Leaky encapsulation</h3><p class="prompt">A class has a private <span class='key'>List&lt;String&gt;</span> field and a getter that returns it directly. Why is encapsulation broken?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Callers get a reference to the internal list and can mutate it behind the class’s back, bypassing every invariant. Return an unmodifiable view (<span class='key'>List.copyOf(...)</span>) or a copy instead.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 15 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Lambdas & the Streams API</span></div>
+  <div class="wrap">Module 08 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Polymorphism: Overloading vs Overriding</span></div>
 </footer>
 
 <script>
@@ -264,7 +264,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"We want a helper type that lives alongside a class’s logic."},{"lit":["a-0"],"caption":"A <b>static nested</b> class is scoped inside but holds <b>no</b> reference to an outer instance."},{"lit":["a-0","a-1","b-0"],"caption":"A non-static <b>inner</b> class holds the enclosing instance, so it can read its fields."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"A <b>local</b> class is declared inside a method, visible only there."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"An <b>anonymous</b> class implements an interface inline, capturing effectively-final locals."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"A <b>lambda</b> is the concise successor to a single-method anonymous class."}];
+const STEPS = [{"lit":[],"caption":"We start with a class that has some state to protect."},{"lit":["a-0"],"caption":"The field is made <b>private</b> — no outside code can poke it directly."},{"lit":["a-0","a-1","b-0"],"caption":"A <b>public method</b> becomes the only door in, so the class controls every change."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"That method <b>validates</b>, enforcing the invariant (e.g. balance never negative) in one place."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"Make the fields <b>final</b> and drop setters — now the object is <b>immutable</b> and always valid."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"For many fields, a <b>builder</b> keeps construction readable while still yielding an immutable object."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');
@@ -302,30 +302,37 @@ function runJava(src){
     }
     return null;
   }
-  function splitTop(s,op){ const res=[]; let depth=0,inStr=false,cur='';
+  function scanTop(s, ops){ // split left-to-right on single-char ops, honoring quotes/parens; skips a leading (unary) operator
+    const toks=[], found=[]; let depth=0,inStr=false,cur='';
     for(let i=0;i<s.length;i++){ const c=s[i];
       if(c==='"'&&s[i-1]!=='\\') inStr=!inStr;
-      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--; else if(c===op&&depth===0){res.push(cur);cur='';continue;} }
+      if(!inStr){ if(c==='(')depth++; else if(c===')')depth--;
+        else if(depth===0 && ops.indexOf(c)>=0 && cur.trim()!==''){ toks.push(cur); found.push(c); cur=''; continue; } }
       cur+=c; }
-    res.push(cur); return res; }
+    toks.push(cur); return {toks, found}; }
+  function multiplicative(expr){ // * / % left-to-right (same precedence)
+    const {toks, found}=scanTop(expr, ['*','/','%']);
+    let acc=evalAtom(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=evalAtom(toks[i+1]), o=found[i];
+      if(o==='*') acc={type:'num',value:acc.value*r.value};
+      else if(o==='/') acc={type:'num',value:Math.trunc(acc.value/r.value)};
+      else acc={type:'num',value:acc.value%r.value}; }
+    return acc; }
+  function additive(expr){ // + - left-to-right ('+' concatenates if either side is a String)
+    const {toks, found}=scanTop(expr, ['+','-']);
+    let acc=multiplicative(toks[0]);
+    for(let i=0;i<found.length;i++){ const r=multiplicative(toks[i+1]);
+      if(found[i]==='+') acc=(acc.type==='String'||r.type==='String') ? {type:'String',value:toStr(acc)+toStr(r)} : {type:'num',value:acc.value+r.value};
+      else acc={type:'num',value:acc.value-r.value}; }
+    return acc; }
   function evalExpr(expr){
     expr=expr.trim();
     const cmp=findTop(expr,['>=','<=','==','!=']) || findTop(expr,['>','<']);
-    if(cmp){ const l=evalExpr(expr.slice(0,cmp.i)); const r=evalExpr(expr.slice(cmp.i+cmp.op.length));
+    if(cmp){ const l=additive(expr.slice(0,cmp.i)); const r=additive(expr.slice(cmp.i+cmp.op.length));
       const lv=l.value, rv=r.value; let b;
       switch(cmp.op){case'>=':b=lv>=rv;break;case'<=':b=lv<=rv;break;case'==':b=lv===rv;break;case'!=':b=lv!==rv;break;case'>':b=lv>rv;break;case'<':b=lv<rv;break;}
       return {type:'boolean',value:b}; }
-    const parts=splitTop(expr,'+');
-    if(parts.length>1){ let acc=evalExpr(parts[0]);
-      for(let i=1;i<parts.length;i++){ const rhs=evalExpr(parts[i]);
-        if(acc.type==='String'||rhs.type==='String') acc={type:'String',value:toStr(acc)+toStr(rhs)};
-        else acc={type:'num',value:acc.value+rhs.value}; }
-      return acc; }
-    const mul=splitTop(expr,'*'); if(mul.length>1) return mul.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value*b.value}));
-    const mod=splitTop(expr,'%'); if(mod.length>1) return mod.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value%b.value}));
-    const sub=splitTop(expr,'-'); if(sub.length>1&&sub[0].trim()!=='') return sub.map(evalExpr).reduce((a,b)=>({type:'num',value:a.value-b.value}));
-    const div=splitTop(expr,'/'); if(div.length>1) return div.map(evalExpr).reduce((a,b)=>({type:'num',value:Math.trunc(a.value/b.value)}));
-    return evalAtom(expr);
+    return additive(expr);
   }
   function evalAtom(t){ t=t.trim();
     if(t.startsWith('(')&&t.endsWith(')')) return evalExpr(t.slice(1,-1));
