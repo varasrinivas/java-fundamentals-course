@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 33 — Logging Done Right</title>
+<title>Module 43 — Command</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 33</span>
-      <span class="title">Logging<small>Java for Developers · Track 5: Real-World Java</small></span>
+      <span class="badge">MODULE 43</span>
+      <span class="title">Command<small>Java for Developers · Track 6: Design Patterns</small></span>
     </div>
-    <div class="links"><a href="module-32-http-client.html">‹ Prev</a><a href="module-34-singleton.html">Next ›</a></div>
+    <div class="links"><a href="module-42-observer.html">‹ Prev</a><a href="module-44-template-method.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,24 +147,24 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>println is not a <span class="grad">logging strategy</span></h1>
-    <p class="lede">In production you can't attach a debugger — logs are how you see what happened. Java's ecosystem settled on SLF4J as a facade over backends like Logback. Levels, parameterized messages, and structure separate useful logs from noise.</p>
+    <h1>Wrap a request as an <span class="grad">object</span></h1>
+    <p class="lede">Real-world picture: a restaurant order ticket. The waiter writes your request on a slip and hangs it in the kitchen. The slip is a thing — it can be queued, reordered, and even cancelled. Command turns an action into an object you can store, pass around, queue, log, and undo.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>A facade, levels, and lazy messages</h2>
-    <p>Code against the <strong>SLF4J</strong> facade (<span class='key'>Logger</span>, <span class='key'>LoggerFactory</span>); pick a backend (Logback, Log4j2) at deploy time. Each message has a <strong>level</strong> — ERROR, WARN, INFO, DEBUG, TRACE — and a configured threshold drops anything less severe.</p><pre class="code" data-src="private static final Logger log =
-    LoggerFactory.getLogger(OrderService.class);
-
-log.info(&quot;placed order {} for user {}&quot;, orderId, userId);  // {} params
-log.debug(&quot;cart contents: {}&quot;, cart);    // skipped unless DEBUG enabled
-try { ... } catch (Exception e) {
-    log.error(&quot;order {} failed&quot;, orderId, e);   // last arg = the exception
-}"></pre><p>Use <span class='key'>{}</span> placeholders, not string concatenation: the message is only formatted if the level is enabled, so a disabled <span class='key'>debug</span> call costs almost nothing. Log the <em>exception object</em> (last argument) to capture the stack trace, never log secrets or PII, and prefer structured/JSON logs so tools can search them.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: LoggerFactory then level then {} params then appender then filter"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LoggerFactory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get logger</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">level</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">INFO / DEBUG</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">{} params</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lazy format</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">appender</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">file / console</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">filter</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by threshold</text></g></svg></div>
+    <h2>An action you can hold in your hand</h2>
+    <p>Normally a method call vanishes the instant it runs. Wrap it in a <strong>Command</strong> object — with an <span class='key'>execute()</span> (and often <span class='key'>undo()</span>) — and the action becomes data you can keep. An <em>invoker</em> (a button, a queue, a scheduler) runs commands without knowing what they do.</p><pre class="code" data-src="interface Command { void execute(); void undo(); }
+class InsertText implements Command {
+    private final Document doc; private final String text;
+    InsertText(Document d, String t){ doc = d; text = t; }
+    public void execute(){ doc.append(text); }
+    public void undo(){ doc.deleteLast(text.length()); }   // reversible
+}
+// Push executed commands on a stack -&gt; pop+undo gives you Ctrl+Z"></pre><p>Command powers undo/redo, task queues, macro recording, and GUI buttons/menu items that trigger the same action. Because a command captures everything it needs, you can run it now, later, on another thread, or replay a whole history.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: Command obj then execute() then undo() then queue / log then invoker"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">Command obj</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">a request</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">execute()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">do it</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">undo()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">reverse it</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">queue / log</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">store as data</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">invoker</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">runs them</text></g></svg></div>
     
   </div>
 </section>
@@ -172,9 +172,9 @@ try { ... } catch (Exception e) {
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>How a log line is decided and emitted</h2>
-    <p>Step through what happens when you call log.debug(...) — including why it can cost almost nothing.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: LoggerFactory then level then {} params then appender then filter"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LoggerFactory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get logger</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">level</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">INFO / DEBUG</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">{} params</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lazy format</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">appender</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">file / console</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">filter</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by threshold</text></g></svg></div>
+    <h2>From a call to a reversible object</h2>
+    <p>Step through why turning an action into an object unlocks queues, logging, and undo.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: Command obj then execute() then undo() then queue / log then invoker"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">Command obj</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">a request</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">execute()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">do it</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">undo()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">reverse it</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">queue / log</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">store as data</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">invoker</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">runs them</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -182,25 +182,25 @@ try { ... } catch (Exception e) {
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">Something noteworthy happens and we want a record of it.</div>
+    <div class="caption" id="caption" aria-live="polite">You want to queue, log, and undo actions — hard with bare method calls.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>Levels and thresholds</h2>
-    <p>Levels have a severity order; a threshold shows messages at or above it. Model which lines survive an INFO threshold.</p>
+    <h2>Execute and undo</h2>
+    <p>Each action is an object, so undo just reverses the last one. Model the effective count.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">Logging.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// Severity: ERROR=5 WARN=4 INFO=3 DEBUG=2 TRACE=1
-int threshold = 3;     // configured at INFO
-int debug = 2;
-int error = 5;
-System.out.println("DEBUG shown at INFO? " + (debug &gt;= threshold));   // false
-System.out.println("ERROR shown at INFO? " + (error &gt;= threshold));   // true
-System.out.println("Below the threshold is filtered out.");</textarea>
+        <label class="editor-label" for="code">Command.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// Each action is a command object you can queue and undo
+int executed = 3;     // type, type, delete
+int undos    = 1;
+int effective = executed - undos;
+System.out.println("commands executed = " + executed);
+System.out.println("after 1 undo      = " + effective);
+System.out.println("undo works because each command is an object.");</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -218,9 +218,9 @@ System.out.println("Below the threshold is filtered out.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>SLF4J + Logback ≈ the <span class='key'>logging</span> module: <span class='key'>getLogger(__name__)</span>, levels, handlers. SLF4J's <span class='key'>{}</span> placeholders are like <span class='key'>logger.info("%s", x)</span> lazy formatting — the string is built only if the level is on.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>A step up from <span class='key'>console.log</span> toward Winston/Pino. The SLF4J facade lets you swap backends without touching call sites, and levels + thresholds give you the production filtering raw <span class='key'>console</span> lacks.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>SLF4J is the <span class='key'>ILogger</span> abstraction; Logback/Log4j2 ≈ Serilog/NLog providers. Parameterized <span class='key'>log.info("{}", x)</span> mirrors structured logging's <span class='key'>Log.Information("{X}", x)</span> — message template now, values captured separately.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>A callable (or <span class='key'>functools.partial</span>) captures an action and its arguments — a lightweight command. For undo you still store paired do/undo callables, which is the same idea with less ceremony.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>Functions and closures are commands you can push onto an undo stack. Redux <b>actions</b> are command-like objects describing “what happened,” enabling logging and time-travel debugging.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>WPF/MVVM has a first-class <span class='key'>ICommand</span> interface for buttons and menus — the pattern is built into the UI framework. <span class='key'>Action</span> delegates serve as lightweight commands too.</p></div>
   </div>
 </section>
 
@@ -228,13 +228,13 @@ System.out.println("Below the threshold is filtered out.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; Why {} not +?</h3><p class="prompt">What's the difference between <span class='key'>log.debug("cart: " + cart)</span> and <span class='key'>log.debug("cart: {}", cart)</span> when DEBUG is disabled?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The first always builds the string (calling <span class='key'>cart.toString()</span>) even though it's discarded — wasted work. The <span class='key'>{}</span> form skips formatting entirely when DEBUG is off, so it's essentially free.</div></details></div>
-      <div class="exercise"><h3>2 &middot; Capture the trace</h3><p class="prompt">In a catch block you write <span class='key'>log.error("failed: " + e.getMessage())</span>. What valuable thing did you lose?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The stack trace. Pass the exception as the last argument instead: <span class='key'>log.error("failed for order {}", orderId, e)</span>. SLF4J then logs the full trace, which <span class='key'>getMessage()</span> alone discards.</div></details></div>
+      <div class="exercise"><h3>1 &middot; What enables undo?</h3><p class="prompt">Why can a Command implement <span class='key'>undo()</span> when a plain method call can’t be “taken back”?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The command object <b>captures the state/inputs</b> needed to reverse itself (e.g. what text it inserted and where). A bare call leaves nothing behind to reverse; the object persists that information.</div></details></div>
+      <div class="exercise"><h3>2 &middot; One action, two buttons</h3><p class="prompt">A toolbar button and a menu item should both “Save.” How does Command avoid duplicating logic?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Both invokers hold the <b>same SaveCommand</b> object and call <span class='key'>execute()</span>. The action lives in one place; the button and menu are just different invokers triggering it.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 33 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Singleton</span></div>
+  <div class="wrap">Module 43 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Template Method</span></div>
 </footer>
 
 <script>
@@ -260,7 +260,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"Something noteworthy happens and we want a record of it."},{"lit":["a-0"],"caption":"A static <b>Logger</b> is obtained once per class from LoggerFactory."},{"lit":["a-0","a-1","b-0"],"caption":"The call carries a <b>level</b> (say DEBUG) compared against the configured threshold."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"With <b>{} parameters</b>, the message is only formatted if that level is enabled — lazy and cheap."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"If enabled, an <b>appender</b> writes it to console, a file, or a log aggregator."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"A <b>filter/threshold</b> drops lower-severity lines so production logs stay signal-rich."}];
+const STEPS = [{"lit":[],"caption":"You want to queue, log, and undo actions — hard with bare method calls."},{"lit":["a-0"],"caption":"Wrap each request as a <b>Command object</b>."},{"lit":["a-0","a-1","b-0"],"caption":"<span class=\"key\">execute()</span> <b>performs</b> the action."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"<span class=\"key\">undo()</span> <b>reverses</b> it — possible because the object captured what it changed."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"Commands can be <b>queued or logged</b> like ordinary data."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"An <b>invoker</b> (a button, a scheduler) runs them without knowing their details."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');

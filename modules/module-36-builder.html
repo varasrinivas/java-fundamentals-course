@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 33 — Logging Done Right</title>
+<title>Module 36 — Builder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 33</span>
-      <span class="title">Logging<small>Java for Developers · Track 5: Real-World Java</small></span>
+      <span class="badge">MODULE 36</span>
+      <span class="title">Builder<small>Java for Developers · Track 6: Design Patterns</small></span>
     </div>
-    <div class="links"><a href="module-32-http-client.html">‹ Prev</a><a href="module-34-singleton.html">Next ›</a></div>
+    <div class="links"><a href="module-35-factory-method.html">‹ Prev</a><a href="module-37-adapter.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,24 +147,23 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>println is not a <span class="grad">logging strategy</span></h1>
-    <p class="lede">In production you can't attach a debugger — logs are how you see what happened. Java's ecosystem settled on SLF4J as a facade over backends like Logback. Levels, parameterized messages, and structure separate useful logs from noise.</p>
+    <h1>Build it <span class="grad">step by step</span></h1>
+    <p class="lede">Real-world picture: ordering a custom burger — you start with a bun and add patties, cheese, bacon, sauce, one choice at a time, then say “done.” Builder constructs a complex object piece by piece, so you don’t need a monster constructor with ten arguments.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>A facade, levels, and lazy messages</h2>
-    <p>Code against the <strong>SLF4J</strong> facade (<span class='key'>Logger</span>, <span class='key'>LoggerFactory</span>); pick a backend (Logback, Log4j2) at deploy time. Each message has a <strong>level</strong> — ERROR, WARN, INFO, DEBUG, TRACE — and a configured threshold drops anything less severe.</p><pre class="code" data-src="private static final Logger log =
-    LoggerFactory.getLogger(OrderService.class);
+    <h2>Readable construction for objects with many parts</h2>
+    <p>A constructor with many parameters — especially optional ones — becomes unreadable: <span class='key'>new Burger(2, true, false, true, 0, true)</span>. Which <span class='key'>true</span> is the bacon? A <strong>Builder</strong> replaces that with named, chained steps and produces an immutable result at the end.</p><pre class="code" data-src="Burger b = new Burger.Builder()
+    .patties(2)
+    .cheese(true)
+    .bacon(true)
+    .build();          // assembles and returns an immutable Burger
 
-log.info(&quot;placed order {} for user {}&quot;, orderId, userId);  // {} params
-log.debug(&quot;cart contents: {}&quot;, cart);    // skipped unless DEBUG enabled
-try { ... } catch (Exception e) {
-    log.error(&quot;order {} failed&quot;, orderId, e);   // last arg = the exception
-}"></pre><p>Use <span class='key'>{}</span> placeholders, not string concatenation: the message is only formatted if the level is enabled, so a disabled <span class='key'>debug</span> call costs almost nothing. Log the <em>exception object</em> (last argument) to capture the stack trace, never log secrets or PII, and prefer structured/JSON logs so tools can search them.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: LoggerFactory then level then {} params then appender then filter"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LoggerFactory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get logger</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">level</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">INFO / DEBUG</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">{} params</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lazy format</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">appender</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">file / console</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">filter</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by threshold</text></g></svg></div>
+// The builder also validates once, in build(), before constructing."></pre><p>You’ve used builders without noticing: <span class='key'>StringBuilder</span>, <span class='key'>HttpRequest.newBuilder()</span>, stream collectors. They shine when an object has many optional fields, when you want the result immutable (module 08), or when construction needs validation before the object exists.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: new Builder then .patties(2) then .cheese(true) then .build() then Burger"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">new Builder</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">start</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">.patties(2)</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">set a part</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">.cheese(true)</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">chain calls</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">.build()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">assemble</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">Burger</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">immutable</text></g></svg></div>
     
   </div>
 </section>
@@ -172,9 +171,9 @@ try { ... } catch (Exception e) {
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>How a log line is decided and emitted</h2>
-    <p>Step through what happens when you call log.debug(...) — including why it can cost almost nothing.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: LoggerFactory then level then {} params then appender then filter"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LoggerFactory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get logger</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">level</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">INFO / DEBUG</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">{} params</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lazy format</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">appender</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">file / console</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">filter</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by threshold</text></g></svg></div>
+    <h2>Assemble a burger one call at a time</h2>
+    <p>Step through chained construction that ends in a single, fully-built, immutable object.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: new Builder then .patties(2) then .cheese(true) then .build() then Burger"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">new Builder</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">start</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">.patties(2)</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">set a part</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">.cheese(true)</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">chain calls</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">.build()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">assemble</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">Burger</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">immutable</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -182,25 +181,26 @@ try { ... } catch (Exception e) {
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">Something noteworthy happens and we want a record of it.</div>
+    <div class="caption" id="caption" aria-live="polite">A Burger has many optional parts — a single big constructor would be unreadable.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>Levels and thresholds</h2>
-    <p>Levels have a severity order; a threshold shows messages at or above it. Model which lines survive an INFO threshold.</p>
+    <h2>Count the layers</h2>
+    <p>Each builder call adds a part. Model the assembled total.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">Logging.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// Severity: ERROR=5 WARN=4 INFO=3 DEBUG=2 TRACE=1
-int threshold = 3;     // configured at INFO
-int debug = 2;
-int error = 5;
-System.out.println("DEBUG shown at INFO? " + (debug &gt;= threshold));   // false
-System.out.println("ERROR shown at INFO? " + (error &gt;= threshold));   // true
-System.out.println("Below the threshold is filtered out.");</textarea>
+        <label class="editor-label" for="code">Builder.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// Building a burger step by step
+int patties = 2;
+int cheese  = 1;
+int bacon   = 1;
+int layers = patties + cheese + bacon;
+System.out.println("patties + cheese + bacon = " + layers + " layers");
+System.out.println("burger built? " + (layers &gt; 0));
+System.out.println("Same builder, different burgers.");</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -218,9 +218,9 @@ System.out.println("Below the threshold is filtered out.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>SLF4J + Logback ≈ the <span class='key'>logging</span> module: <span class='key'>getLogger(__name__)</span>, levels, handlers. SLF4J's <span class='key'>{}</span> placeholders are like <span class='key'>logger.info("%s", x)</span> lazy formatting — the string is built only if the level is on.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>A step up from <span class='key'>console.log</span> toward Winston/Pino. The SLF4J facade lets you swap backends without touching call sites, and levels + thresholds give you the production filtering raw <span class='key'>console</span> lacks.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>SLF4J is the <span class='key'>ILogger</span> abstraction; Logback/Log4j2 ≈ Serilog/NLog providers. Parameterized <span class='key'>log.info("{}", x)</span> mirrors structured logging's <span class='key'>Log.Information("{X}", x)</span> — message template now, values captured separately.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Python’s <b>keyword arguments</b> and <span class='key'>@dataclass</span> defaults cover many builder use-cases directly: <span class='key'>Burger(patties=2, bacon=True)</span>. Java lacks named/optional parameters, which is exactly why the Builder pattern is so common there.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>An <b>options object</b> — <span class='key'>makeBurger({ patties: 2, bacon: true })</span> — is the usual JS substitute. Builders still appear for fluent, validated, immutable construction (e.g. query builders).</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p><b>Object initializers</b> (<span class='key'>new Burger { Patties = 2 }</span>) reduce the need, but fluent builders are still idiomatic for immutable types and validation, just like Java.</p></div>
   </div>
 </section>
 
@@ -228,13 +228,13 @@ System.out.println("Below the threshold is filtered out.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; Why {} not +?</h3><p class="prompt">What's the difference between <span class='key'>log.debug("cart: " + cart)</span> and <span class='key'>log.debug("cart: {}", cart)</span> when DEBUG is disabled?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The first always builds the string (calling <span class='key'>cart.toString()</span>) even though it's discarded — wasted work. The <span class='key'>{}</span> form skips formatting entirely when DEBUG is off, so it's essentially free.</div></details></div>
-      <div class="exercise"><h3>2 &middot; Capture the trace</h3><p class="prompt">In a catch block you write <span class='key'>log.error("failed: " + e.getMessage())</span>. What valuable thing did you lose?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The stack trace. Pass the exception as the last argument instead: <span class='key'>log.error("failed for order {}", orderId, e)</span>. SLF4J then logs the full trace, which <span class='key'>getMessage()</span> alone discards.</div></details></div>
+      <div class="exercise"><h3>1 &middot; When is it worth it?</h3><p class="prompt">For a class with two required fields and no options, is a Builder a good idea?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Usually no — a plain constructor (or a record) is clearer. Builders pay off when there are <b>many fields, several optional</b>, when you want an immutable result, or when construction needs validation. Don’t add ceremony you don’t need.</div></details></div>
+      <div class="exercise"><h3>2 &middot; Telescoping constructors</h3><p class="prompt">What problem with “telescoping constructors” (many overloads) does the Builder solve?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Overloads like <span class='key'>Burger(int)</span>, <span class='key'>Burger(int,bool)</span>, <span class='key'>Burger(int,bool,bool)</span> explode combinatorially and make call sites cryptic (which arg is which?). The Builder names each part and handles any subset of options readably.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 33 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Singleton</span></div>
+  <div class="wrap">Module 36 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Adapter</span></div>
 </footer>
 
 <script>
@@ -260,7 +260,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"Something noteworthy happens and we want a record of it."},{"lit":["a-0"],"caption":"A static <b>Logger</b> is obtained once per class from LoggerFactory."},{"lit":["a-0","a-1","b-0"],"caption":"The call carries a <b>level</b> (say DEBUG) compared against the configured threshold."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"With <b>{} parameters</b>, the message is only formatted if that level is enabled — lazy and cheap."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"If enabled, an <b>appender</b> writes it to console, a file, or a log aggregator."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"A <b>filter/threshold</b> drops lower-severity lines so production logs stay signal-rich."}];
+const STEPS = [{"lit":[],"caption":"A Burger has many optional parts — a single big constructor would be unreadable."},{"lit":["a-0"],"caption":"Start with a fresh <b>Builder</b>."},{"lit":["a-0","a-1","b-0"],"caption":"Set one part at a time with a named call: <span class=\"key\">.patties(2)</span>."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"<b>Chain</b> more readable steps: <span class=\"key\">.cheese(true).bacon(true)</span>."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"<b>.build()</b> validates and assembles everything in one shot."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"You get an <b>immutable</b> Burger; the same builder can make different burgers."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 33 — Logging Done Right</title>
+<title>Module 35 — Factory Method</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 33</span>
-      <span class="title">Logging<small>Java for Developers · Track 5: Real-World Java</small></span>
+      <span class="badge">MODULE 35</span>
+      <span class="title">Factory<small>Java for Developers · Track 6: Design Patterns</small></span>
     </div>
-    <div class="links"><a href="module-32-http-client.html">‹ Prev</a><a href="module-34-singleton.html">Next ›</a></div>
+    <div class="links"><a href="module-34-singleton.html">‹ Prev</a><a href="module-36-builder.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,24 +147,25 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>println is not a <span class="grad">logging strategy</span></h1>
-    <p class="lede">In production you can't attach a debugger — logs are how you see what happened. Java's ecosystem settled on SLF4J as a facade over backends like Logback. Levels, parameterized messages, and structure separate useful logs from noise.</p>
+    <h1>Order a product <span class="grad">without naming the class</span></h1>
+    <p class="lede">Real-world picture: you walk into a pizza place and order “a veggie pizza.” You don’t reach into the kitchen and assemble it yourself — the store decides exactly how to make it. Factory Method puts object creation behind a method so callers ask for what they want, not how to build it.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>A facade, levels, and lazy messages</h2>
-    <p>Code against the <strong>SLF4J</strong> facade (<span class='key'>Logger</span>, <span class='key'>LoggerFactory</span>); pick a backend (Logback, Log4j2) at deploy time. Each message has a <strong>level</strong> — ERROR, WARN, INFO, DEBUG, TRACE — and a configured threshold drops anything less severe.</p><pre class="code" data-src="private static final Logger log =
-    LoggerFactory.getLogger(OrderService.class);
+    <h2>Defer the “new” to a method subclasses control</h2>
+    <p>Hardcoding <span class='key'>new VeggiePizza()</span> everywhere couples your code to concrete classes. A <strong>factory method</strong> wraps the <span class='key'>new</span> in an overridable method, so subclasses (or configuration) decide which concrete type to create, and callers depend only on an interface.</p><pre class="code" data-src="interface Pizza { int prepTime(); }
+class Veggie implements Pizza { public int prepTime(){ return 15; } }
+class Meat   implements Pizza { public int prepTime(){ return 20; } }
 
-log.info(&quot;placed order {} for user {}&quot;, orderId, userId);  // {} params
-log.debug(&quot;cart contents: {}&quot;, cart);    // skipped unless DEBUG enabled
-try { ... } catch (Exception e) {
-    log.error(&quot;order {} failed&quot;, orderId, e);   // last arg = the exception
-}"></pre><p>Use <span class='key'>{}</span> placeholders, not string concatenation: the message is only formatted if the level is enabled, so a disabled <span class='key'>debug</span> call costs almost nothing. Log the <em>exception object</em> (last argument) to capture the stack trace, never log secrets or PII, and prefer structured/JSON logs so tools can search them.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: LoggerFactory then level then {} params then appender then filter"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LoggerFactory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get logger</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">level</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">INFO / DEBUG</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">{} params</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lazy format</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">appender</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">file / console</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">filter</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by threshold</text></g></svg></div>
+abstract class PizzaStore {
+    Pizza order(String type) { return create(type); }   // uses the factory
+    protected abstract Pizza create(String type);        // the factory method
+}
+// A NyPizzaStore subclass decides which concrete Pizza `create` returns."></pre><p>You see factory methods all over the JDK: <span class='key'>List.of(...)</span>, <span class='key'>Integer.valueOf(...)</span>, <span class='key'>LocalDate.now()</span>. They give better names than constructors, can return cached instances, and can hand back a subtype — flexibility a raw constructor can’t.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: order(type) then create() then subclass decides then new Concrete then Pizza"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">order(type)</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">client asks</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">create()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">factory method</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">subclass decides</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">which class</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">new Concrete</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">hidden inside</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">Pizza</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">returned</text></g></svg></div>
     
   </div>
 </section>
@@ -172,9 +173,9 @@ try { ... } catch (Exception e) {
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>How a log line is decided and emitted</h2>
-    <p>Step through what happens when you call log.debug(...) — including why it can cost almost nothing.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: LoggerFactory then level then {} params then appender then filter"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LoggerFactory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get logger</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">level</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">INFO / DEBUG</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">{} params</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lazy format</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">appender</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">file / console</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">filter</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by threshold</text></g></svg></div>
+    <h2>From an order to a built product</h2>
+    <p>Step through how a request becomes an object without the caller ever naming a concrete class.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: order(type) then create() then subclass decides then new Concrete then Pizza"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">order(type)</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">client asks</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">create()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">factory method</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">subclass decides</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">which class</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">new Concrete</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">hidden inside</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">Pizza</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">returned</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -182,25 +183,25 @@ try { ... } catch (Exception e) {
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">Something noteworthy happens and we want a record of it.</div>
+    <div class="caption" id="caption" aria-live="polite">You want a pizza, but not to hardwire which class your code builds.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>Levels and thresholds</h2>
-    <p>Levels have a severity order; a threshold shows messages at or above it. Model which lines survive an INFO threshold.</p>
+    <h2>Order without “new”</h2>
+    <p>The factory builds the right product and reports its prep time; you never named the concrete class.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">Logging.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// Severity: ERROR=5 WARN=4 INFO=3 DEBUG=2 TRACE=1
-int threshold = 3;     // configured at INFO
-int debug = 2;
-int error = 5;
-System.out.println("DEBUG shown at INFO? " + (debug &gt;= threshold));   // false
-System.out.println("ERROR shown at INFO? " + (error &gt;= threshold));   // true
-System.out.println("Below the threshold is filtered out.");</textarea>
+        <label class="editor-label" for="code">Factory.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// You ordered a type; the factory chose the class and its prep time
+String type = "veggie";
+int prep = 15;       // the chosen pizza knows its own times
+int bake = 10;
+System.out.println("ordered: " + type + " pizza");
+System.out.println("ready in " + (prep + bake) + " min");
+System.out.println("caller never wrote new VeggiePizza().");</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -218,9 +219,9 @@ System.out.println("Below the threshold is filtered out.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>SLF4J + Logback ≈ the <span class='key'>logging</span> module: <span class='key'>getLogger(__name__)</span>, levels, handlers. SLF4J's <span class='key'>{}</span> placeholders are like <span class='key'>logger.info("%s", x)</span> lazy formatting — the string is built only if the level is on.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>A step up from <span class='key'>console.log</span> toward Winston/Pino. The SLF4J facade lets you swap backends without touching call sites, and levels + thresholds give you the production filtering raw <span class='key'>console</span> lacks.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>SLF4J is the <span class='key'>ILogger</span> abstraction; Logback/Log4j2 ≈ Serilog/NLog providers. Parameterized <span class='key'>log.info("{}", x)</span> mirrors structured logging's <span class='key'>Log.Information("{X}", x)</span> — message template now, values captured separately.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>With duck typing you often skip interfaces and just use a <b>factory function</b> that returns whatever object fits. Java’s version is more formal (an interface + an overridable method) but achieves the same decoupling.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>A plain <b>factory function</b> returning an object is the everyday JS equivalent — no <span class='key'>class</span> required. Java leans on an interface return type so the compiler enforces the contract.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Nearly identical — a virtual/abstract factory method or a static factory. C#’s <span class='key'>static</span> creation methods (e.g. <span class='key'>Task.FromResult</span>) mirror Java’s <span class='key'>List.of</span> / <span class='key'>valueOf</span> style.</p></div>
   </div>
 </section>
 
@@ -228,13 +229,13 @@ System.out.println("Below the threshold is filtered out.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; Why {} not +?</h3><p class="prompt">What's the difference between <span class='key'>log.debug("cart: " + cart)</span> and <span class='key'>log.debug("cart: {}", cart)</span> when DEBUG is disabled?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The first always builds the string (calling <span class='key'>cart.toString()</span>) even though it's discarded — wasted work. The <span class='key'>{}</span> form skips formatting entirely when DEBUG is off, so it's essentially free.</div></details></div>
-      <div class="exercise"><h3>2 &middot; Capture the trace</h3><p class="prompt">In a catch block you write <span class='key'>log.error("failed: " + e.getMessage())</span>. What valuable thing did you lose?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The stack trace. Pass the exception as the last argument instead: <span class='key'>log.error("failed for order {}", orderId, e)</span>. SLF4J then logs the full trace, which <span class='key'>getMessage()</span> alone discards.</div></details></div>
+      <div class="exercise"><h3>1 &middot; Why not a constructor?</h3><p class="prompt">Give two things a static factory method can do that a plain constructor cannot.</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">It can have a <b>meaningful name</b> (<span class='key'>List.of</span> vs another overload), <b>return a cached</b> or shared instance instead of always allocating, and <b>return a subtype</b> of the declared type. Constructors must create a new object of exactly their class.</div></details></div>
+      <div class="exercise"><h3>2 &middot; Spot the coupling</h3><p class="prompt">Code is littered with <span class='key'>new MySqlConnection()</span>. How does a factory method make swapping to Postgres easier?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Centralize creation in one factory that returns a <span class='key'>Connection</span> interface. Callers depend on the interface, so switching databases means changing one factory, not every <span class='key'>new</span> call site.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 33 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Singleton</span></div>
+  <div class="wrap">Module 35 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Builder</span></div>
 </footer>
 
 <script>
@@ -260,7 +261,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"Something noteworthy happens and we want a record of it."},{"lit":["a-0"],"caption":"A static <b>Logger</b> is obtained once per class from LoggerFactory."},{"lit":["a-0","a-1","b-0"],"caption":"The call carries a <b>level</b> (say DEBUG) compared against the configured threshold."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"With <b>{} parameters</b>, the message is only formatted if that level is enabled — lazy and cheap."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"If enabled, an <b>appender</b> writes it to console, a file, or a log aggregator."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"A <b>filter/threshold</b> drops lower-severity lines so production logs stay signal-rich."}];
+const STEPS = [{"lit":[],"caption":"You want a pizza, but not to hardwire which class your code builds."},{"lit":["a-0"],"caption":"You call <span class=\"key\">order(\"veggie\")</span> on the store — describing what, not how."},{"lit":["a-0","a-1","b-0"],"caption":"The store’s <b>factory method</b> <span class=\"key\">create()</span> is responsible for construction."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"A <b>subclass decides</b> the concrete class to instantiate (NY style vs Chicago style)."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"<span class=\"key\">new VeggiePizza()</span> happens <b>inside</b>, hidden from the caller."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"You get a <span class=\"key\">Pizza</span> back — decoupled from its concrete type."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');

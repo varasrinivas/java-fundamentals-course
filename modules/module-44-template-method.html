@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 33 — Logging Done Right</title>
+<title>Module 44 — Template Method</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 33</span>
-      <span class="title">Logging<small>Java for Developers · Track 5: Real-World Java</small></span>
+      <span class="badge">MODULE 44</span>
+      <span class="title">Template Method<small>Java for Developers · Track 6: Design Patterns</small></span>
     </div>
-    <div class="links"><a href="module-32-http-client.html">‹ Prev</a><a href="module-34-singleton.html">Next ›</a></div>
+    <div class="links"><a href="module-43-command.html">‹ Prev</a><a href="module-45-state.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,24 +147,27 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>println is not a <span class="grad">logging strategy</span></h1>
-    <p class="lede">In production you can't attach a debugger — logs are how you see what happened. Java's ecosystem settled on SLF4J as a facade over backends like Logback. Levels, parameterized messages, and structure separate useful logs from noise.</p>
+    <h1>A fixed recipe with <span class="grad">one step you fill in</span></h1>
+    <p class="lede">Real-world picture: making a hot drink. Boil water, add the main ingredient, pour, serve — the steps and their order are fixed, but “add the main ingredient” differs for tea vs coffee. Template Method puts the skeleton of an algorithm in a base class and lets subclasses fill in specific steps.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>A facade, levels, and lazy messages</h2>
-    <p>Code against the <strong>SLF4J</strong> facade (<span class='key'>Logger</span>, <span class='key'>LoggerFactory</span>); pick a backend (Logback, Log4j2) at deploy time. Each message has a <strong>level</strong> — ERROR, WARN, INFO, DEBUG, TRACE — and a configured threshold drops anything less severe.</p><pre class="code" data-src="private static final Logger log =
-    LoggerFactory.getLogger(OrderService.class);
-
-log.info(&quot;placed order {} for user {}&quot;, orderId, userId);  // {} params
-log.debug(&quot;cart contents: {}&quot;, cart);    // skipped unless DEBUG enabled
-try { ... } catch (Exception e) {
-    log.error(&quot;order {} failed&quot;, orderId, e);   // last arg = the exception
-}"></pre><p>Use <span class='key'>{}</span> placeholders, not string concatenation: the message is only formatted if the level is enabled, so a disabled <span class='key'>debug</span> call costs almost nothing. Log the <em>exception object</em> (last argument) to capture the stack trace, never log secrets or PII, and prefer structured/JSON logs so tools can search them.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: LoggerFactory then level then {} params then appender then filter"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LoggerFactory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get logger</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">level</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">INFO / DEBUG</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">{} params</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lazy format</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">appender</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">file / console</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">filter</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by threshold</text></g></svg></div>
+    <h2>The base class owns the structure</h2>
+    <p>A <strong>template method</strong> is a <span class='key'>final</span> method in an abstract class that calls a fixed sequence of steps. Some steps are implemented in the base; others are <span class='key'>abstract</span> hooks the subclasses must supply. Subclasses customize <em>what</em> happens at each step but can’t change the overall <em>order</em>.</p><pre class="code" data-src="abstract class HotDrink {
+    final void make() {          // the template: fixed order, can\u2019t override
+        boilWater();
+        addMainIngredient();     // the step subclasses fill in
+        pourIntoCup();
+    }
+    private void boilWater(){ /* shared */ }
+    private void pourIntoCup(){ /* shared */ }
+    protected abstract void addMainIngredient();   // the hook
+}
+class Tea extends HotDrink { protected void addMainIngredient(){ steepTeaBag(); } }"></pre><p>It’s the inheritance-based counterpart to Strategy: instead of injecting a behavior object, you subclass and override a hook. The JDK uses it in <span class='key'>AbstractList</span> (implement <span class='key'>get</span>/<span class='key'>size</span>, inherit the rest) and servlet <span class='key'>HttpServlet</span> (override <span class='key'>doGet</span>/<span class='key'>doPost</span>).</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: make() then boilWater() then addIngredient() then subclass fills then pour()"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">make()</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">skeleton</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">boilWater()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fixed step</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">addIngredient()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">abstract hook</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">subclass fills</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">Tea / Coffee</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">pour()</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fixed step</text></g></svg></div>
     
   </div>
 </section>
@@ -172,9 +175,9 @@ try { ... } catch (Exception e) {
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>How a log line is decided and emitted</h2>
-    <p>Step through what happens when you call log.debug(...) — including why it can cost almost nothing.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: LoggerFactory then level then {} params then appender then filter"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LoggerFactory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get logger</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">level</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">INFO / DEBUG</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">{} params</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lazy format</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">appender</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">file / console</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">filter</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by threshold</text></g></svg></div>
+    <h2>Shared structure, varying steps</h2>
+    <p>Step through how the base class locks the order while subclasses supply the differing step.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: make() then boilWater() then addIngredient() then subclass fills then pour()"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">make()</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">skeleton</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">boilWater()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fixed step</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">addIngredient()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">abstract hook</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">subclass fills</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">Tea / Coffee</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">pour()</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fixed step</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -182,25 +185,25 @@ try { ... } catch (Exception e) {
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">Something noteworthy happens and we want a record of it.</div>
+    <div class="caption" id="caption" aria-live="polite">Several recipes share the same steps in the same order.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>Levels and thresholds</h2>
-    <p>Levels have a severity order; a threshold shows messages at or above it. Model which lines survive an INFO threshold.</p>
+    <h2>Fixed plus custom steps</h2>
+    <p>The skeleton contributes fixed steps; the subclass adds its one custom step. Model the totals.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">Logging.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// Severity: ERROR=5 WARN=4 INFO=3 DEBUG=2 TRACE=1
-int threshold = 3;     // configured at INFO
-int debug = 2;
-int error = 5;
-System.out.println("DEBUG shown at INFO? " + (debug &gt;= threshold));   // false
-System.out.println("ERROR shown at INFO? " + (error &gt;= threshold));   // true
-System.out.println("Below the threshold is filtered out.");</textarea>
+        <label class="editor-label" for="code">Template.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// Template method: fixed skeleton steps + one step the subclass varies
+int fixedSteps  = 3;     // boil, pour, serve (same for all drinks)
+int customSteps = 1;     // the ingredient step that varies
+int totalSteps = fixedSteps + customSteps;
+System.out.println("fixed skeleton steps  = " + fixedSteps);
+System.out.println("subclass custom steps = " + customSteps);
+System.out.println("total run steps = " + totalSteps);</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -218,9 +221,9 @@ System.out.println("Below the threshold is filtered out.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>SLF4J + Logback ≈ the <span class='key'>logging</span> module: <span class='key'>getLogger(__name__)</span>, levels, handlers. SLF4J's <span class='key'>{}</span> placeholders are like <span class='key'>logger.info("%s", x)</span> lazy formatting — the string is built only if the level is on.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>A step up from <span class='key'>console.log</span> toward Winston/Pino. The SLF4J facade lets you swap backends without touching call sites, and levels + thresholds give you the production filtering raw <span class='key'>console</span> lacks.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>SLF4J is the <span class='key'>ILogger</span> abstraction; Logback/Log4j2 ≈ Serilog/NLog providers. Parameterized <span class='key'>log.info("{}", x)</span> mirrors structured logging's <span class='key'>Log.Information("{X}", x)</span> — message template now, values captured separately.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>Same approach: a base class with a concrete method that calls <span class='key'>NotImplementedError</span> hooks (or <span class='key'>abc.abstractmethod</span>) which subclasses override. Python’s duck typing makes the hooks less formal but the structure identical.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>A base class method that calls overridable methods on <span class='key'>this</span> achieves it; subclasses override the hook. Without abstract keywords you enforce hooks by convention or by throwing in the base.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Mark the template <span class='key'>sealed</span> and the hooks <span class='key'>abstract</span>/<span class='key'>virtual</span> — a near-exact mapping of Java’s <span class='key'>final</span> template + <span class='key'>abstract</span> steps.</p></div>
   </div>
 </section>
 
@@ -228,13 +231,13 @@ System.out.println("Below the threshold is filtered out.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; Why {} not +?</h3><p class="prompt">What's the difference between <span class='key'>log.debug("cart: " + cart)</span> and <span class='key'>log.debug("cart: {}", cart)</span> when DEBUG is disabled?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The first always builds the string (calling <span class='key'>cart.toString()</span>) even though it's discarded — wasted work. The <span class='key'>{}</span> form skips formatting entirely when DEBUG is off, so it's essentially free.</div></details></div>
-      <div class="exercise"><h3>2 &middot; Capture the trace</h3><p class="prompt">In a catch block you write <span class='key'>log.error("failed: " + e.getMessage())</span>. What valuable thing did you lose?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The stack trace. Pass the exception as the last argument instead: <span class='key'>log.error("failed for order {}", orderId, e)</span>. SLF4J then logs the full trace, which <span class='key'>getMessage()</span> alone discards.</div></details></div>
+      <div class="exercise"><h3>1 &middot; Why final?</h3><p class="prompt">Why is the template method itself usually <span class='key'>final</span> (non-overridable)?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">To protect the <b>invariant order</b> of steps. The whole point is that subclasses customize individual steps, not rearrange or skip them. Making the template final stops a subclass from breaking the algorithm’s structure.</div></details></div>
+      <div class="exercise"><h3>2 &middot; Template vs Strategy</h3><p class="prompt">Both let behavior vary. When would you pick Strategy over Template Method?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Template Method varies steps via <b>inheritance</b> (compile-time, one subclass per variant). Strategy varies the whole algorithm via <b>composition</b> (swap an object at runtime). Prefer Strategy when you need runtime flexibility or want to avoid subclassing.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 33 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Singleton</span></div>
+  <div class="wrap">Module 44 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: State</span></div>
 </footer>
 
 <script>
@@ -260,7 +263,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"Something noteworthy happens and we want a record of it."},{"lit":["a-0"],"caption":"A static <b>Logger</b> is obtained once per class from LoggerFactory."},{"lit":["a-0","a-1","b-0"],"caption":"The call carries a <b>level</b> (say DEBUG) compared against the configured threshold."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"With <b>{} parameters</b>, the message is only formatted if that level is enabled — lazy and cheap."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"If enabled, an <b>appender</b> writes it to console, a file, or a log aggregator."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"A <b>filter/threshold</b> drops lower-severity lines so production logs stay signal-rich."}];
+const STEPS = [{"lit":[],"caption":"Several recipes share the same steps in the same order."},{"lit":["a-0"],"caption":"A <span class=\"key\">final make()</span> method defines the <b>skeleton</b> — subclasses can’t reorder it."},{"lit":["a-0","a-1","b-0"],"caption":"Some steps are <b>fixed</b> and shared, like <span class=\"key\">boilWater()</span>."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"One step is an <b>abstract hook</b>: <span class=\"key\">addMainIngredient()</span>."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"Each <b>subclass fills in</b> only that step (Tea steeps; Coffee brews)."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"<span class=\"key\">pourIntoCup()</span> finishes — structure shared, details vary."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');

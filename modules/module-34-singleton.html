@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 33 — Logging Done Right</title>
+<title>Module 34 — Singleton</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -136,10 +136,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 <nav class="module-nav">
   <div class="wrap">
     <div style="display:flex; align-items:center; gap:14px;">
-      <span class="badge">MODULE 33</span>
-      <span class="title">Logging<small>Java for Developers · Track 5: Real-World Java</small></span>
+      <span class="badge">MODULE 34</span>
+      <span class="title">Singleton<small>Java for Developers · Track 6: Design Patterns</small></span>
     </div>
-    <div class="links"><a href="module-32-http-client.html">‹ Prev</a><a href="module-34-singleton.html">Next ›</a></div>
+    <div class="links"><a href="module-33-logging.html">‹ Prev</a><a href="module-35-factory-method.html">Next ›</a></div>
   </div>
 </nav>
 
@@ -147,24 +147,27 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 <header class="hero">
   <div class="wrap">
-    <h1>println is not a <span class="grad">logging strategy</span></h1>
-    <p class="lede">In production you can't attach a debugger — logs are how you see what happened. Java's ecosystem settled on SLF4J as a facade over backends like Logback. Levels, parameterized messages, and structure separate useful logs from noise.</p>
+    <h1>Exactly <span class="grad">one</span> of something</h1>
+    <p class="lede">Real-world picture: a country has exactly one sitting president. No matter who asks “who’s the president?”, everyone gets the same person. The Singleton pattern guarantees a class has just one instance and gives everyone a single, shared way to reach it.</p>
   </div>
 </header>
 
 <section class="concept">
   <div class="wrap">
     <p class="section-kicker">Concept</p>
-    <h2>A facade, levels, and lazy messages</h2>
-    <p>Code against the <strong>SLF4J</strong> facade (<span class='key'>Logger</span>, <span class='key'>LoggerFactory</span>); pick a backend (Logback, Log4j2) at deploy time. Each message has a <strong>level</strong> — ERROR, WARN, INFO, DEBUG, TRACE — and a configured threshold drops anything less severe.</p><pre class="code" data-src="private static final Logger log =
-    LoggerFactory.getLogger(OrderService.class);
+    <h2>One instance, one global access point</h2>
+    <p>Some things should exist only once: an app’s configuration, a connection pool, a logger. Singleton makes the class itself responsible for that. The trick: make the <strong>constructor private</strong> so no one can <span class='key'>new</span> it, create the one instance internally, and hand it out through a static method.</p><pre class="code" data-src="public final class Settings {
+    private static final Settings INSTANCE = new Settings();  // the one
+    private Settings() {}                 // private: no `new Settings()` outside
+    public static Settings get() { return INSTANCE; }
+}
 
-log.info(&quot;placed order {} for user {}&quot;, orderId, userId);  // {} params
-log.debug(&quot;cart contents: {}&quot;, cart);    // skipped unless DEBUG enabled
-try { ... } catch (Exception e) {
-    log.error(&quot;order {} failed&quot;, orderId, e);   // last arg = the exception
-}"></pre><p>Use <span class='key'>{}</span> placeholders, not string concatenation: the message is only formatted if the level is enabled, so a disabled <span class='key'>debug</span> call costs almost nothing. Log the <em>exception object</em> (last argument) to capture the stack trace, never log secrets or PII, and prefer structured/JSON logs so tools can search them.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: LoggerFactory then level then {} params then appender then filter"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LoggerFactory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get logger</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">level</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">INFO / DEBUG</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">{} params</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lazy format</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">appender</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">file / console</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">filter</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by threshold</text></g></svg></div>
+Settings a = Settings.get();
+Settings b = Settings.get();           // a == b  (same object)
+
+// Modern, thread-safe, serialization-safe form: an enum
+enum Config { INSTANCE; int port = 8080; }"></pre><p>The enum form is the idiom most Java pros prefer — the JVM guarantees a single instance for free. A caution: a Singleton is global state, so overusing it makes code hard to test. Reach for it when “exactly one” is a genuine rule, and prefer dependency injection (module 29) when you just want to share an object.</p>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: private ctor then static INSTANCE then get() then same object then enum form"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">private ctor</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">no new outside</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">static INSTANCE</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">created once</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">get()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">global access</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">same object</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">every call</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">enum form</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">thread-safe</text></g></svg></div>
     
   </div>
 </section>
@@ -172,9 +175,9 @@ try { ... } catch (Exception e) {
 <section class="step-through">
   <div class="wrap">
     <p class="section-kicker">Step-through</p>
-    <h2>How a log line is decided and emitted</h2>
-    <p>Step through what happens when you call log.debug(...) — including why it can cost almost nothing.</p>
-    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: LoggerFactory then level then {} params then appender then filter"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LoggerFactory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get logger</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">level</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">INFO / DEBUG</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">{} params</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lazy format</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">appender</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">file / console</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">filter</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by threshold</text></g></svg></div>
+    <h2>How a class enforces “only one”</h2>
+    <p>Step through the mechanics that make a second instance impossible — and the enum shortcut that does it for you.</p>
+    <div class="diagram-wrap"><svg id="pipeAnim" viewBox="0 0 860 200" role="img" aria-label="Diagram: private ctor then static INSTANCE then get() then same object then enum form"><defs><marker id="arrow-pipeAnim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage" id="a-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">private ctor</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">no new outside</text></g><line class="flow-arrow" id="b-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">static INSTANCE</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">created once</text></g><line class="flow-arrow" id="b-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">get()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">global access</text></g><line class="flow-arrow" id="b-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">same object</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">every call</text></g><line class="flow-arrow" id="b-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeAnim)"></line><g class="stage" id="a-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">enum form</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">thread-safe</text></g></svg></div>
     <div class="controls" role="group" aria-label="Step-through controls">
       <button class="btn btn-primary" id="playPause">▶ Play</button>
       <button class="btn" id="stepBack">‹ Step Back</button>
@@ -182,25 +185,24 @@ try { ... } catch (Exception e) {
       <button class="btn" id="resetBtn">⟲ Reset</button>
       <span class="step-readout" id="readout" aria-live="polite">step 0 / 5</span>
     </div>
-    <div class="caption" id="caption" aria-live="polite">Something noteworthy happens and we want a record of it.</div>
+    <div class="caption" id="caption" aria-live="polite">We want exactly one configuration object for the whole app.</div>
   </div>
 </section>
 
 <section class="playground">
   <div class="wrap">
     <p class="section-kicker">Playground</p>
-    <h2>Levels and thresholds</h2>
-    <p>Levels have a severity order; a threshold shows messages at or above it. Model which lines survive an INFO threshold.</p>
+    <h2>Same instance every time</h2>
+    <p>Two calls to get() return the identical object. Model their identity check.</p>
     <div class="playground-grid">
       <div>
-        <label class="editor-label" for="code">Logging.java</label>
-        <textarea class="editor" id="code" spellcheck="false">// Severity: ERROR=5 WARN=4 INFO=3 DEBUG=2 TRACE=1
-int threshold = 3;     // configured at INFO
-int debug = 2;
-int error = 5;
-System.out.println("DEBUG shown at INFO? " + (debug &gt;= threshold));   // false
-System.out.println("ERROR shown at INFO? " + (error &gt;= threshold));   // true
-System.out.println("Below the threshold is filtered out.");</textarea>
+        <label class="editor-label" for="code">Singleton.java</label>
+        <textarea class="editor" id="code" spellcheck="false">// Every get() returns the SAME instance
+int firstId  = 1001;     // identity of the one instance
+int secondId = 1001;     // get() again -&gt; same object
+System.out.println("first  get() id = " + firstId);
+System.out.println("second get() id = " + secondId);
+System.out.println("same instance? " + (firstId == secondId));</textarea>
       </div>
       <div>
         <label class="output-label" for="out">JVM output</label>
@@ -218,9 +220,9 @@ System.out.println("Below the threshold is filtered out.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Coming from another language</p>
     <h2>What will surprise you</h2>
-      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>SLF4J + Logback ≈ the <span class='key'>logging</span> module: <span class='key'>getLogger(__name__)</span>, levels, handlers. SLF4J's <span class='key'>{}</span> placeholders are like <span class='key'>logger.info("%s", x)</span> lazy formatting — the string is built only if the level is on.</p></div>
-      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>A step up from <span class='key'>console.log</span> toward Winston/Pino. The SLF4J facade lets you swap backends without touching call sites, and levels + thresholds give you the production filtering raw <span class='key'>console</span> lacks.</p></div>
-      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>SLF4J is the <span class='key'>ILogger</span> abstraction; Logback/Log4j2 ≈ Serilog/NLog providers. Parameterized <span class='key'>log.info("{}", x)</span> mirrors structured logging's <span class='key'>Log.Information("{X}", x)</span> — message template now, values captured separately.</p></div>
+      <div class="callout callout-python"><span class="lang-tag"><span class="dot"></span>Coming from Python</span><p>A Python <b>module</b> is itself a singleton — import it anywhere and you share one namespace, so people often just use a module-level object. The explicit pattern uses a classmethod or <span class='key'>__new__</span> guard, but it’s needed far less.</p></div>
+      <div class="callout callout-js"><span class="lang-tag"><span class="dot"></span>Coming from JavaScript</span><p>An ES <b>module</b> (or a single exported object literal) is a natural singleton — every <span class='key'>import</span> gets the same instance. Java needs the private-constructor ceremony because every class is instantiable by default.</p></div>
+      <div class="callout callout-csharp"><span class="lang-tag"><span class="dot"></span>Coming from C#</span><p>Same idea: a private constructor + static instance, or <span class='key'>Lazy&lt;T&gt;</span> for thread-safe lazy init. A static class is the “no instance at all” cousin. The Java enum trick has no direct C# equivalent.</p></div>
   </div>
 </section>
 
@@ -228,13 +230,13 @@ System.out.println("Below the threshold is filtered out.");</textarea>
   <div class="wrap">
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
-      <div class="exercise"><h3>1 &middot; Why {} not +?</h3><p class="prompt">What's the difference between <span class='key'>log.debug("cart: " + cart)</span> and <span class='key'>log.debug("cart: {}", cart)</span> when DEBUG is disabled?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The first always builds the string (calling <span class='key'>cart.toString()</span>) even though it's discarded — wasted work. The <span class='key'>{}</span> form skips formatting entirely when DEBUG is off, so it's essentially free.</div></details></div>
-      <div class="exercise"><h3>2 &middot; Capture the trace</h3><p class="prompt">In a catch block you write <span class='key'>log.error("failed: " + e.getMessage())</span>. What valuable thing did you lose?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The stack trace. Pass the exception as the last argument instead: <span class='key'>log.error("failed for order {}", orderId, e)</span>. SLF4J then logs the full trace, which <span class='key'>getMessage()</span> alone discards.</div></details></div>
+      <div class="exercise"><h3>1 &middot; Why private constructor?</h3><p class="prompt">What stops calling code from just writing <span class='key'>new Settings()</span> and making a second instance?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The <b>private</b> constructor — it’s only accessible inside the class itself, so external code can’t invoke it. The single instance is created internally and handed out via the static accessor.</div></details></div>
+      <div class="exercise"><h3>2 &middot; The hidden cost</h3><p class="prompt">Why can heavy use of Singletons make a codebase hard to unit-test?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">A Singleton is global, shared, mutable state reached implicitly (not passed in), so tests can’t easily substitute a fake or reset it between runs. Prefer injecting the dependency (DI) when you only need sharing, not a hard “exactly one” guarantee.</div></details></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">Module 33 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Singleton</span></div>
+  <div class="wrap">Module 34 of the Java for Developers course · standalone &amp; offline · <span style="color:var(--accent-cyan)">next: Factory Method</span></div>
 </footer>
 
 <script>
@@ -260,7 +262,7 @@ function highlightJava(src){
 }
 document.querySelectorAll('pre.code[data-src]').forEach(pre=>{ pre.innerHTML=highlightJava(pre.getAttribute('data-src')); });
 
-const STEPS = [{"lit":[],"caption":"Something noteworthy happens and we want a record of it."},{"lit":["a-0"],"caption":"A static <b>Logger</b> is obtained once per class from LoggerFactory."},{"lit":["a-0","a-1","b-0"],"caption":"The call carries a <b>level</b> (say DEBUG) compared against the configured threshold."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"With <b>{} parameters</b>, the message is only formatted if that level is enabled — lazy and cheap."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"If enabled, an <b>appender</b> writes it to console, a file, or a log aggregator."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"A <b>filter/threshold</b> drops lower-severity lines so production logs stay signal-rich."}];
+const STEPS = [{"lit":[],"caption":"We want exactly one configuration object for the whole app."},{"lit":["a-0"],"caption":"The <b>constructor is private</b>, so outside code can never write <span class=\"key\">new Settings()</span>."},{"lit":["a-0","a-1","b-0"],"caption":"The class holds one <b>static INSTANCE</b>, created a single time when the class loads."},{"lit":["a-0","a-1","b-0","a-2","b-1"],"caption":"<b>get()</b> is the only door in — it returns that one instance."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2"],"caption":"Every caller gets the <b>same object</b>, so shared state stays consistent."},{"lit":["a-0","a-1","b-0","a-2","b-1","a-3","b-2","a-4","b-3"],"caption":"An <b>enum</b> with one constant is the simplest thread-safe singleton — the JVM guarantees it."}];
 let stepIdx=0, playing=false, rafId=null, lastTick=0; const STEP_MS=1400;
 const $=id=>document.getElementById(id);
 const caption=$('caption'), readout=$('readout');

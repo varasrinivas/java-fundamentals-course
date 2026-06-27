@@ -52,6 +52,20 @@ $tracks = [ordered]@{
     @{ n="32"; slug="http-client";           t="The HTTP Client (java.net.http)" },
     @{ n="33"; slug="logging";               t="Logging Done Right" }
   )
+  "Track 6 — Design Patterns" = @(
+    @{ n="34"; slug="singleton";             t="Singleton" },
+    @{ n="35"; slug="factory-method";        t="Factory Method" },
+    @{ n="36"; slug="builder";               t="Builder" },
+    @{ n="37"; slug="adapter";               t="Adapter" },
+    @{ n="38"; slug="decorator";             t="Decorator" },
+    @{ n="39"; slug="facade";                t="Facade" },
+    @{ n="40"; slug="proxy";                 t="Proxy" },
+    @{ n="41"; slug="strategy";              t="Strategy" },
+    @{ n="42"; slug="observer";              t="Observer" },
+    @{ n="43"; slug="command";               t="Command" },
+    @{ n="44"; slug="template-method";       t="Template Method" },
+    @{ n="45"; slug="state";                 t="State" }
+  )
 }
 
 function ModuleExists($n, $slug) {

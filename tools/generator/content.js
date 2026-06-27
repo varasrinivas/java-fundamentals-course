@@ -37,6 +37,18 @@ const NAV = [
   { num:'31', slug:'json-jackson',          title:'JSON with Jackson' },
   { num:'32', slug:'http-client',           title:'The HTTP Client (java.net.http)' },
   { num:'33', slug:'logging',               title:'Logging Done Right' },
+  { num:'34', slug:'singleton',             title:'Singleton' },
+  { num:'35', slug:'factory-method',        title:'Factory Method' },
+  { num:'36', slug:'builder',               title:'Builder' },
+  { num:'37', slug:'adapter',               title:'Adapter' },
+  { num:'38', slug:'decorator',             title:'Decorator' },
+  { num:'39', slug:'facade',                title:'Facade' },
+  { num:'40', slug:'proxy',                 title:'Proxy' },
+  { num:'41', slug:'strategy',              title:'Strategy' },
+  { num:'42', slug:'observer',              title:'Observer' },
+  { num:'43', slug:'command',               title:'Command' },
+  { num:'44', slug:'template-method',       title:'Template Method' },
+  { num:'45', slug:'state',                 title:'State' },
 ];
 
 const T1 = 'Track 1: The Machine', T2 = 'Track 2: The Language', T3 = 'Track 3: Modern Java', T4 = 'Track 4: The Ecosystem', T5 = 'Track 5: Real-World Java';
@@ -1045,5 +1057,6 @@ CONTENT['33'] = {
 };
 
 Object.assign(CONTENT, require('./content-oop').MODS);
+Object.assign(CONTENT, require('./content-patterns').MODS);
 
 module.exports = { NAV, CONTENT };

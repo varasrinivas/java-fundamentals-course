@@ -63,6 +63,22 @@ system, tooling, idioms, and the reasons behind them.
 | 32 | http-client      | The HTTP Client (java.net.http)    | ✅ built |
 | 33 | logging          | Logging Done Right                 | ✅ built |
 
+### Track 6 — Design Patterns (GoF, beginner-friendly)
+| #  | Slug             | Title                              | Status |
+|----|------------------|------------------------------------|--------|
+| 34 | singleton        | Singleton                          | ✅ built |
+| 35 | factory-method   | Factory Method                     | ✅ built |
+| 36 | builder          | Builder                            | ✅ built |
+| 37 | adapter          | Adapter                            | ✅ built |
+| 38 | decorator        | Decorator                          | ✅ built |
+| 39 | facade           | Facade                             | ✅ built |
+| 40 | proxy            | Proxy                              | ✅ built |
+| 41 | strategy         | Strategy                           | ✅ built |
+| 42 | observer         | Observer                           | ✅ built |
+| 43 | command          | Command                            | ✅ built |
+| 44 | template-method  | Template Method                    | ✅ built |
+| 45 | state            | State                              | ✅ built |
+
 ## Design System (canonical — keep in sync with CLAUDE.md tokens)
 
 **Palette** — deep indigo surfaces, high-contrast text, five accents used semantically:
