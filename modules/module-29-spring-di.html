@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Inversion of control: the container wires you up</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127869; Real-world analogy</span>
+      <p><strong>Dependency injection is a restaurant kitchen that never forages its own ingredients.</strong> A line cook doesn&rsquo;t drive to the farm and pick tomatoes &mdash; a <b>supplier</b> delivers exactly what each dish needs to the counter, already prepped. The cook just declares &ldquo;this recipe needs tomatoes&rdquo; and they appear. The <b>Spring container</b> is that supplier and stockroom manager: it knows every recipe&rsquo;s needs (the <b>beans</b>), and when it builds a dish (an object) it hands over each collaborator ready-made. So a class just says &ldquo;I need a <span class='key'>Repository</span>&rdquo; in its constructor instead of running off to <span class='key'>new</span> one itself &mdash; and swapping the supplier (a fake for tests) never changes the recipe.</p>
+    </div>
     <p>Without DI, a class builds its own dependencies — <span class='key'>new EmailService()</span> — hard-wiring one implementation and making it untestable. With DI, the class declares what it needs (ideally an <em>interface</em>) and receives it, usually through its <strong>constructor</strong>. Who supplies it? The <strong>container</strong>.</p><pre class="code" data-src="@Component
 class OrderService {
     private final Notifier notifier;          // depends on an interface
@@ -167,6 +175,85 @@ class OrderService {
 @Component class EmailNotifier implements Notifier {}
 // Spring scans for @Component beans and injects EmailNotifier automatically."></pre><p>Spring scans for beans (<span class='key'>@Component</span>, <span class='key'>@Service</span>…), builds a dependency graph, and constructs everything in order into an <strong>application context</strong>. Because <span class='key'>OrderService</span> depends on the <span class='key'>Notifier</span> interface, a test can inject a fake — that swappability is the whole point. Prefer constructor injection over field injection: it makes dependencies explicit and objects immutable.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: @Component then scan then resolve then inject then context"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">@Component</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">declare bean</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">scan</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">find beans</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">resolve</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">graph deps</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">inject</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">constructor</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">context</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">app ready</text></g></svg></div>
+
+    <h3>The problem DI solves: <span class='key'>new</span> is a hard-wire</h3>
+    <p>Every <span class='key'>new</span> inside a class is a soldered joint: the class picks one concrete collaborator and there is no seam to cut. You can&rsquo;t substitute a stub in a unit test, can&rsquo;t reuse the class with a different implementation, and construction logic leaks everywhere. <strong>Inversion of Control</strong> flips this &mdash; the class stops <em>looking up</em> or <em>building</em> its dependencies and instead <em>receives</em> them from the outside.</p>
+<pre class="code" data-src="// BEFORE: hard-wired, untestable
+class OrderService {
+    private final EmailNotifier notifier = new EmailNotifier(); // soldered to one impl
+    // In a test you CANNOT replace EmailNotifier - it sends real email.
+}
+
+// AFTER: dependency passed in (inverted control)
+class OrderService {
+    private final Notifier notifier;
+    OrderService(Notifier notifier) { this.notifier = notifier; } // caller decides which
+}"></pre>
+    <h3>Constructor vs field vs setter injection</h3>
+    <p>Spring can inject three ways, but they are not equals. <strong>Constructor injection</strong> wins: the fields can be <span class='key'>final</span> (immutable, thread-safe), the object is never seen half-built, and its dependencies are impossible to miss &mdash; the compiler won&rsquo;t let you construct it without them. <strong>Field injection</strong> (<span class='key'>@Autowired</span> on a field) hides dependencies, forbids <span class='key'>final</span>, and needs reflection to set up in a test. <strong>Setter injection</strong> suits genuinely optional dependencies. Note: with a <em>single</em> constructor, Spring 4.3+ auto-injects it &mdash; no <span class='key'>@Autowired</span> needed.</p>
+<pre class="code" data-src="@Service
+class OrderService {
+    private final Notifier notifier;          // final: set once, never null
+    private final OrderRepository repo;
+
+    // Single constructor -&gt; no @Autowired required; both deps are mandatory.
+    OrderService(Notifier notifier, OrderRepository repo) {
+        this.notifier = notifier;
+        this.repo = repo;
+    }
+}
+
+// Field injection (discouraged): hidden dep, can't be final, hard to unit-test.
+class Bad {
+    @Autowired private Notifier notifier;
+}"></pre>
+    <h3>Beans and stereotype annotations</h3>
+    <p>A <strong>bean</strong> is just an object the container owns and manages. You tell Spring which classes to manage with <em>stereotype</em> annotations: <span class='key'>@Component</span> is the generic marker; <span class='key'>@Service</span> and <span class='key'>@Repository</span> are specializations that read better and carry extra behavior (<span class='key'>@Repository</span>, for instance, translates persistence exceptions). At startup Spring&rsquo;s <em>component scan</em> discovers them and injects by type &mdash; matching a required <span class='key'>Notifier</span> to the one bean that implements it.</p>
+<pre class="code" data-src="@Repository
+class JdbcOrderRepository implements OrderRepository { /* ... */ }
+
+@Service
+class OrderService {
+    private final OrderRepository repo;
+    OrderService(OrderRepository repo) { this.repo = repo; } // injected by type
+}
+
+// @Component / @Service / @Repository are all beans; the names document intent."></pre>
+    <h3>Configuration: <span class='key'>@Bean</span> methods vs component scanning</h3>
+    <p>Component scanning is great for <em>your own</em> classes, but you can&rsquo;t annotate a type you don&rsquo;t own (a library&rsquo;s <span class='key'>DataSource</span>, say). For those, write a <span class='key'>@Configuration</span> class with <span class='key'>@Bean</span> methods: each method <em>constructs</em> a bean by hand and its return value goes into the context. Parameters to a <span class='key'>@Bean</span> method are themselves injected, so you can wire third-party objects together explicitly. Both styles coexist in the same application.</p>
+<pre class="code" data-src="@Configuration
+class AppConfig {
+    @Bean
+    DataSource dataSource() {                 // you own the construction here
+        return new HikariDataSource(/* url, user, pass */);
+    }
+
+    @Bean
+    OrderRepository orderRepository(DataSource ds) { // ds injected from the bean above
+        return new JdbcOrderRepository(ds);
+    }
+}"></pre>
+    <h3>Bean scopes: singleton by default</h3>
+    <p>By default every bean is a <strong>singleton</strong> &mdash; one shared instance for the whole context, injected into everyone who needs it. <span class='key'>@Scope(&quot;prototype&quot;)</span> gives a fresh instance per injection point instead. The critical corollary: because a singleton is shared across all threads, it must hold <strong>no mutable state</strong>. Keep beans stateless (only their injected, final collaborators) and let request-scoped data live in method parameters &mdash; otherwise two concurrent requests corrupt each other.</p>
+<pre class="code" data-src="@Service                       // implicitly @Scope(&quot;singleton&quot;) - ONE instance
+class PriceCalculator {
+    private final TaxTable taxes;              // injected, final: safe to share
+    // private int lastTotal;                  // DON'T: mutable state, shared across threads
+    PriceCalculator(TaxTable taxes) { this.taxes = taxes; }
+}
+
+@Scope(&quot;prototype&quot;)            // a brand-new bean every time it is injected/requested
+@Component
+class ShoppingCart { /* per-user state is fine here */ }"></pre>
+    <h3>DI is a pattern; Spring is one implementation</h3>
+    <p>Don&rsquo;t conflate the two. <strong>Dependency injection</strong> is a design pattern &mdash; &ldquo;push collaborators in, program to interfaces&rdquo; &mdash; that you can practice with nothing but plain constructors (called <em>poor man&rsquo;s DI</em>). Spring is merely the most popular <em>container</em> that automates it; alternatives include Google <strong>Guice</strong> and the Jakarta <strong>CDI</strong> standard. The payoff of programming to interfaces is swappability: production and test wiring differ only in which bean the container hands over.</p>
+<pre class="code" data-src="// The pattern needs no framework at all - just wire it in main():
+Notifier notifier = new EmailNotifier();
+OrderRepository repo = new JdbcOrderRepository(dataSource);
+OrderService service = new OrderService(notifier, repo); // manual injection
+
+// A test swaps implementations without touching OrderService:
+OrderService underTest = new OrderService(new FakeNotifier(), new InMemoryRepo());"></pre>
     
   </div>
 </section>
@@ -232,6 +319,9 @@ System.out.println("more swappable (better for tests)? " + (injectable &gt; hard
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Why constructor injection?</h3><p class="prompt">Spring supports field injection (<span class='key'>@Autowired</span> on a field) and constructor injection. Why do teams prefer the constructor?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Constructor injection makes dependencies explicit and required, allows <span class='key'>final</span> (immutable) fields, and lets you instantiate the class in a plain unit test with <span class='key'>new</span> — no Spring needed. Field injection hides dependencies and needs reflection to set up in tests.</div></details></div>
       <div class="exercise"><h3>2 &middot; Depend on what?</h3><p class="prompt">Should <span class='key'>OrderService</span> depend on <span class='key'>EmailNotifier</span> (a class) or <span class='key'>Notifier</span> (an interface)? Why does it matter for testing?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">On the <b>interface</b>. That lets the container inject the real <span class='key'>EmailNotifier</span> in production and a fake/mock in tests, with no change to <span class='key'>OrderService</span>. Depending on the concrete class re-couples you to one implementation.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Does the constructor need <span class='key'>@Autowired</span>?</h3><p class="prompt">A <span class='key'>@Service</span> class has exactly one constructor taking two beans. Do you need to annotate it with <span class='key'>@Autowired</span>?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">No. Since Spring 4.3, a bean with a <b>single constructor</b> has it used for injection automatically &mdash; <span class='key'>@Autowired</span> is redundant. You only need the annotation to pick one constructor among several.</div></details></div>
+      <div class="exercise"><h3>4 &middot; The mutable singleton trap</h3><p class="prompt">A <span class='key'>@Service</span> keeps <span class='key'>private int lastTotal;</span> and updates it on each request. Two users hit the endpoint at once. What goes wrong?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">A bean is a <b>singleton</b> by default: one instance shared across every thread. Two concurrent requests read and write the same <span class='key'>lastTotal</span>, so they clobber each other &mdash; a race condition. Keep singletons <b>stateless</b>; put per-request data in method parameters/locals, or use <span class='key'>@Scope(&quot;prototype&quot;)</span>.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Wiring a library type</h3><p class="prompt">You need a third-party <span class='key'>DataSource</span> as a bean, but it&rsquo;s a library class you can&rsquo;t annotate with <span class='key'>@Component</span>. How do you register it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Write a <span class='key'>@Configuration</span> class with a <span class='key'>@Bean</span> method that constructs and returns the <span class='key'>DataSource</span>. Component scanning is for classes you own; <span class='key'>@Bean</span> methods let you contribute any object &mdash; including ones from libraries &mdash; to the context, and their parameters get injected too.</div></details></div>
   </div>
 </section>
 

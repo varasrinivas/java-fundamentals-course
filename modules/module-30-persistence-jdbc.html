@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>JDBC underneath, JPA on top</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>JDBC is a phone call to the database in its own raw language; JPA is a bilingual translator you hire.</strong> With <b>JDBC</b> you dial a <span class="key">Connection</span> down a telephone line, speak SQL word for word, and copy every reply the database reads back to you into your own objects &mdash; by hand, one column at a time. Nothing is automatic, but you hear exactly what is said. With <b>JPA/Hibernate</b> you instead hire a <b>translator</b> who already knows the mapping between your Java objects and the table rows: you say &ldquo;save this <span class="key">Order</span>&rdquo; and the translator writes and speaks the SQL for you. Enormously convenient &mdash; but the translator is still talking to that same database on the same phone line, and if you never ask what it is actually saying on your behalf, it will happily fire a hundred extra calls (the N+1 problem) while you smile and nod.</p>
+    </div>
     <p>JDBC's flow: get a <span class='key'>Connection</span> from a pooled <span class='key'>DataSource</span>, run a <strong><span class='key'>PreparedStatement</span></strong> with <span class='key'>?</span> placeholders, read a <span class='key'>ResultSet</span>, and map each row to an object. The placeholders aren't a convenience — they're how you stop SQL injection.</p><pre class="code" data-src="// JDBC — note the parameterized query and try-with-resources
 var sql = &quot;SELECT name FROM users WHERE id = ?&quot;;
 try (var ps = conn.prepareStatement(sql)) {
@@ -169,6 +177,92 @@ try (var ps = conn.prepareStatement(sql)) {
 @Entity class User { @Id Long id; String name; }
 User u = entityManager.find(User.class, userId);"></pre><p>JPA/Hibernate maps <span class='key'>@Entity</span> classes to tables and generates the SQL for you, including lazy loading and caching. It's productive but leaky — you still need to understand the SQL it emits (watch for the N+1 query problem). Use JDBC (or a thin layer like jOOQ/Spring Data JDBC) when you want control; use JPA when you want speed of development.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: DataSource then Connection then PreparedStatement then ResultSet then map"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">DataSource</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">pool</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Connection</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">borrow</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">PreparedStatement</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">? params</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">ResultSet</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">rows</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">map</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">to objects</text></g></svg></div>
+
+    <h3>Connections are resources &mdash; close them with try-with-resources</h3>
+    <p>A <span class="key">Connection</span>, <span class="key">Statement</span>, and <span class="key">ResultSet</span> each hold a native handle and (with a pool) a borrowed slot. Leak one and you eventually exhaust the pool and the app hangs. Java's answer is <strong>try-with-resources</strong>: anything <span class="key">AutoCloseable</span> declared in the <span class="key">try (...)</span> header is closed automatically, in reverse order, even if the body throws. Nest them so the <span class="key">ResultSet</span> closes before the <span class="key">PreparedStatement</span>, which closes before the <span class="key">Connection</span> is returned to the pool.</p>
+    <pre class="code" data-src="DataSource ds = ...;   // a pool such as HikariCP, injected by Spring
+String sql = &quot;SELECT id, name FROM users WHERE id = ?&quot;;
+try (Connection conn = ds.getConnection();
+     PreparedStatement ps = conn.prepareStatement(sql)) {
+    ps.setLong(1, userId);
+    try (ResultSet rs = ps.executeQuery()) {   // closed first, before ps/conn
+        if (rs.next()) {
+            User u = new User(rs.getLong(&quot;id&quot;), rs.getString(&quot;name&quot;));
+        }
+    }
+}   // ps.close() then conn.close() (returns the connection to the pool)"></pre>
+    <h3>Why <span class="key">?</span> placeholders are non-negotiable</h3>
+    <p>Building SQL by concatenating user input is the classic <strong>SQL-injection</strong> hole. If a login field contains <span class="key">' OR '1'='1</span>, string concatenation splices it straight into the query and the <span class="key">WHERE</span> clause becomes always-true. A <span class="key">PreparedStatement</span> sends the SQL <em>text</em> and the <em>parameter values</em> to the database on separate channels: the driver never parses your data as SQL, so the value <span class="key">1 OR 1=1</span> is looked up as a literal id, not executed. This is a security rule, not a style preference &mdash; there is no &ldquo;trusted&rdquo; string.</p>
+    <pre class="code" data-src="// NEVER do this - the value becomes part of the SQL and can rewrite it:
+String bad = &quot;SELECT * FROM users WHERE email = '&quot; + email + &quot;'&quot;;
+stmt.executeQuery(bad);          // email = &quot;x' OR '1'='1&quot;  -&gt; dumps every user
+
+// ALWAYS parameterize - the value is data, never code:
+PreparedStatement ps = conn.prepareStatement(
+        &quot;SELECT * FROM users WHERE email = ?&quot;);
+ps.setString(1, email);          // driver escapes/binds it safely
+ResultSet rs = ps.executeQuery();"></pre>
+    <h3>Transactions: all-or-nothing with commit / rollback</h3>
+    <p>By default JDBC is in <strong>auto-commit</strong> mode: every statement commits on its own. When several writes must succeed or fail together &mdash; debit one account, credit another &mdash; turn auto-commit off, do the work, then <span class="key">commit()</span>. If anything throws, <span class="key">rollback()</span> undoes the whole unit so the database never sees a half-finished transfer. That atomicity (the &ldquo;A&rdquo; in ACID) is the whole reason relational databases exist.</p>
+    <pre class="code" data-src="try (Connection conn = ds.getConnection()) {
+    conn.setAutoCommit(false);            // begin a transaction
+    try (PreparedStatement debit  = conn.prepareStatement(
+             &quot;UPDATE account SET balance = balance - ? WHERE id = ?&quot;);
+         PreparedStatement credit = conn.prepareStatement(
+             &quot;UPDATE account SET balance = balance + ? WHERE id = ?&quot;)) {
+        debit.setBigDecimal(1, amount);  debit.setLong(2, from);  debit.executeUpdate();
+        credit.setBigDecimal(1, amount); credit.setLong(2, to);   credit.executeUpdate();
+        conn.commit();                    // both succeeded -&gt; make it permanent
+    } catch (SQLException e) {
+        conn.rollback();                  // any failure -&gt; undo everything
+        throw e;
+    }
+}"></pre>
+    <h3>Connection pooling: why HikariCP exists</h3>
+    <p>Opening a database connection is expensive: a TCP handshake, TLS negotiation, and server-side authentication &mdash; often tens of milliseconds, which dwarfs the query itself. Doing that per web request would cap your throughput almost immediately. A <strong>connection pool</strong> like <strong>HikariCP</strong> opens a handful of connections up front and lends them out; <span class="key">getConnection()</span> borrows an idle one and <span class="key">close()</span> returns it rather than tearing it down. In Spring Boot, Hikari is the default <span class="key">DataSource</span> &mdash; you configure a pool size, not individual connections.</p>
+    <pre class="code" data-src="HikariConfig cfg = new HikariConfig();
+cfg.setJdbcUrl(&quot;jdbc:postgresql://localhost:5432/shop&quot;);
+cfg.setUsername(&quot;app&quot;);
+cfg.setPassword(System.getenv(&quot;DB_PASSWORD&quot;));   // never hard-code secrets
+cfg.setMaximumPoolSize(10);                       // 10 real connections, reused
+
+DataSource ds = new HikariDataSource(cfg);
+// each ds.getConnection() borrows from the pool; close() returns it (no real disconnect)"></pre>
+    <h3>The ORM idea: entities, the <span class="key">EntityManager</span>, and repositories</h3>
+    <p>An <strong>ORM</strong> maps a Java class to a table and each object to a row. In JPA you annotate a class with <span class="key">@Entity</span> and mark its primary key with <span class="key">@Id</span>; the <span class="key">EntityManager</span> (or, in Spring Data, a <span class="key">Repository</span> interface you never implement) turns <span class="key">find</span>/<span class="key">save</span> calls into the SQL. You still work in parameterized queries under the hood &mdash; JPQL and the criteria API bind parameters, never concatenate. The payoff is that CRUD becomes object manipulation; the cost is another layer whose generated SQL you must still be able to read.</p>
+    <pre class="code" data-src="@Entity
+@Table(name = &quot;orders&quot;)
+class Order {
+    @Id @GeneratedValue Long id;
+    @Column(nullable = false) BigDecimal total;
+    @ManyToOne Customer customer;   // a foreign key, mapped to an object
+}
+
+// Spring Data: declare the interface, get the implementation for free
+interface OrderRepository extends JpaRepository&lt;Order, Long&gt; {
+    List&lt;Order&gt; findByCustomerId(Long customerId);   // parsed into a safe query
+}
+
+orderRepo.save(new Order(...));            // INSERT generated for you
+Order o = orderRepo.findById(42L).orElseThrow();"></pre>
+    <h3>The leaky abstraction: N+1 selects and lazy vs eager loading</h3>
+    <p>By default JPA loads associations <strong>lazily</strong>: a <span class="key">Order</span> comes back without its <span class="key">Customer</span>, and the customer row is fetched the first time you call <span class="key">getCustomer()</span>. Loop over 100 orders touching each customer and you fire 1 query for the list plus 100 for the customers &mdash; the infamous <strong>N+1 problem</strong>. The fix is to tell the ORM to fetch them together with a <span class="key">JOIN FETCH</span> (or an entity graph). Marking the association <span class="key">EAGER</span> instead just moves the cost, and can trigger the N+1 everywhere; prefer lazy-by-default and fetch explicitly where you need it.</p>
+    <pre class="code" data-src="// N+1: 1 query for orders, then 1 lazy query PER order for its customer
+for (Order o : orderRepo.findAll())
+    System.out.println(o.getCustomer().getName());   // each call hits the DB
+
+// Fix: fetch the association in the same query (still parameterized)
+@Query(&quot;SELECT o FROM Order o JOIN FETCH o.customer WHERE o.total &gt; :min&quot;)
+List&lt;Order&gt; ordersOver(@Param(&quot;min&quot;) BigDecimal min);   // 1 query, no N+1"></pre>
+    <h3>When raw JDBC or <span class="key">JdbcTemplate</span> beats a full ORM</h3>
+    <p>The ORM earns its keep on entity-shaped CRUD across a rich object graph. It fights you on set-based work: bulk updates, reporting queries with odd joins and aggregates, or anything where you want to see and tune the exact SQL. There, Spring's <span class="key">JdbcTemplate</span> (or jOOQ / Spring Data JDBC) gives you parameterized SQL with the boilerplate handled &mdash; no lazy-loading surprises, no persistence context to reason about. A common real-world shape is JPA for the domain writes and <span class="key">JdbcTemplate</span> for the read-heavy queries.</p>
+    <pre class="code" data-src="// JdbcTemplate: parameterized SQL, no ResultSet plumbing, no ORM
+List&lt;Report&gt; rows = jdbc.query(
+    &quot;SELECT c.name, SUM(o.total) AS spent &quot; +
+    &quot;FROM orders o JOIN customers c ON c.id = o.customer_id &quot; +
+    &quot;WHERE o.created &gt;= ? GROUP BY c.name&quot;,
+    (rs, i) -&gt; new Report(rs.getString(&quot;name&quot;), rs.getBigDecimal(&quot;spent&quot;)),
+    since);        // the ? is bound safely - still never concatenate input"></pre>
     
   </div>
 </section>
@@ -234,6 +328,9 @@ System.out.println("result has rows? " + (rows &gt; 0));</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; The injection trap</h3><p class="prompt">Why is <span class='key'>"...WHERE id = " + userId</span> dangerous, and how does <span class='key'>PreparedStatement</span> fix it?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">String-concatenating user input lets an attacker inject SQL (e.g. <span class='key'>1 OR 1=1</span>). A <span class='key'>PreparedStatement</span> sends the SQL and the parameter separately, so the value is always treated as data, never executable SQL.</div></details></div>
       <div class="exercise"><h3>2 &middot; N+1 surprise</h3><p class="prompt">With JPA, looping over 100 orders and reading each order's customer fires 101 queries. What's this called, and one way to avoid it?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The N+1 query problem — one query for the list, then one per item for the association. Fix it with an eager <span class='key'>JOIN FETCH</span> (or a batch/entity-graph) so the customers load in a single query.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Half a transfer</h3><p class="prompt">Two <span class="key">UPDATE</span>s run under <span class="key">setAutoCommit(false)</span>; the second throws before <span class="key">commit()</span>. What does the table look like afterwards, and which call guarantees it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Neither update is visible: the <span class="key">catch</span> block calls <span class="key">conn.rollback()</span>, which discards every change since the transaction began. Without turning auto-commit off, the first <span class="key">UPDATE</span> would have committed on its own and you'd be left with a half-finished transfer.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Why not open a connection per request?</h3><p class="prompt">A colleague calls <span class="key">DriverManager.getConnection(url, user, pw)</span> at the top of every HTTP handler. Why is a pool like HikariCP faster, and what does <span class="key">close()</span> then mean?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Opening a connection pays for a TCP handshake, TLS, and authentication every time &mdash; far more than the query. A pool keeps a few live connections and lends them out, so <span class="key">getConnection()</span> just borrows an idle one and <span class="key">close()</span> returns it to the pool instead of tearing down the socket.</div></details></div>
+      <div class="exercise"><h3>5 &middot; ORM or raw SQL?</h3><p class="prompt">You need a reporting query: total spend per customer over a date range, grouped and aggregated. Would you reach for a JPA entity graph or Spring's <span class="key">JdbcTemplate</span>, and why?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class="key">JdbcTemplate</span> (or jOOQ). The result isn't an entity &mdash; it's a set-based aggregate with a custom shape &mdash; so mapping it through the persistence context adds friction and hides the SQL you want to tune. Keep JPA for entity CRUD; use parameterized <span class="key">JdbcTemplate</span> for read-heavy reporting. Either way the date range is still bound with <span class="key">?</span>, never concatenated.</div></details></div>
   </div>
 </section>
 

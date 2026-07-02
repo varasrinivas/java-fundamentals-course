@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>ObjectMapper: one object, two directions</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#128230; Real-world analogy</span>
+      <p><strong>Serialization is packing a Java object into a flat shipping crate for travel across the wire.</strong> Your live object &mdash; with its fields and references &mdash; can&rsquo;t ride the network as-is, so Jackson flattens it into <b>JSON text</b>: a labelled crate the wire can carry. <b>Deserialization</b> is the reverse: on the far side, the crate is unpacked back into a live, typed object. The <span class="key">ObjectMapper</span> is the <b>packing-and-unpacking clerk</b> who works both ends. He follows a strict <b>labelling scheme</b> &mdash; field names, getters, and annotations like <span class="key">@JsonProperty</span> &mdash; so the packer and the unpacker agree exactly what goes in which slot. Change the label on one end only and the clerk mis-files the contents; that mismatch is the source of most real-world JSON bugs.</p>
+    </div>
     <p>Jackson reads your class's fields (via getters or directly) and emits a JSON object — and the reverse, constructing an instance from JSON. Annotations tune the mapping: <span class='key'>@JsonProperty</span> renames a field, <span class='key'>@JsonIgnore</span> hides one.</p><pre class="code" data-src="record User(
     @JsonProperty(&quot;full_name&quot;) String name,
     int age) {}
@@ -166,7 +174,96 @@ String json = mapper.writeValueAsString(new User(&quot;Ada&quot;, 36));
 
 User back = mapper.readValue(json, User.class);   // parse it back"></pre><p>Serialization walks the object graph to text; deserialization matches JSON keys to constructor parameters or fields. Reuse a single configured <span class='key'>ObjectMapper</span> (it's thread-safe and expensive to create), register the <span class='key'>jackson-datatype-jsr310</span> module for <span class='key'>java.time</span> types, and fail fast on unknown fields only when you mean to.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: POJO / record then ObjectMapper then writeValue then JSON text then readValue"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">POJO / record</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">object</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">ObjectMapper</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">configured</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">writeValue</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">serialize</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">JSON text</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">{ ... }</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">readValue</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">deserialize</text></g></svg></div>
-    
+
+    <h3>The two core operations</h3>
+    <p>Everything Jackson does reduces to two calls on <span class="key">ObjectMapper</span>. <span class="key">writeValueAsString</span> takes any object and returns its JSON text (there are overloads that write to a file, stream, or <span class="key">byte[]</span>). <span class="key">readValue</span> takes JSON plus a target <span class="key">Class</span> and hands back a fully typed instance. Both throw <span class="key">JsonProcessingException</span> (a checked exception), so real code wraps them or lets them propagate.</p>
+    <pre class="code" data-src="ObjectMapper mapper = new ObjectMapper();
+
+// serialize: object -&gt; JSON text
+String json = mapper.writeValueAsString(new User(&quot;Ada&quot;, 36));
+// -&gt; {&quot;name&quot;:&quot;Ada&quot;,&quot;age&quot;:36}
+
+// deserialize: JSON text -&gt; typed object
+User u = mapper.readValue(json, User.class);
+int age = u.age();   // 36, already typed - no casting from a map"></pre>
+
+    <h3>What Jackson needs from a class</h3>
+    <p>To <em>serialize</em>, Jackson reads public getters (or fields, if you configure field visibility). To <em>deserialize</em> a plain POJO it needs a <strong>no-arg constructor</strong> plus setters or accessible fields, then sets each property by name. <span class="key">record</span> types work out of the box &mdash; Jackson matches JSON keys to the canonical constructor&rsquo;s parameter names. For any other constructor you must point Jackson at it with <span class="key">@JsonCreator</span>.</p>
+    <pre class="code" data-src="// Records: zero ceremony - component names ARE the JSON keys.
+record User(String name, int age) {}
+
+// A classic POJO needs a no-arg ctor + setters (or accessible fields):
+class MutableUser {
+    private String name;
+    public MutableUser() {}                 // Jackson calls this, then setters
+    public String getName() { return name; }
+    public void setName(String n) { name = n; }
+}
+
+// Non-canonical constructor? Mark it so Jackson knows how to build the object.
+record Point(int x, int y) {
+    @JsonCreator
+    Point(@JsonProperty(&quot;x&quot;) int x, @JsonProperty(&quot;y&quot;) int y) { this.x = x; this.y = y; }
+}"></pre>
+
+    <h3>Controlling the mapping</h3>
+    <p>A handful of annotations cover most wire-shaping needs. <span class="key">@JsonProperty</span> renames a field on the wire. <span class="key">@JsonIgnore</span> drops a field from both directions &mdash; the classic use is keeping a password or internal id out of the payload. <span class="key">@JsonInclude(Include.NON_NULL)</span> omits null-valued properties entirely, shrinking output and matching what most REST clients expect.</p>
+    <pre class="code" data-src="import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)          // skip nulls in the output
+record Account(
+    @JsonProperty(&quot;user_name&quot;) String userName,   // renamed on the wire
+    @JsonIgnore String passwordHash,               // never serialized
+    String nickname) {}                            // dropped when null
+
+mapper.writeValueAsString(new Account(&quot;ada&quot;, &quot;x9f&quot;, null));
+// -&gt; {&quot;user_name&quot;:&quot;ada&quot;}   (passwordHash ignored, nickname null-skipped)"></pre>
+
+    <h3>Deserializing generics &amp; collections</h3>
+    <p>Because of type erasure (Module 17), <span class="key">readValue(json, List.class)</span> gives you a <span class="key">List</span> of untyped <span class="key">LinkedHashMap</span>s &mdash; the element type <span class="key">T</span> is gone at runtime, so Jackson can&rsquo;t know to build <span class="key">User</span>s. The fix is <span class="key">TypeReference</span>, an anonymous subclass that captures the full generic type in its class metadata, which survives erasure.</p>
+    <pre class="code" data-src="String arrayJson = &quot;[{\&quot;name\&quot;:\&quot;Ada\&quot;,\&quot;age\&quot;:36}]&quot;;
+
+// WRONG: elements come back as raw maps, not Users.
+List rawList = mapper.readValue(arrayJson, List.class);
+
+// RIGHT: TypeReference carries List&lt;User&gt; past erasure.
+List&lt;User&gt; users = mapper.readValue(
+        arrayJson, new TypeReference&lt;List&lt;User&gt;&gt;() {});
+String first = users.get(0).name();   // &quot;Ada&quot;, properly typed
+
+// Same trick for maps: new TypeReference&lt;Map&lt;String, User&gt;&gt;() {}"></pre>
+
+    <h3>Surviving real-world payloads</h3>
+    <p>Live APIs add fields you don&rsquo;t model. By default Jackson <em>throws</em> on any unknown property; in practice you usually disable <span class="key">FAIL_ON_UNKNOWN_PROPERTIES</span> so a new server field doesn&rsquo;t break your client. And out of the box Jackson can&rsquo;t handle <span class="key">java.time</span> types &mdash; register the <span class="key">JavaTimeModule</span> (from <span class="key">jackson-datatype-jsr310</span>) to read and write <span class="key">Instant</span>, <span class="key">LocalDate</span>, and friends as ISO-8601 text instead of numeric timestamps.</p>
+    <pre class="code" data-src="ObjectMapper mapper = new ObjectMapper()
+    .registerModule(new JavaTimeModule())               // java.time support
+    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // ISO-8601, not epoch
+
+record Event(String name, Instant at) {}
+mapper.writeValueAsString(new Event(&quot;launch&quot;, Instant.parse(&quot;2026-01-01T00:00:00Z&quot;)));
+// -&gt; {&quot;name&quot;:&quot;launch&quot;,&quot;at&quot;:&quot;2026-01-01T00:00:00Z&quot;}
+
+// Prefer a per-class opt-out over a global disable when you can:
+@JsonIgnoreProperties(ignoreUnknown = true)
+record Partial(String name) {}"></pre>
+
+    <h3>Deserialization is an attack surface</h3>
+    <p>Deserializing untrusted input is a security boundary, not a formality. The headline risk is <strong>polymorphic (&ldquo;default&rdquo;) typing</strong>: if you call <span class="key">activateDefaultTyping</span>, Jackson will read a type hint <em>from the JSON itself</em> and instantiate that class &mdash; a classic gadget-chain path to remote code execution. Don&rsquo;t enable it on untrusted data; prefer explicit <span class="key">@JsonSubTypes</span> with a fixed allow-list. Also cap the blast radius: validate the parsed object, and constrain input size and nesting depth (via <span class="key">StreamReadConstraints</span>) so a hostile payload can&rsquo;t exhaust memory or the stack.</p>
+    <pre class="code" data-src="// DANGER on untrusted input: lets the JSON name the class to instantiate.
+// mapper.activateDefaultTyping(...);   // &lt;- deserialization-gadget risk
+
+// SAFE: explicit, closed set of allowed subtypes.
+@JsonTypeInfo(use = Id.NAME, property = &quot;type&quot;)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = Cat.class, name = &quot;cat&quot;),
+    @JsonSubTypes.Type(value = Dog.class, name = &quot;dog&quot;)
+})
+sealed interface Animal permits Cat, Dog {}
+
+// Bound the input so a malicious payload can't blow up memory/stack.
+mapper.getFactory().setStreamReadConstraints(
+    StreamReadConstraints.builder().maxNestingDepth(1000).build());"></pre>
   </div>
 </section>
 
@@ -230,6 +327,9 @@ System.out.println("round-trips back intact? " + (jsonKeys == fields));</textare
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Name mismatch</h3><p class="prompt">Your API must emit <span class='key'>"full_name"</span> but your field is <span class='key'>name</span>. What's the one-line fix?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Annotate the field/component with <span class='key'>@JsonProperty("full_name")</span>. Jackson then uses that name on the wire while your Java code keeps the idiomatic <span class='key'>name</span>.</div></details></div>
       <div class="exercise"><h3>2 &middot; Reuse the mapper</h3><p class="prompt">Why is creating a <span class='key'>new ObjectMapper()</span> inside every request handler a bad idea?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><span class='key'>ObjectMapper</span> is thread-safe and relatively expensive to construct (it builds and caches serializers). Create one, configure it once, and share it — per-request creation wastes CPU and memory under load.</div></details></div>
+      <div class="exercise"><h3>3 &middot; A list comes back as maps</h3><p class="prompt">You call <span class='key'>mapper.readValue(json, List.class)</span> on a JSON array of users, but <span class='key'>list.get(0)</span> isn&rsquo;t a <span class='key'>User</span> &mdash; it&rsquo;s a map. Why, and what&rsquo;s the fix?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Type erasure: at runtime <span class='key'>List.class</span> carries no element type, so Jackson defaults each element to <span class='key'>LinkedHashMap</span>. Pass a <span class='key'>new TypeReference&lt;List&lt;User&gt;&gt;() {}</span> instead &mdash; its anonymous subclass records the full generic type, which survives erasure.</div></details></div>
+      <div class="exercise"><h3>4 &middot; The server added a field</h3><p class="prompt">A backend team adds <span class='key'>"lastLogin"</span> to a response you already consume, and your client starts throwing on parse. What&rsquo;s happening, and how do you make the client forward-compatible?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">By default Jackson throws <span class='key'>UnrecognizedPropertyException</span> on unknown fields. Disable <span class='key'>DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES</span> on the mapper (or annotate the class with <span class='key'>@JsonIgnoreProperties(ignoreUnknown = true)</span>) so new server fields are ignored rather than fatal.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Don&rsquo;t trust the wire</h3><p class="prompt">A tutorial suggests calling <span class='key'>mapper.activateDefaultTyping(...)</span> so Jackson can deserialize arbitrary polymorphic types from JSON. Why is that dangerous for data arriving from the internet, and what should you do instead?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Default typing lets the <em>JSON itself</em> name the class to instantiate, which attackers exploit via gadget chains to reach remote code execution. Never enable it on untrusted input. Model your hierarchy explicitly with <span class='key'>@JsonTypeInfo</span> + <span class='key'>@JsonSubTypes</span> (a fixed allow-list), and constrain input size/nesting.</div></details></div>
   </div>
 </section>
 

@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Declare dependencies; the tool assembles the classpath</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127959;&#65039; Real-world analogy</span>
+      <p><strong>A build tool is a general contractor for your project.</strong> You hand it a <b>spec</b> (<span class='key'>pom.xml</span> or <span class='key'>build.gradle</span>) that lists the <b>materials</b> you need &mdash; your dependencies, named by exact part number (<span class='key'>group : artifact : version</span>). The contractor phones the <b>warehouse</b> (Maven Central), has every material delivered &mdash; plus whatever those materials <em>themselves</em> require (transitive dependencies) &mdash; and stores them in a local <b>supply yard</b> (<span class='key'>~/.m2</span>) so the next job reuses them. Then it assembles the building in a fixed <b>order of operations</b> (the build lifecycle: compile &rarr; test &rarr; package) and hands back a finished <b>package</b> (a JAR). The <b>classpath</b> is the contractor&rsquo;s address book &mdash; the exact list of locations the JVM will drive to, in order, to find each class when the program actually runs.</p>
+    </div>
     <p>You declare a dependency by coordinates — <span class='key'>group : artifact : version</span> — and the build tool downloads it (and <em>its</em> dependencies, transitively) from a repository into a local cache (Maven's <span class='key'>~/.m2</span>). At compile and run time, every jar must be on the <strong>classpath</strong>: the list of places the JVM searches for classes.</p><pre class="code" data-src="&lt;!-- Maven: pom.xml --&gt;
 &lt;dependency&gt;
   &lt;groupId&gt;com.google.guava&lt;/groupId&gt;
@@ -169,7 +177,97 @@ implementation(&quot;com.google.guava:guava:33.0.0-jre&quot;)
 // What it becomes
 java -cp app.jar:guava.jar:... com.example.Main"></pre><p>A <span class='key'>ClassNotFoundException</span> almost always means a jar is missing from the classpath; a <span class='key'>NoSuchMethodError</span> usually means two versions collided and the wrong one won. Build tools exist to make the classpath correct and reproducible so you don't assemble it by hand.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: pom.xml then resolve then compile then package then run"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">pom.xml</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">declare</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">resolve</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">deps tree</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">compile</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">javac</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">package</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">jar</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">run</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">classpath</text></g></svg></div>
-    
+    <h3>What a build tool actually does (vs javac by hand)</h3>
+    <p>You <em>can</em> build Java with nothing but <span class='key'>javac</span> and <span class='key'>jar</span> &mdash; for one file. The moment you depend on a third-party library, you must download it, download <em>its</em> dependencies, put every jar on the classpath in the right form for compiling, testing, and running, then package the result. A build tool automates that whole sequence: <strong>resolve dependencies</strong>, <strong>compile</strong>, <strong>run tests</strong>, <strong>package</strong> &mdash; reproducibly, on any machine.</p>
+    <pre class="code" data-src="# The manual way: you fetch every jar and spell out the classpath yourself
+javac -cp libs/guava.jar:libs/failureaccess.jar -d out src/*.java
+jar --create --file app.jar -C out .
+java -cp app.jar:libs/guava.jar:libs/failureaccess.jar com.example.Main
+
+# The build-tool way: declare guava once; the tool finds the rest
+mvn package        # resolve + compile + test + jar, all from pom.xml
+./gradlew build    # same lifecycle, driven by build.gradle"></pre>
+    <h3>Maven: pom.xml, coordinates, and the standard layout</h3>
+    <p>Maven is <strong>convention over configuration</strong>. Your <span class='key'>pom.xml</span> is declarative XML: the project's own coordinates plus a flat list of <span class='key'>&lt;dependency&gt;</span> entries. Every dependency is addressed by three parts &mdash; <span class='key'>groupId</span> (who publishes it), <span class='key'>artifactId</span> (which library), and <span class='key'>version</span>. Maven expects a fixed directory layout, so it knows where sources and tests live without being told.</p>
+    <pre class="code" data-src="&lt;project&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+  &lt;!-- YOUR project's coordinates --&gt;
+  &lt;groupId&gt;com.example&lt;/groupId&gt;
+  &lt;artifactId&gt;orders-service&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0&lt;/version&gt;
+
+  &lt;dependencies&gt;
+    &lt;dependency&gt;                       &lt;!-- group : artifact : version --&gt;
+      &lt;groupId&gt;com.google.guava&lt;/groupId&gt;
+      &lt;artifactId&gt;guava&lt;/artifactId&gt;
+      &lt;version&gt;33.0.0-jre&lt;/version&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/project&gt;
+
+# Standard directory layout Maven assumes (no config needed):
+#   src/main/java   -&gt; production classes
+#   src/main/resources
+#   src/test/java   -&gt; test classes
+#   target/         -&gt; build output (compiled classes, the jar)"></pre>
+    <h3>The Maven build lifecycle</h3>
+    <p>Maven runs an ordered pipeline of <strong>phases</strong>. Asking for one phase runs every phase before it &mdash; <span class='key'>mvn package</span> silently does <span class='key'>compile</span> and <span class='key'>test</span> first. That ordering is the guarantee: you can never package code that failed to compile or failed its tests (unless you deliberately skip them).</p>
+    <pre class="code" data-src="# Phases run in order; naming one runs all earlier ones too.
+mvn validate    # check the project is well-formed
+mvn compile     # javac src/main/java -&gt; target/classes
+mvn test        # compile + run unit tests (fails the build if red)
+mvn package     # compile + test + bundle into target/*.jar
+mvn verify      # package + integration tests / checks
+mvn install     # verify + copy the jar into your local ~/.m2 cache
+mvn deploy      # install + upload to a remote/shared repository
+
+# So this single command already compiled and tested for you:
+mvn package"></pre>
+    <h3>Gradle: a programmable DSL, a daemon, and incremental builds</h3>
+    <p>Where Maven describes <em>what</em> in XML, Gradle lets you write build logic in a <strong>Groovy or Kotlin DSL</strong> &mdash; it's executable code, so custom tasks are far easier. Two features make Gradle feel faster: a long-lived <strong>daemon</strong> JVM stays warm between builds (no cold JVM startup each time), and <strong>incremental builds</strong> skip any task whose inputs haven't changed, restoring outputs from a build cache. On a large project, a no-change build can finish in a fraction of a second.</p>
+    <pre class="code" data-src="// build.gradle (Groovy DSL) - far terser than pom.xml
+plugins { id 'java' }
+
+repositories { mavenCentral() }        // same warehouse as Maven
+
+dependencies {
+    implementation 'com.google.guava:guava:33.0.0-jre'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+}
+
+# The daemon stays alive; a second build with no changes is nearly instant:
+./gradlew build        # first run: compiles + tests
+./gradlew build        # again: &quot;UP-TO-DATE&quot;, tasks skipped from cache"></pre>
+    <h3>Dependency scopes, transitive deps &amp; conflict resolution</h3>
+    <p>Not every dependency belongs on every classpath. A <strong>scope</strong> tells the tool <em>when</em> a jar is needed. <span class='key'>compile</span> (Gradle's <span class='key'>implementation</span>) is needed everywhere; <span class='key'>test</span> only when compiling and running tests; <span class='key'>provided</span> (Gradle's <span class='key'>compileOnly</span>) is needed to compile but supplied at runtime by the server, so it isn't bundled; <span class='key'>runtime</span> is needed to run but not to compile (a JDBC driver, say). Because dependencies are <strong>transitive</strong>, two of yours can each drag in a different version of the same library &mdash; a conflict. Maven resolves it by <b>&ldquo;nearest wins&rdquo;</b> (the version closest to your project in the tree); Gradle picks the <b>highest</b> version by default.</p>
+    <pre class="code" data-src="# Maven scopes
+&lt;dependency&gt; ... &lt;scope&gt;test&lt;/scope&gt;     &lt;/dependency&gt;  # junit: tests only
+&lt;dependency&gt; ... &lt;scope&gt;provided&lt;/scope&gt; &lt;/dependency&gt;  # servlet-api: server supplies it
+&lt;dependency&gt; ... &lt;scope&gt;runtime&lt;/scope&gt;  &lt;/dependency&gt;  # jdbc driver: run, not compile
+
+// Gradle configurations (the same ideas)
+implementation  '...'   // compile + runtime
+testImplementation '...' // test only
+compileOnly     '...'   // provided: compile, not packaged
+runtimeOnly     '...'   // runtime only
+
+# Inspect the resolved tree to see which version actually won:
+mvn dependency:tree
+./gradlew dependencies"></pre>
+    <h3>The classpath &amp; fat (uber) JARs</h3>
+    <p>At runtime the JVM has no idea about Maven or Gradle &mdash; it only knows the <strong>classpath</strong>: an ordered list of jars and directories it searches to load each <span class='key'>.class</span> by its fully-qualified name. A plain application jar contains <em>only your</em> classes, so running it still requires every dependency jar on the classpath. A <strong>fat jar</strong> (a.k.a. uber jar) unpacks all your dependencies into one self-contained jar you can launch with <span class='key'>java -jar</span> and nothing else &mdash; the standard way to ship a deployable service.</p>
+    <pre class="code" data-src="# A thin jar needs the deps spelled out on the classpath (: on Unix, ; on Windows)
+java -cp app.jar:guava.jar:failureaccess.jar com.example.Main
+
+# A fat/uber jar bundles everything, so one file is enough
+java -jar app-all.jar
+
+# How each tool builds a fat jar:
+#   Maven  -&gt; maven-shade-plugin  (shades all deps into target/app-all.jar)
+#   Gradle -&gt; the shadowJar task, or Spring Boot's bootJar
+
+# Class load order follows the classpath left-to-right: the FIRST jar
+# containing com.foo.Bar wins - which is why version conflicts matter."></pre>
   </div>
 </section>
 
@@ -233,6 +331,9 @@ System.out.println("Maven caches them once in ~/.m2");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Read the error</h3><p class="prompt">At startup you get <span class='key'>ClassNotFoundException: com.foo.Bar</span>. What category of problem is this, and where do you look?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">A classpath problem — the jar containing <span class='key'>com.foo.Bar</span> isn't on the runtime classpath. Check that the dependency is declared with the right scope and is actually packaged/passed via <span class='key'>-cp</span>.</div></details></div>
       <div class="exercise"><h3>2 &middot; Two versions walk in</h3><p class="prompt">Two of your dependencies each pull in a different version of the same library. What decides which one is used, and what can break?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The build tool's conflict resolution picks one version (Maven: “nearest wins”). If code compiled against the other version calls a method missing from the winner, you get <span class='key'>NoSuchMethodError</span> at runtime.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Pick the scope</h3><p class="prompt">JUnit is only needed while running your tests; a PostgreSQL JDBC driver is needed when the app runs but not to compile it. What Maven scope does each get?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">JUnit &rarr; <span class='key'>&lt;scope&gt;test&lt;/scope&gt;</span> (Gradle <span class='key'>testImplementation</span>): kept off the production classpath entirely. The JDBC driver &rarr; <span class='key'>&lt;scope&gt;runtime&lt;/scope&gt;</span> (Gradle <span class='key'>runtimeOnly</span>): your code talks to the JDBC <em>interfaces</em> in the JDK, so it compiles without the driver, but the concrete driver must be present when the program actually runs.</div></details></div>
+      <div class="exercise"><h3>4 &middot; What did mvn package already do?</h3><p class="prompt">A teammate says &ldquo;just run <span class='key'>mvn package</span>&rdquo; but never mentions compiling or testing. Did those steps happen?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Yes. Maven phases are an ordered pipeline, and naming a phase runs every earlier phase. <span class='key'>package</span> is preceded by <span class='key'>compile</span> and <span class='key'>test</span>, so the build already compiled the sources and ran the unit tests &mdash; if either had failed, <span class='key'>package</span> would never have produced the jar.</div></details></div>
+      <div class="exercise"><h3>5 &middot; One file to ship</h3><p class="prompt">You built <span class='key'>app.jar</span> but <span class='key'>java -jar app.jar</span> throws <span class='key'>NoClassDefFoundError</span> for a class from Guava. What kind of jar do you actually need, and how do you get one?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">A plain jar holds only <em>your</em> classes, so Guava isn't on the classpath. You need a <b>fat/uber jar</b> that bundles all dependencies &mdash; build it with the <span class='key'>maven-shade-plugin</span> (Maven) or the <span class='key'>shadowJar</span> task / Spring Boot's <span class='key'>bootJar</span> (Gradle). Then <span class='key'>java -jar app-all.jar</span> is self-contained.</div></details></div>
   </div>
 </section>
 

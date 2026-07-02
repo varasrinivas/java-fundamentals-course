@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Arrange, act, assert — one behavior per test</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127981; Real-world analogy</span>
+      <p><strong>A test suite is a factory&rsquo;s quality-control line.</strong> Each <b>unit test</b> is an inspector at one station: it feeds a single part a <em>known input</em>, then checks the output against the spec &mdash; that check is an <b>assertion</b>. To test one station without spinning up the whole assembly line, the inspector slots in a <b>mock</b> &mdash; a stand-in dummy part that behaves exactly as told, so a failure can only mean <em>this</em> station is broken. When every inspector signs off, the line shows a <b>green sign-off</b> (the green bar) and the product is cleared to ship. A red light halts the line at the exact station that failed, so you never ship a defect you could have caught for a fraction of a cent.</p>
+    </div>
     <p>A test is a method marked <span class='key'>@Test</span>. The runner finds it by that annotation, runs it in isolation, and reports pass or fail. The classic shape is <strong>arrange</strong> (set up inputs), <strong>act</strong> (call the thing), <strong>assert</strong> (check the result).</p><pre class="code" data-src="class CalculatorTest {
     @Test
     void addsTwoNumbers() {
@@ -171,6 +179,117 @@ assertThat(sum).isEqualTo(5);
 when(repo.find(1)).thenReturn(new User(&quot;Ada&quot;));"></pre><p>Good tests are fast, independent, and named for the behavior they pin down. The payoff: a passing suite turns a scary refactor into a routine one — change the code, run the bar, trust the result.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: @Test then arrange then act then assert then report"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">@Test</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">method</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">arrange</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">given</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">act</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">when</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">assert</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">then</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">report</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">red / green</text></g></svg></div>
     
+    <h3>JUnit 5 basics: @Test and assertThrows</h3>
+    <p>JUnit 5 (the <span class='key'>org.junit.jupiter</span> packages) is the default. A test is any method annotated <span class='key'>@Test</span> &mdash; it needs no <span class='key'>public</span> modifier and takes no arguments. The static helpers on <span class='key'>Assertions</span> (usually imported statically) do the checking: <span class='key'>assertEquals(expected, actual)</span>, <span class='key'>assertTrue</span>, <span class='key'>assertNull</span>, and <span class='key'>assertThrows</span> for the exception path.</p>
+<pre class="code" data-src="import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+class AccountTest {
+    @Test
+    void withdrawReducesBalance() {
+        Account acct = new Account(100);   // arrange
+        acct.withdraw(30);                  // act
+        assertEquals(70, acct.balance());   // assert (expected, actual)
+    }
+
+    @Test
+    void overdraftIsRejected() {
+        Account acct = new Account(100);
+        // assertThrows returns the caught exception so you can inspect it
+        var ex = assertThrows(IllegalArgumentException.class,
+                              () -&gt; acct.withdraw(500));
+        assertEquals(&quot;insufficient funds&quot;, ex.getMessage());
+    }
+}"></pre>
+
+    <h3>Lifecycle hooks: @BeforeEach and friends</h3>
+    <p>Duplicated setup moves into lifecycle methods. <span class='key'>@BeforeEach</span> runs before <em>every</em> test method, giving each one a fresh fixture &mdash; crucial because JUnit constructs a <strong>new instance of the test class for each test</strong>, so instance fields never leak between tests. <span class='key'>@AfterEach</span> cleans up. The <span class='key'>@BeforeAll</span>/<span class='key'>@AfterAll</span> pair runs once for the whole class and must be <span class='key'>static</span> (there is no instance yet), so reserve them for expensive shared resources like a test container.</p>
+<pre class="code" data-src="import org.junit.jupiter.api.*;
+
+class OrderServiceTest {
+    OrderService service;
+
+    @BeforeAll
+    static void bootExpensiveResource() { /* runs once, must be static */ }
+
+    @BeforeEach
+    void freshFixture() {
+        service = new OrderService();   // rebuilt before each @Test
+    }
+
+    @Test void placesOrder()   { /* uses a pristine service */ }
+    @Test void cancelsOrder()  { /* also a pristine service  */ }
+
+    @AfterEach
+    void tidyUp() { /* close files, reset state */ }
+}"></pre>
+
+    <h3>Parameterized tests &amp; @DisplayName</h3>
+    <p>When one behavior should hold across many inputs, don&rsquo;t copy-paste. A <span class='key'>@ParameterizedTest</span> runs the same body once per value. Feed it with <span class='key'>@ValueSource</span> for a single-column list, or <span class='key'>@CsvSource</span> when each case needs input <em>and</em> expected output. Add <span class='key'>@DisplayName</span> (or a <span class='key'>name</span> template) so reports read as sentences instead of method names.</p>
+<pre class="code" data-src="import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.*;
+
+@DisplayName(&quot;isPrime&quot;)
+class PrimeTest {
+    @ParameterizedTest(name = &quot;{0} is prime&quot;)
+    @ValueSource(ints = {2, 3, 5, 7, 11})
+    void recognisesPrimes(int n) {
+        assertTrue(Primes.isPrime(n));
+    }
+
+    @ParameterizedTest
+    @CsvSource({ &quot;4, false&quot;, &quot;9, false&quot;, &quot;13, true&quot; })
+    void classifies(int n, boolean expected) {
+        assertEquals(expected, Primes.isPrime(n));
+    }
+}"></pre>
+
+    <h3>The testing pyramid &mdash; and what a &ldquo;unit&rdquo; is</h3>
+    <p>The <strong>testing pyramid</strong> is a guideline for proportions: a wide base of <strong>unit</strong> tests (many, milliseconds each), a thinner band of <strong>integration</strong> tests (fewer, exercising real wiring like a database), and a narrow tip of <strong>end-to-end</strong> tests (few, slow, driving the whole system). A <strong>unit</strong> isn&rsquo;t necessarily one class &mdash; it&rsquo;s one behavior tested in isolation from slow or nondeterministic collaborators. Invert the pyramid (mostly e2e) and your suite becomes slow and flaky; that shape is nicknamed the &ldquo;ice-cream cone&rdquo;.</p>
+<pre class="code" data-src="//            /\        e2e     few, slow, whole-system
+//           /  \       ------
+//          / integ \   integration  some, real DB / HTTP
+//         /----------\
+//        /   unit     \ many, fast, isolated (the base)
+//       /--------------\
+//
+// Rule of thumb: if a test needs the network, a real clock, or the
+// filesystem to pass, it is NOT a unit test - push it up the pyramid."></pre>
+
+    <h3>Test doubles &amp; mocking with Mockito</h3>
+    <p>To test a class in isolation you replace its collaborators with <strong>test doubles</strong>. Mockito&rsquo;s <span class='key'>mock(Type.class)</span> creates a fake whose methods return defaults until you <strong>stub</strong> them with <span class='key'>when(...).thenReturn(...)</span>. After acting, <span class='key'>verify(...)</span> asserts an interaction actually happened. Stub <em>queries</em> (things you read) and verify <em>commands</em> (side effects you care about) &mdash; over-verifying couples the test to implementation detail.</p>
+<pre class="code" data-src="import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+@Test
+void sendsWelcomeEmailForNewUser() {
+    UserRepo repo   = mock(UserRepo.class);      // fake collaborator
+    Mailer   mailer = mock(Mailer.class);
+    when(repo.find(1)).thenReturn(new User(&quot;Ada&quot;));   // stub a query
+
+    var service = new Signup(repo, mailer);
+    service.welcome(1);                               // act
+
+    verify(mailer).send(&quot;Ada&quot;, &quot;Welcome!&quot;);           // verify a command
+    verifyNoMoreInteractions(mailer);
+}"></pre>
+
+    <h3>Good tests &amp; fluent AssertJ</h3>
+    <p>A good unit test is <strong>fast</strong> (no I/O), <strong>isolated</strong> (order-independent), <strong>deterministic</strong> (same result every run &mdash; no wall clock or random seed), and has <strong>one reason to fail</strong>. Test <em>behavior</em>, not implementation: assert on observable outcomes, not private fields, so refactors don&rsquo;t break green tests. <strong>AssertJ</strong> makes the assertion side read like prose &mdash; one <span class='key'>assertThat</span> entry point, discoverable chained matchers, and far clearer failure messages than raw <span class='key'>assertEquals</span>.</p>
+<pre class="code" data-src="import static org.assertj.core.api.Assertions.assertThat;
+
+assertThat(sum).isEqualTo(5);
+assertThat(names)
+    .hasSize(3)
+    .contains(&quot;Ada&quot;)
+    .doesNotContain(&quot;Bob&quot;);
+
+assertThat(user.email()).endsWith(&quot;@example.com&quot;);
+
+// Fluent chains fail with a rich message, e.g.
+//   Expecting actual: [&quot;Ada&quot;,&quot;Al&quot;] to contain: &quot;Bob&quot;"></pre>
   </div>
 </section>
 
@@ -235,6 +354,9 @@ System.out.println("A green suite makes the next refactor safe.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Expected vs actual</h3><p class="prompt">In <span class='key'>assertEquals(5, sum)</span>, which argument is the expected value and why does the order matter for the failure message?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The <b>first</b> argument is expected, the second actual. JUnit's message reads “expected: 5 but was: …”, so swapping them produces a misleading report even though the pass/fail result is the same.</div></details></div>
       <div class="exercise"><h3>2 &middot; Why isolate?</h3><p class="prompt">Why should each <span class='key'>@Test</span> be independent of the others, and what tool helps when a test has external collaborators?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Independent tests can run in any order and in parallel, and a failure points at one cause. For external collaborators (a DB, a service), use a mocking library like <span class='key'>Mockito</span> to supply fast, deterministic fakes.</div></details></div>
+      <div class="exercise"><h3>3 &middot; assertThrows over try/catch</h3><p class="prompt">You want to test that <span class='key'>parse(&quot;&quot;)</span> throws an <span class='key'>IllegalArgumentException</span>. Why is <span class='key'>assertThrows</span> better than wrapping the call in a <span class='key'>try/catch</span> with a <span class='key'>fail()</span>?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>assertThrows(IllegalArgumentException.class, () -&gt; parse(&quot;&quot;))</span> fails automatically if nothing is thrown, returns the exception so you can assert on its message, and reads in one line. A hand-rolled try/catch needs an explicit <span class='key'>fail()</span> after the call (easy to forget) and is far noisier.</div></details></div>
+      <div class="exercise"><h3>4 &middot; @BeforeEach vs @BeforeAll</h3><p class="prompt">A field set in <span class='key'>@BeforeAll</span> must be <span class='key'>static</span>, but one set in <span class='key'>@BeforeEach</span> need not be. Why the difference, and which should hold a fresh <span class='key'>ArrayList</span> fixture per test?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">JUnit creates a <b>new instance of the test class for every @Test</b>, so <span class='key'>@BeforeAll</span> runs before any instance exists and must be static. A per-test fresh <span class='key'>ArrayList</span> belongs in <span class='key'>@BeforeEach</span> so tests can&rsquo;t pollute each other&rsquo;s state.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Stub vs verify</h3><p class="prompt">Given a mocked <span class='key'>PriceApi</span> and <span class='key'>AuditLog</span>, which one do you set up with <span class='key'>when(...).thenReturn(...)</span> and which with <span class='key'>verify(...)</span>? What&rsquo;s the general rule?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><b>Stub queries, verify commands.</b> <span class='key'>PriceApi</span> is a query you read a value from, so stub it with <span class='key'>when(priceApi.priceOf(x)).thenReturn(9.99)</span>. <span class='key'>AuditLog</span> is a command with a side effect, so assert it happened with <span class='key'>verify(auditLog).record(...)</span>. Verifying queries or stubbing commands over-couples the test to implementation.</div></details></div>
   </div>
 </section>
 
