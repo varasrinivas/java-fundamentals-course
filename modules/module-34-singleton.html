@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>One instance, one global access point</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>A Singleton is the one printing press that mints a country&rsquo;s currency.</strong> There may be millions of people who need banknotes, and countless bank branches asking for them &mdash; but there is exactly <b>one</b> official press, and every request is routed back to that same machine. You cannot buy your own and start printing (the <b>constructor is private</b>); you ask the treasury for access (a <b>static accessor</b>), and it always hands you a note from the <em>same</em> press. Because everyone shares that one source, the money supply stays consistent &mdash; but it also means the whole economy depends on a single hidden authority, which is exactly why over-using Singletons makes a system rigid and hard to test.</p>
+    </div>
     <p>Some things should exist only once: an app’s configuration, a connection pool, a logger. Singleton makes the class itself responsible for that. The trick: make the <strong>constructor private</strong> so no one can <span class='key'>new</span> it, create the one instance internally, and hand it out through a static method.</p><pre class="code" data-src="public final class Settings {
     private static final Settings INSTANCE = new Settings();  // the one
     private Settings() {}                 // private: no `new Settings()` outside
@@ -168,6 +176,94 @@ Settings b = Settings.get();           // a == b  (same object)
 // Modern, thread-safe, serialization-safe form: an enum
 enum Config { INSTANCE; int port = 8080; }"></pre><p>The enum form is the idiom most Java pros prefer — the JVM guarantees a single instance for free. A caution: a Singleton is global state, so overusing it makes code hard to test. Reach for it when “exactly one” is a genuine rule, and prefer dependency injection (module 29) when you just want to share an object.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: private ctor then static INSTANCE then get() then same object then enum form"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">private ctor</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">no new outside</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">static INSTANCE</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">created once</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">get()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">global access</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">same object</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">every call</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">enum form</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">thread-safe</text></g></svg></div>
+
+    <h3>Intent: guarantee one instance + a global access point</h3>
+    <p>The Gang of Four define Singleton as two guarantees at once: <strong>ensure a class has only one instance</strong>, and <strong>provide a global point of access to it</strong>. Both halves matter. It is legitimate when a single instance models a real constraint &mdash; a hardware device driver, an in-process cache, a thread pool, an app-wide configuration &mdash; where a second copy would be wrong, not merely wasteful. If you only want <em>convenient sharing</em> of one object, that is a job for dependency injection, not this pattern.</p>
+<pre class="code" data-src="// The two guarantees, spelled out:
+public final class PrinterDriver {
+    private static final PrinterDriver INSTANCE = new PrinterDriver(); // (1) only one
+    private PrinterDriver() { /* open the physical device once */ }
+    public static PrinterDriver instance() { return INSTANCE; }        // (2) global access
+    public void print(String job) { /* ... */ }
+}"></pre>
+    <h3>Naive lazy init &mdash; and why it is NOT thread-safe</h3>
+    <p>A common first attempt defers creation until the first call (&ldquo;lazy&rdquo;) with a plain <span class='key'>null</span> check. On a single thread it works. Under concurrency it is <strong>broken</strong>: two threads can both evaluate <span class='key'>instance == null</span> as true before either assigns, so the constructor runs twice and each thread walks away with a <em>different</em> object &mdash; violating the entire point of the pattern.</p>
+<pre class="code" data-src="public class Broken {
+    private static Broken instance;             // no volatile, no lock
+    private Broken() {}
+    public static Broken get() {
+        if (instance == null)                   // Thread A and Thread B can BOTH
+            instance = new Broken();            //   see null here -&gt; two instances!
+        return instance;
+    }
+}"></pre>
+    <h3>Correct: eager <span class="key">static final</span> and double-checked locking</h3>
+    <p>The simplest correct form is <strong>eager initialization</strong>: a <span class='key'>private static final</span> field. Class initialization runs inside the JVM&rsquo;s own lock, so the instance is published safely and exactly once &mdash; the cost is that it is built even if never used. If you truly need laziness with a lock, use the <strong>double-checked locking</strong> idiom, which <em>requires</em> <span class='key'>volatile</span> on the field. Without <span class='key'>volatile</span>, another thread can observe a partially-constructed object because the write of the reference can be reordered ahead of the object&rsquo;s field writes.</p>
+<pre class="code" data-src="// Eager: safe and trivial. The class loader guarantees single init.
+public final class Eager {
+    private static final Eager INSTANCE = new Eager();
+    private Eager() {}
+    public static Eager get() { return INSTANCE; }
+}
+
+// Double-checked locking: lazy + thread-safe. `volatile` is MANDATORY.
+public final class Dcl {
+    private static volatile Dcl instance;         // volatile: no torn/reordered publish
+    private Dcl() {}
+    public static Dcl get() {
+        if (instance == null) {                   // 1st check: no lock, fast path
+            synchronized (Dcl.class) {
+                if (instance == null)             // 2nd check: under the lock
+                    instance = new Dcl();
+            }
+        }
+        return instance;
+    }
+}"></pre>
+    <h3>The initialization-on-demand HOLDER idiom</h3>
+    <p>The cleanest lazy-and-thread-safe form uses a private static <strong>holder class</strong>. A nested class is not loaded until it is first referenced, so <span class='key'>INSTANCE</span> is created only when <span class='key'>get()</span> is first called. The JVM&rsquo;s class-initialization lock makes that creation atomic and correctly published &mdash; with <strong>no explicit synchronization</strong> and therefore no locking cost on subsequent calls.</p>
+<pre class="code" data-src="public final class Holder {
+    private Holder() {}
+    private static class Lazy {                 // not loaded until first referenced
+        static final Holder INSTANCE = new Holder();
+    }
+    public static Holder get() {
+        return Lazy.INSTANCE;                    // triggers Lazy init here, once, safely
+    }
+}"></pre>
+    <h3>The enum singleton (<em>Effective Java</em>&rsquo;s recommendation)</h3>
+    <p>Joshua Bloch&rsquo;s <em>Effective Java</em> calls a single-element <span class='key'>enum</span> the best way to implement a singleton. The JVM guarantees exactly one instance of each enum constant, and it is <strong>thread-safe for free</strong>. Crucially it is also <strong>serialization-proof</strong> (enums serialize by name, so deserializing never fabricates a second object) and <strong>reflection-proof</strong> (the reflection API explicitly forbids constructing enum instances) &mdash; two attacks that can break the plain class-based forms.</p>
+<pre class="code" data-src="public enum Registry {
+    INSTANCE;                                    // the one and only instance
+
+    private final Map&lt;String, String&gt; data = new ConcurrentHashMap&lt;&gt;();
+    public void put(String k, String v) { data.put(k, v); }
+    public String get(String k)         { return data.get(k); }
+}
+
+// Usage reads naturally:
+Registry.INSTANCE.put(&quot;region&quot;, &quot;us-east-1&quot;);"></pre>
+    <h3>Downsides: global state, and preferring dependency injection</h3>
+    <p>A Singleton is <strong>global, mutable state reached implicitly</strong>. That hurts testability (tests cannot swap in a fake or reset it between runs), <strong>hides dependencies</strong> (a class that calls <span class='key'>Foo.get()</span> internally doesn&rsquo;t declare it needs a <span class='key'>Foo</span>), and couples code to a concrete type. The modern default is <strong>dependency injection</strong>: register the class as <em>singleton-scoped</em> in a DI container (Spring, Guice) and let it inject the one instance through the constructor. You get &ldquo;exactly one, shared&rdquo; without the private-constructor baggage &mdash; and tests just pass a mock.</p>
+<pre class="code" data-src="// Instead of reaching for a global:
+class OrderService {
+    private final Clock clock = Clock.INSTANCE;   // hidden dependency, hard to fake
+}
+
+// Prefer injection: the container supplies the single instance.
+@Service                                          // Spring: singleton-scoped by default
+class OrderService {
+    private final Clock clock;
+    OrderService(Clock clock) { this.clock = clock; }  // declared + testable (pass a mock)
+}"></pre>
+    <h3>Singletons in the JDK</h3>
+    <p>The pattern is all over the standard library. <span class='key'>Runtime.getRuntime()</span> always returns the one <span class='key'>Runtime</span> bound to the JVM; <span class='key'>Desktop.getDesktop()</span> and <span class='key'>Toolkit.getDefaultToolkit()</span> follow the same shape. And the smallest singletons of all are the JDK&rsquo;s <em>stateless</em> ones &mdash; <span class='key'>Collections.emptyList()</span> and <span class='key'>Comparator.naturalOrder()</span> hand back a shared instance because there is no reason to allocate more than one.</p>
+<pre class="code" data-src="Runtime rt = Runtime.getRuntime();            // the single VM runtime
+rt.availableProcessors();
+rt.addShutdownHook(new Thread(() -&gt; System.out.println(&quot;bye&quot;)));
+
+// getRuntime() always returns the very same object:
+boolean same = (Runtime.getRuntime() == Runtime.getRuntime());  // true"></pre>
     
   </div>
 </section>
@@ -232,6 +328,9 @@ System.out.println("same instance? " + (firstId == secondId));</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Why private constructor?</h3><p class="prompt">What stops calling code from just writing <span class='key'>new Settings()</span> and making a second instance?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The <b>private</b> constructor — it’s only accessible inside the class itself, so external code can’t invoke it. The single instance is created internally and handed out via the static accessor.</div></details></div>
       <div class="exercise"><h3>2 &middot; The hidden cost</h3><p class="prompt">Why can heavy use of Singletons make a codebase hard to unit-test?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">A Singleton is global, shared, mutable state reached implicitly (not passed in), so tests can’t easily substitute a fake or reset it between runs. Prefer injecting the dependency (DI) when you only need sharing, not a hard “exactly one” guarantee.</div></details></div>
+      <div class="exercise"><h3>3 &middot; The race condition</h3><p class="prompt">In the naive lazy <span class='key'>if (instance == null) instance = new X();</span>, describe the exact interleaving of two threads that produces <em>two</em> instances.</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Thread A evaluates <span class='key'>instance == null</span> &rarr; true, then is paused before it assigns. Thread B now runs the whole method: it also sees <span class='key'>null</span>, constructs an object, and assigns it. Thread A resumes and constructs a <em>second</em> object, overwriting the field. The two threads hold different references &mdash; the &ldquo;single&rdquo; guarantee is gone. The fix is a lock (DCL with <span class='key'>volatile</span>), the holder idiom, an eager field, or an enum.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Why <span class='key'>volatile</span>?</h3><p class="prompt">Double-checked locking works only if the instance field is <span class='key'>volatile</span>. What can go wrong without it, even though there is a <span class='key'>synchronized</span> block?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Without <span class='key'>volatile</span>, the write that publishes the reference can be reordered ahead of the writes that initialize the object’s fields. A second thread taking the fast path (no lock) can then read a non-null reference to a <em>partially-constructed</em> object. <span class='key'>volatile</span> forbids that reordering and establishes the happens-before edge that makes the fully-built object visible.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Enum vs class</h3><p class="prompt">Two ways a plain class-based singleton can be broken into producing a second instance &mdash; and why the single-element <span class='key'>enum</span> defeats both.</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>Serialization</b>: deserializing a class-based singleton creates a fresh object unless you add <span class='key'>readResolve()</span>. <b>Reflection</b>: <span class='key'>setAccessible(true)</span> on the private constructor lets attackers call <span class='key'>newInstance()</span>. An <span class='key'>enum</span> is immune to both: enums serialize by name (no new object), and the reflection API explicitly refuses to instantiate enum types. That is why <em>Effective Java</em> recommends it.</div></details></div>
   </div>
 </section>
 

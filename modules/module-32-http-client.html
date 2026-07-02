@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Client, request, response — with async built in</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p>Think of an <b>HttpClient</b> as a <b>courier company you set up once</b> &mdash; you configure its address book, cut-off times (timeouts), and whether it follows forwarding addresses (redirects), then hand it every shipment for the life of your app. An <b>HttpRequest</b> is <b>one addressed parcel</b>: the destination URI, the instruction on the label (GET, POST&hellip;), any extra notes (headers), and optionally contents to deliver (a body). A <b>BodyHandler</b> is you telling the courier <b>how to unpack the reply</b> &mdash; hand it back as a <span class='key'>String</span>, drop it straight into a file, or stream it in as it arrives. You never rebuild the courier company per parcel; you describe each parcel fresh and reuse the same reliable operation underneath.</p>
+    </div>
     <p>Build one reusable <span class='key'>HttpClient</span>, describe the call with an immutable <span class='key'>HttpRequest</span>, then <span class='key'>send</span> it (blocking) or <span class='key'>sendAsync</span> (returns a <span class='key'>CompletableFuture</span>). The response carries a status code and a typed body via a <span class='key'>BodyHandler</span>.</p><pre class="code" data-src="HttpClient client = HttpClient.newHttpClient();   // reuse this
 HttpRequest req = HttpRequest.newBuilder()
     .uri(URI.create(&quot;https://api.example.com/users/1&quot;))
@@ -170,7 +178,85 @@ if (res.statusCode() == 200) parse(res.body());
 client.sendAsync(req, BodyHandlers.ofString())
       .thenApply(HttpResponse::body);"></pre><p>Check <span class='key'>statusCode()</span> before trusting the body — a 4xx or 5xx still returns normally (no exception). The async path pairs naturally with virtual threads or <span class='key'>CompletableFuture</span> chains for calling many services at once. Treat <span class='key'>HttpClient</span> like a connection pool: create it once and share it.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: HttpClient then HttpRequest then send then HttpResponse then parse"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">HttpClient</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">reusable</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">HttpRequest</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">build</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">send</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">sync / async</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">HttpResponse</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">status + body</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">parse</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">JSON → object</text></g></svg></div>
-    
+
+    <h3>Build the client once, reuse it everywhere</h3>
+    <p>An <span class='key'>HttpClient</span> is <strong>immutable and thread-safe</strong>. Configure it once through its builder &mdash; HTTP version, redirect policy, connect timeout, a shared connection pool &mdash; then share the single instance across your whole app. Under the hood it keeps live connections and, on Java 11+, prefers <strong>HTTP/2</strong> (falling back to 1.1). Creating a fresh client per request throws all that reuse away.</p>
+    <pre class="code" data-src="HttpClient client = HttpClient.newBuilder()
+    .version(HttpClient.Version.HTTP_2)          // default; downgrades to 1.1 if needed
+    .followRedirects(HttpClient.Redirect.NORMAL) // follow 3xx except https-&gt;http
+    .connectTimeout(Duration.ofSeconds(10))      // time to establish the connection
+    .build();
+
+// Immutable + thread-safe: keep ONE and reuse it (like a connection pool).
+// A per-request timeout lives on the request, not the client (see below)."></pre>
+
+    <h3>Describe the call with an HttpRequest</h3>
+    <p>Each request is built fluently from <span class='key'>HttpRequest.newBuilder(uri)</span> and is itself immutable. Pick a method &mdash; <span class='key'>GET()</span> takes no body; <span class='key'>POST</span>, <span class='key'>PUT</span>, and <span class='key'>DELETE</span> take a <span class='key'>BodyPublisher</span> that supplies the request body. Add headers, and set a <span class='key'>timeout</span> for this specific call.</p>
+    <pre class="code" data-src="// GET: no body
+HttpRequest get = HttpRequest.newBuilder(URI.create(&quot;https://api.example.com/users/1&quot;))
+    .header(&quot;Accept&quot;, &quot;application/json&quot;)
+    .timeout(Duration.ofSeconds(5))   // per-request read timeout
+    .GET()
+    .build();
+
+// POST with a JSON body via a BodyPublisher
+HttpRequest post = HttpRequest.newBuilder(URI.create(&quot;https://api.example.com/users&quot;))
+    .header(&quot;Content-Type&quot;, &quot;application/json&quot;)
+    .POST(BodyPublishers.ofString(&quot;{\&quot;name\&quot;:\&quot;Ada\&quot;}&quot;))
+    .build();"></pre>
+
+    <h3>Send synchronously and read the response</h3>
+    <p>The blocking <span class='key'>send</span> takes the request and a <span class='key'>BodyHandler</span> describing how to materialize the body &mdash; <span class='key'>BodyHandlers.ofString()</span> is the common one. It returns an <span class='key'>HttpResponse&lt;String&gt;</span>. Always branch on <span class='key'>statusCode()</span> first: a 4xx or 5xx comes back <em>normally</em>, not as an exception.</p>
+    <pre class="code" data-src="HttpResponse&lt;String&gt; res = client.send(get, BodyHandlers.ofString());
+
+int code = res.statusCode();          // 200, 404, 500, ...
+if (code &gt;= 200 &amp;&amp; code &lt; 300) {
+    String body = res.body();         // safe to trust now
+    process(body);
+} else {
+    throw new IOException(&quot;Request failed: HTTP &quot; + code);
+}
+// send() throws only for I/O failures / timeouts / interruption -
+// never merely because the server answered with an error status."></pre>
+
+    <h3>Go non-blocking with sendAsync</h3>
+    <p><span class='key'>sendAsync</span> returns a <span class='key'>CompletableFuture&lt;HttpResponse&lt;T&gt;&gt;</span> immediately, so you can compose the result without parking a thread. Chain <span class='key'>thenApply</span>/<span class='key'>thenAccept</span> to transform, and fire many calls at once, joining them with <span class='key'>CompletableFuture.allOf</span> instead of waiting for each in turn.</p>
+    <pre class="code" data-src="CompletableFuture&lt;String&gt; future =
+    client.sendAsync(get, BodyHandlers.ofString())
+          .thenApply(HttpResponse::body)          // extract the body
+          .exceptionally(ex -&gt; &quot;failed: &quot; + ex);  // recover from I/O errors
+
+// Fan out to many endpoints concurrently, then combine:
+List&lt;CompletableFuture&lt;HttpResponse&lt;String&gt;&gt;&gt; calls = urls.stream()
+    .map(u -&gt; client.sendAsync(requestFor(u), BodyHandlers.ofString()))
+    .toList();
+CompletableFuture.allOf(calls.toArray(new CompletableFuture[0])).join();"></pre>
+
+    <h3>Bodies beyond String</h3>
+    <p>The body type is chosen entirely by the <span class='key'>BodyHandler</span>, and it isn't limited to strings. Stream large downloads with <span class='key'>ofInputStream()</span>, save straight to disk with <span class='key'>ofFile(path)</span>, or discard the body with <span class='key'>discarding()</span>. Note the client does <strong>not</strong> parse JSON &mdash; you take the <span class='key'>String</span> (or stream) and hand it to a library like Jackson.</p>
+    <pre class="code" data-src="// Download a big file directly to disk - never buffers it all in memory
+client.send(get, BodyHandlers.ofFile(Path.of(&quot;report.pdf&quot;)));
+
+// Stream the body as it arrives
+HttpResponse&lt;InputStream&gt; stream = client.send(get, BodyHandlers.ofInputStream());
+
+// The client returns bytes/text; YOU parse JSON with your own library:
+HttpResponse&lt;String&gt; r = client.send(get, BodyHandlers.ofString());
+User user = new ObjectMapper().readValue(r.body(), User.class);  // Jackson"></pre>
+
+    <h3>Why it replaced HttpURLConnection</h3>
+    <p>The legacy <span class='key'>HttpURLConnection</span> was verbose, mutable, HTTP/1.1-only, and had no real async story &mdash; you manually opened streams, set methods reflectively, and read bytes by hand. <span class='key'>java.net.http</span> replaces all of it with a fluent, immutable API, native HTTP/2, WebSocket support, and first-class async via <span class='key'>CompletableFuture</span>, all in the JDK with no third-party dependency.</p>
+    <pre class="code" data-src="// The OLD way - boilerplate, mutable, HTTP/1.1 only:
+HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+c.setRequestMethod(&quot;GET&quot;);
+c.setRequestProperty(&quot;Accept&quot;, &quot;application/json&quot;);
+try (var in = c.getInputStream()) { /* read bytes manually... */ }
+int code = c.getResponseCode();
+
+// The NEW way - one fluent, immutable, async-capable call:
+var res = client.send(HttpRequest.newBuilder(URI.create(url)).build(),
+                      BodyHandlers.ofString());"></pre>
+
   </div>
 </section>
 
@@ -233,6 +319,9 @@ System.out.println("client error (4xx)? " + (status &gt;= 400));</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; No exception on 404</h3><p class="prompt">You call an endpoint that returns 404 and your code reads <span class='key'>res.body()</span> as if it succeeded. What did you forget?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">To check <span class='key'>res.statusCode()</span> first. The client returns normally for 4xx/5xx — it doesn't throw — so the body may be an error page or empty. Branch on the status before trusting the body.</div></details></div>
       <div class="exercise"><h3>2 &middot; Sync or async?</h3><p class="prompt">You must call 50 independent services and combine the results. Which send method, and why?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><span class='key'>sendAsync</span> — fire all 50 as <span class='key'>CompletableFuture</span>s so they run concurrently, then combine. Calling <span class='key'>send</span> (blocking) in a loop serializes them, taking the sum of all latencies. (Virtual threads make even the blocking style scale, but async composes the results cleanly.)</div></details></div>
+      <div class="exercise"><h3>3 &middot; A client per request</h3><p class="prompt">A teammate calls <span class='key'>HttpClient.newHttpClient()</span> inside a method that runs on every request. Why is that wasteful, and what should they do instead?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Each new client spins up its own connection pool and (for HTTP/2) its own connections, throwing away keep-alive reuse and adding setup cost per call. Since <span class='key'>HttpClient</span> is immutable and thread-safe, build <strong>one</strong> instance (a static field or an injected singleton) and share it across all requests.</div></details></div>
+      <div class="exercise"><h3>4 &middot; POST a JSON body</h3><p class="prompt">You need to POST <span class='key'>{"name":"Ada"}</span> as JSON. Which builder methods set the method, the body, and the content type &mdash; and does the client serialize the object for you?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Use <span class='key'>.POST(BodyPublishers.ofString(json))</span> and <span class='key'>.header("Content-Type", "application/json")</span>. The client does <strong>not</strong> serialize objects &mdash; you produce the JSON string yourself (e.g. with Jackson's <span class='key'>ObjectMapper.writeValueAsString</span>) and feed it to the <span class='key'>BodyPublisher</span>.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Don't buffer a huge download</h3><p class="prompt">You must download a 2 GB file. Why is <span class='key'>BodyHandlers.ofString()</span> a bad choice here, and what handler fits?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>ofString()</span> buffers the entire body into memory &mdash; 2 GB of heap, likely an <span class='key'>OutOfMemoryError</span>. Use <span class='key'>BodyHandlers.ofFile(path)</span> to stream it straight to disk, or <span class='key'>ofInputStream()</span> to process it in chunks as it arrives.</div></details></div>
   </div>
 </section>
 

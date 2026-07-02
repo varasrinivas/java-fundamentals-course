@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>A facade, levels, and lazy messages</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>Logging is your aircraft’s black-box flight recorder.</strong> When something goes wrong at 30,000 feet (in production, where you can’t attach a debugger), nobody replays the flight live &mdash; investigators pull the recorder afterward and <em>reconstruct</em> what happened, second by second. <b>Log levels</b> are the cockpit’s severity triage: a flickering light is a <span class='key'>DEBUG</span> curiosity, a low-fuel warning is <span class='key'>WARN</span>, and a full mayday is <span class='key'>ERROR</span> &mdash; you tune how much chatter the recorder keeps. And <b>SLF4J</b> is the universal power adapter: your code plugs into one standard socket, and whatever electrical grid the destination airport provides (Logback, Log4j2, java.util.logging) lights up without you rewiring the plane.</p>
+    </div>
     <p>Code against the <strong>SLF4J</strong> facade (<span class='key'>Logger</span>, <span class='key'>LoggerFactory</span>); pick a backend (Logback, Log4j2) at deploy time. Each message has a <strong>level</strong> — ERROR, WARN, INFO, DEBUG, TRACE — and a configured threshold drops anything less severe.</p><pre class="code" data-src="private static final Logger log =
     LoggerFactory.getLogger(OrderService.class);
 
@@ -165,6 +173,97 @@ try { ... } catch (Exception e) {
     log.error(&quot;order {} failed&quot;, orderId, e);   // last arg = the exception
 }"></pre><p>Use <span class='key'>{}</span> placeholders, not string concatenation: the message is only formatted if the level is enabled, so a disabled <span class='key'>debug</span> call costs almost nothing. Log the <em>exception object</em> (last argument) to capture the stack trace, never log secrets or PII, and prefer structured/JSON logs so tools can search them.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: LoggerFactory then level then {} params then appender then filter"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LoggerFactory</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">get logger</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">level</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">INFO / DEBUG</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">{} params</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lazy format</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">appender</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">file / console</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">filter</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by threshold</text></g></svg></div>
+
+    <h3>Why <span class='key'>System.out.println</span> fails in production</h3>
+    <p><span class='key'>println</span> is a debugging reflex, not a strategy. It has <strong>no levels</strong>, so you can’t dial the noise up or down &mdash; the only volume control is deleting the line and redeploying. It has <strong>no routing</strong>: everything piles onto stdout instead of a rolling file or a log aggregator. It carries <strong>no timestamp, thread name, or source</strong> unless you concatenate them by hand. It is <strong>always eager</strong> (the string is built even when no one reads it) and <span class='key'>System.out</span> is a <em>synchronized</em> <span class='key'>PrintStream</span>, so a chatty loop can actually throttle throughput.</p>
+    <pre class="code" data-src="// System.out.println: fine for a scratch main(), a trap in production.
+System.out.println(&quot;user &quot; + id + &quot; placed order &quot; + orderId);
+
+// What it CANNOT do:
+//  - no levels: you cannot silence it without deleting code + redeploying
+//  - no routing: everything lands on stdout, not a file / rolling log / aggregator
+//  - no timestamps, thread, or logger name unless you hand-build them
+//  - always eager: the concatenation runs even when nobody will read it
+//  - System.out is synchronized -&gt; a hot loop of prints can throttle throughput"></pre>
+
+    <h3>The ecosystem: SLF4J facade vs backends</h3>
+    <p><strong>SLF4J</strong> (Simple Logging Facade for Java) is an <em>API only</em> &mdash; a set of interfaces you code against. At runtime it binds to exactly one <strong>backend</strong> that does the real work: <span class='key'>Logback</span> (written by the same author, the common default), <span class='key'>Log4j2</span>, or a bridge to the JDK’s built-in <span class='key'>java.util.logging</span> (JUL). Because libraries log through the facade, the <em>application</em> chooses the implementation by picking a dependency &mdash; no call site changes.</p>
+    <pre class="code" data-src="// You compile against SLF4J only:
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+// SLF4J (the facade / API) --&gt; bound at runtime to ONE backend:
+//   logback-classic   (native SLF4J, the common default)
+//   log4j-slf4j2-impl (routes SLF4J -&gt; Log4j2)
+//   slf4j-jdk14       (routes SLF4J -&gt; java.util.logging / JUL)
+//
+// Swap the backend by swapping a dependency; your call sites never change.
+// java.util.logging (JUL) ships in the JDK but is rarely used directly -
+// most libraries log through SLF4J so the app picks the implementation."></pre>
+
+    <h3>Log levels &mdash; and choosing the right one</h3>
+    <p>The five standard SLF4J levels form a severity ladder: <span class='key'>ERROR</span> &gt; <span class='key'>WARN</span> &gt; <span class='key'>INFO</span> &gt; <span class='key'>DEBUG</span> &gt; <span class='key'>TRACE</span>. A configured threshold keeps everything <em>at or above</em> it and drops the rest. Choosing well is the whole game: <span class='key'>ERROR</span> means a human should look; <span class='key'>WARN</span> is recoverable but suspicious; <span class='key'>INFO</span> is the business/lifecycle narrative; <span class='key'>DEBUG</span> and <span class='key'>TRACE</span> are developer diagnostics you enable only when hunting a bug.</p>
+    <pre class="code" data-src="// Most severe -&gt; least severe. The configured threshold drops anything below it.
+log.error(&quot;payment gateway unreachable&quot;);   // something failed; needs attention
+log.warn (&quot;retry 3/3 for order {}&quot;, id);     // recoverable, but suspicious
+log.info (&quot;service started on port {}&quot;, 8080); // key lifecycle / business events
+log.debug(&quot;cache miss for key {}&quot;, key);      // diagnostics for developers
+log.trace(&quot;loop i={} value={}&quot;, i, value);    // very fine-grained, firehose
+
+// Rule of thumb: production usually runs at INFO. DEBUG/TRACE are opt-in and
+// enabled per-package when you are actually chasing a bug."></pre>
+
+    <h3>Parameterized logging beats concatenation</h3>
+    <p>Pass a message template with <span class='key'>{}</span> placeholders and the values as trailing arguments. This does two things at once: it keeps call sites readable, and &mdash; crucially &mdash; if the level is disabled, SLF4J <strong>returns immediately without formatting the string or calling <span class='key'>toString()</span></strong> on the arguments. That makes a switched-off <span class='key'>debug</span> call essentially free, so the old <span class='key'>if (log.isDebugEnabled())</span> guard is only worth it when computing an <em>argument</em> is itself expensive.</p>
+    <pre class="code" data-src="// Parameterized: one message template, values as trailing args.
+log.debug(&quot;user {} loaded {} orders in {} ms&quot;, userId, count, elapsed);
+
+// Two wins over string concatenation:
+//  1) if DEBUG is disabled, SLF4J returns immediately - it never builds the
+//     string or calls toString() on the arguments. Essentially free.
+//  2) cleaner call sites; the message template is greppable.
+
+// So you almost never need the old guard pattern:
+if (log.isDebugEnabled()) {                     // rarely necessary now
+    log.debug(&quot;expensive: &quot; + buildBigReport()); // guard only if an ARGUMENT
+}                                                // is itself costly to compute"></pre>
+
+    <h3>A logger per class</h3>
+    <p>The convention is one <span class='key'>private static final Logger</span> per class, obtained from <span class='key'>LoggerFactory.getLogger(Foo.class)</span>. Passing the <span class='key'>Class</span> names the logger after its fully-qualified class name, which does two jobs: every log line records <em>where</em> it came from, and your configuration can raise or lower the level for a whole package (<span class='key'>com.shop</span>) or a single class without touching code.</p>
+    <pre class="code" data-src="public class OrderService {
+    // One logger per class, static final, named after the class.
+    // getLogger(OrderService.class) uses the fully-qualified class name,
+    // so config can raise/lower the level per package: com.shop.OrderService.
+    private static final Logger log =
+            LoggerFactory.getLogger(OrderService.class);
+
+    void place(Order o) {
+        log.info(&quot;placing order {}&quot;, o.id());
+    }
+}
+// The logger name (the class) is what appears in each line and what your
+// logback.xml / log4j2.xml targets with &lt;logger name=&quot;com.shop&quot; level=&quot;DEBUG&quot;/&gt;."></pre>
+
+    <h3>Operational hygiene: exceptions, secrets, MDC</h3>
+    <p>Three habits separate useful logs from liabilities. First, log the <strong>exception object</strong> as the last argument &mdash; <span class='key'>log.error("...", e)</span> &mdash; so SLF4J captures the full stack trace; <span class='key'>e.getMessage()</span> alone throws it away. Second, <strong>never log secrets or PII</strong> (passwords, tokens, card numbers, full emails) &mdash; logs are copied, shipped, and indexed far more widely than you think. Third, use <strong>MDC</strong> (Mapped Diagnostic Context) to stamp a correlation key like a request ID onto every line on the current thread, so you can trace one request across many log statements &mdash; and always <span class='key'>clear()</span> it, because threads are pooled and reused.</p>
+    <pre class="code" data-src="try {
+    charge(card, amount);
+} catch (PaymentException e) {
+    // RIGHT: pass the throwable as the LAST arg -&gt; full stack trace is logged.
+    log.error(&quot;charge failed for order {}&quot;, orderId, e);
+    // WRONG: log.error(&quot;charge failed: &quot; + e.getMessage());  // trace lost!
+}
+
+// Never log secrets or PII: no card numbers, passwords, tokens, full emails.
+log.info(&quot;charged card ****{}&quot;, last4);   // mask it
+
+// MDC = per-thread context, stamped onto every line for correlation:
+MDC.put(&quot;requestId&quot;, requestId);
+try {
+    log.info(&quot;handling request&quot;);          // line carries requestId automatically
+} finally {
+    MDC.clear();                           // always clear (threads are pooled!)
+}"></pre>
     
   </div>
 </section>
@@ -230,6 +329,9 @@ System.out.println("Below the threshold is filtered out.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Why {} not +?</h3><p class="prompt">What's the difference between <span class='key'>log.debug("cart: " + cart)</span> and <span class='key'>log.debug("cart: {}", cart)</span> when DEBUG is disabled?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The first always builds the string (calling <span class='key'>cart.toString()</span>) even though it's discarded — wasted work. The <span class='key'>{}</span> form skips formatting entirely when DEBUG is off, so it's essentially free.</div></details></div>
       <div class="exercise"><h3>2 &middot; Capture the trace</h3><p class="prompt">In a catch block you write <span class='key'>log.error("failed: " + e.getMessage())</span>. What valuable thing did you lose?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The stack trace. Pass the exception as the last argument instead: <span class='key'>log.error("failed for order {}", orderId, e)</span>. SLF4J then logs the full trace, which <span class='key'>getMessage()</span> alone discards.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Facade vs backend</h3><p class="prompt">Your code imports only <span class='key'>org.slf4j.Logger</span>, yet at runtime it must actually write somewhere. What decides where the lines go, and how do you switch it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">SLF4J is just the facade (API). The <b>backend</b> on the classpath &mdash; Logback, Log4j2, or a JUL bridge &mdash; does the real writing. You switch it by swapping that one dependency; your call sites, which only touch SLF4J, never change.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Is the guard still needed?</h3><p class="prompt">Someone reviews your code and asks you to wrap every <span class='key'>log.debug("id={}", id)</span> in <span class='key'>if (log.isDebugEnabled())</span>. Are they right?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">No. With <span class='key'>{}</span> parameters, a disabled <span class='key'>debug</span> call already returns without formatting the string or calling <span class='key'>toString()</span>. The guard only earns its keep when building an <em>argument</em> is itself expensive &mdash; e.g. <span class='key'>log.debug("dump={}", serializeWholeState())</span>.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Pick the level</h3><p class="prompt">Assign a level to each: (a) the app finished startup and is listening on a port; (b) a retry succeeded on the 3rd attempt; (c) the database is completely unreachable; (d) the exact SQL bound-parameter values on every query.</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">(a) <span class='key'>INFO</span> &mdash; a key lifecycle event. (b) <span class='key'>WARN</span> &mdash; recoverable but worth noticing. (c) <span class='key'>ERROR</span> &mdash; a human must act. (d) <span class='key'>DEBUG</span> or <span class='key'>TRACE</span> &mdash; firehose diagnostics, off in production (and mind PII in those values).</div></details></div>
   </div>
 </section>
 

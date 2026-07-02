@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Defer the “new” to a method subclasses control</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p>A factory method is ordering the <b>chef’s choice</b> at a restaurant. You tell the waiter &ldquo;bring me a dessert&rdquo; &mdash; a <em>category</em>, not a recipe. The <b>kitchen</b> decides and builds the concrete dish: tonight it plates a lava cake, tomorrow a tiramisu. You, the caller, never write <span class='key'>new ChocolateCake()</span>; you only depend on the idea of &ldquo;a dessert.&rdquo; Because creation lives behind the kitchen door, the restaurant can <b>change what it serves</b> &mdash; new supplier, seasonal menu, a healthier recipe &mdash; without you changing your order at all. That indirection between <em>what</em> you ask for and <em>which concrete class</em> gets built is the whole pattern.</p>
+    </div>
     <p>Hardcoding <span class='key'>new VeggiePizza()</span> everywhere couples your code to concrete classes. A <strong>factory method</strong> wraps the <span class='key'>new</span> in an overridable method, so subclasses (or configuration) decide which concrete type to create, and callers depend only on an interface.</p><pre class="code" data-src="interface Pizza { int prepTime(); }
 class Veggie implements Pizza { public int prepTime(){ return 15; } }
 class Meat   implements Pizza { public int prepTime(){ return 20; } }
@@ -166,7 +174,81 @@ abstract class PizzaStore {
 }
 // A NyPizzaStore subclass decides which concrete Pizza `create` returns."></pre><p>You see factory methods all over the JDK: <span class='key'>List.of(...)</span>, <span class='key'>Integer.valueOf(...)</span>, <span class='key'>LocalDate.now()</span>. They give better names than constructors, can return cached instances, and can hand back a subtype — flexibility a raw constructor can’t.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: order(type) then create() then subclass decides then new Concrete then Pizza"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">order(type)</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">client asks</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">create()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">factory method</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">subclass decides</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">which class</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">new Concrete</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">hidden inside</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">Pizza</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">returned</text></g></svg></div>
-    
+
+    <h3>Intent: depend on an abstraction, not on <span class='key'>new</span></h3>
+    <p>The Gang of Four define Factory Method as: <strong>&ldquo;define an interface for creating an object, but let subclasses decide which class to instantiate.&rdquo;</strong> The point is to invert a dependency. Client code is written against a <em>product interface</em> and calls a creation method; the decision of <em>which concrete class</em> to build is pushed to a subclass or configuration. Swap the concrete type and the client never changes.</p>
+<pre class="code" data-src="// The client depends only on Notifier - never on a concrete class.
+interface Notifier { void send(String msg); }
+
+class EmailNotifier implements Notifier {
+    public void send(String msg) { /* SMTP... */ }
+}
+
+// No `new EmailNotifier()` anywhere in business logic:
+void alertOps(Notifier n) {          // caller receives the abstraction
+    n.send(&quot;disk almost full&quot;);      // works for any Notifier subtype
+}"></pre>
+
+    <h3>The participants (a small worked example)</h3>
+    <p>Classic Factory Method has four roles: the <strong>Product</strong> interface, one or more <strong>Concrete Products</strong>, an abstract <strong>Creator</strong> that declares the factory method (and usually calls it), and <strong>Concrete Creators</strong> that override it to pick a class. The creator often contains real logic that <em>uses</em> the product it just made &mdash; that is what separates this from a bare factory function.</p>
+<pre class="code" data-src="interface Dialog { String render(); }                 // Product
+class HtmlDialog implements Dialog {                   // Concrete Product
+    public String render() { return &quot;&lt;button&gt;OK&lt;/button&gt;&quot;; }
+}
+class WinDialog implements Dialog {                    // Concrete Product
+    public String render() { return &quot;[ OK ]&quot;; }
+}
+
+abstract class App {                                   // Creator
+    protected abstract Dialog createDialog();          // the factory method
+    String show() {                                    // uses the product
+        return &quot;showing: &quot; + createDialog().render();
+    }
+}
+class WebApp extends App {                              // Concrete Creator
+    protected Dialog createDialog() { return new HtmlDialog(); }
+}
+class DesktopApp extends App {                          // Concrete Creator
+    protected Dialog createDialog() { return new WinDialog(); }
+}"></pre>
+
+    <h3>Simple factory vs Factory Method vs Abstract Factory</h3>
+    <p>These three get muddled. A <strong>simple factory</strong> is just a static method with a <span class='key'>switch</span> &mdash; convenient, but not a GoF pattern and not extensible without editing it. <strong>Factory Method</strong> (this module) uses <em>inheritance</em>: subclasses override <em>one</em> creation method. <strong>Abstract Factory</strong> (module 46) goes further &mdash; an object whose methods create a whole <em>family</em> of related products that must fit together.</p>
+<pre class="code" data-src="// SIMPLE FACTORY - not GoF: one method decides via a switch.
+static Shape make(String kind) {
+    return switch (kind) {
+        case &quot;circle&quot; -&gt; new Circle();
+        case &quot;square&quot; -&gt; new Square();
+        default       -&gt; throw new IllegalArgumentException(kind);
+    };
+}
+
+// FACTORY METHOD - subclasses override create():  new WebApp().show();
+// ABSTRACT FACTORY - one object builds a matching family (teaser, module 46):
+interface GuiKit { Button button(); Checkbox checkbox(); }  // whole family"></pre>
+
+    <h3>Static factory methods: the everyday Java form</h3>
+    <p>You rarely build the full inheritance ceremony. The version you meet daily is the <strong>static factory method</strong> &mdash; a static method that returns an instance instead of a public constructor. The JDK is saturated with them, and Effective Java item 1 recommends considering them <em>before</em> constructors.</p>
+<pre class="code" data-src="List&lt;String&gt; xs = List.of(&quot;a&quot;, &quot;b&quot;);   // returns an immutable List subtype
+Optional&lt;User&gt; u = Optional.of(user);  // named, self-documenting
+Integer i = Integer.valueOf(127);      // may return a CACHED instance
+LocalDate d = LocalDate.of(2026, 7, 1);// clearer than a 3-arg constructor
+var page = Optional.empty();           // no allocation - shared singleton"></pre>
+
+    <h3>Why a static factory beats a constructor</h3>
+    <p>Constructors have three hard limits a static factory escapes. (1) They <strong>can’t be named</strong> &mdash; every overload is just <span class='key'>new Foo(...)</span>, so <span class='key'>BigInteger.probablePrime(n, rnd)</span> reads far better than a constructor. (2) They <strong>must return a fresh object</strong> of exactly their class &mdash; a factory can <em>cache</em> and hand back a shared instance (<span class='key'>Integer.valueOf</span>, <span class='key'>Boolean.valueOf</span>). (3) They <strong>must return their own type</strong> &mdash; a factory can return any <em>subtype</em>, even one that’s package-private, which is how <span class='key'>List.of</span> hides its real implementation class.</p>
+<pre class="code" data-src="// Named + returns a subtype + can cache - none possible with a constructor:
+static Notifier forChannel(String ch) {
+    return switch (ch) {
+        case &quot;email&quot; -&gt; new EmailNotifier();   // concrete type stays hidden
+        case &quot;sms&quot;   -&gt; SmsNotifier.SHARED;     // returns a cached instance
+        default      -&gt; Notifier.NONE;          // a null-object subtype
+    };
+}
+// The declared return type is the interface, so callers stay decoupled."></pre>
+
+    <h3>When it helps &mdash; and when it’s over-engineering</h3>
+    <p>Reach for a factory when creation logic is <strong>non-trivial or likely to vary</strong>: choosing an implementation by config, returning cached/pooled objects, or injecting a fake in tests (a factory is a natural seam &mdash; pass a stub creator). But a factory around a single, stable <span class='key'>new Point(x, y)</span> is <strong>pure ceremony</strong>. If there’s one implementation and no naming/caching/subtype benefit, just call the constructor. Patterns are a response to change; add the indirection when the change actually shows up.</p>
   </div>
 </section>
 
@@ -231,6 +313,9 @@ System.out.println("caller never wrote new VeggiePizza().");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Why not a constructor?</h3><p class="prompt">Give two things a static factory method can do that a plain constructor cannot.</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">It can have a <b>meaningful name</b> (<span class='key'>List.of</span> vs another overload), <b>return a cached</b> or shared instance instead of always allocating, and <b>return a subtype</b> of the declared type. Constructors must create a new object of exactly their class.</div></details></div>
       <div class="exercise"><h3>2 &middot; Spot the coupling</h3><p class="prompt">Code is littered with <span class='key'>new MySqlConnection()</span>. How does a factory method make swapping to Postgres easier?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Centralize creation in one factory that returns a <span class='key'>Connection</span> interface. Callers depend on the interface, so switching databases means changing one factory, not every <span class='key'>new</span> call site.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Name the participants</h3><p class="prompt">In the <span class='key'>App</span> / <span class='key'>Dialog</span> example, label each of the four roles: Product, Concrete Product, Creator, Concrete Creator.</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>Dialog</span> is the <b>Product</b> interface; <span class='key'>HtmlDialog</span> / <span class='key'>WinDialog</span> are <b>Concrete Products</b>; the abstract <span class='key'>App</span> (declaring <span class='key'>createDialog()</span> and using it in <span class='key'>show()</span>) is the <b>Creator</b>; <span class='key'>WebApp</span> / <span class='key'>DesktopApp</span> are <b>Concrete Creators</b> that override the factory method.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Factory Method vs Abstract Factory</h3><p class="prompt">You need to create a matching set of <span class='key'>Button</span>, <span class='key'>Checkbox</span>, and <span class='key'>Menu</span> that all share a theme (dark vs light). Is Factory Method enough, or do you want Abstract Factory?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">You want <b>Abstract Factory</b> (module 46). Factory Method produces <em>one</em> product per creation method; here you need a <em>family</em> of related products guaranteed to fit together (all dark, or all light). One <span class='key'>ThemeFactory</span> object with <span class='key'>button()</span>, <span class='key'>checkbox()</span>, <span class='key'>menu()</span> keeps them consistent.</div></details></div>
+      <div class="exercise"><h3>5 &middot; When NOT to add a factory</h3><p class="prompt">A teammate wraps every <span class='key'>new Point(x, y)</span> in a <span class='key'>PointFactory.create(x, y)</span> that only does <span class='key'>return new Point(x, y);</span>. Justified, or over-engineering?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><b>Over-engineering.</b> There’s a single stable implementation and no naming, caching, or subtype benefit &mdash; the factory adds indirection for zero payoff. A static factory earns its keep only when creation varies, can be cached/pooled, needs a descriptive name, or must return a hidden subtype. Otherwise just call the constructor.</div></details></div>
   </div>
 </section>
 

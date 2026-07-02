@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Readable construction for objects with many parts</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127829; Real-world analogy</span>
+      <p><strong>A Builder is ordering a custom sandwich at the deli counter.</strong> You don&rsquo;t recite one impossible order that names every possible ingredient in a fixed sequence &mdash; &ldquo;rye, no wait white, Swiss, hold the onions, extra pickles, mustard not mayo&hellip;&rdquo; &mdash; and pray the order of words lines up. Instead you build it up one instruction at a time: <b>&ldquo;add cheese,&rdquo; &ldquo;no onions,&rdquo; &ldquo;extra pickles.&rdquo;</b> Each request is <b>named</b>, so nobody has to remember whether the third <span class="key">true</span> meant bacon or toasted. When you finally say <b>&ldquo;make it,&rdquo;</b> the deli assembles everything at once, checks it&rsquo;s a valid sandwich, and hands it over <b>complete and wrapped</b> &mdash; you can&rsquo;t un-add the cheese afterward. That handoff is <span class="key">build()</span> returning an immutable object.</p>
+    </div>
     <p>A constructor with many parameters — especially optional ones — becomes unreadable: <span class='key'>new Burger(2, true, false, true, 0, true)</span>. Which <span class='key'>true</span> is the bacon? A <strong>Builder</strong> replaces that with named, chained steps and produces an immutable result at the end.</p><pre class="code" data-src="Burger b = new Burger.Builder()
     .patties(2)
     .cheese(true)
@@ -164,6 +172,105 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 
 // The builder also validates once, in build(), before constructing."></pre><p>You’ve used builders without noticing: <span class='key'>StringBuilder</span>, <span class='key'>HttpRequest.newBuilder()</span>, stream collectors. They shine when an object has many optional fields, when you want the result immutable (module 08), or when construction needs validation before the object exists.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: new Builder then .patties(2) then .cheese(true) then .build() then Burger"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">new Builder</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">start</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">.patties(2)</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">set a part</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">.cheese(true)</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">chain calls</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">.build()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">assemble</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">Burger</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">immutable</text></g></svg></div>
+
+    <h3>The problem: telescoping constructors</h3>
+    <p>When a class has several fields &mdash; some required, some optional &mdash; the classic &ldquo;solution&rdquo; is a ladder of overlapping constructors, each taking one more argument than the last. This is the <strong>telescoping constructor</strong> anti-pattern. It compiles, but the call sites are write-only: nobody reading <span class="key">new Pizza(12, true, false, true, null)</span> can tell what those literals mean without opening the constructor.</p>
+    <pre class="code" data-src="// Telescoping constructors: each one delegates to the next.
+class Pizza {
+    Pizza(int size) { this(size, false); }
+    Pizza(int size, boolean cheese) { this(size, cheese, false); }
+    Pizza(int size, boolean cheese, boolean pepperoni) { this(size, cheese, pepperoni, false); }
+    Pizza(int size, boolean cheese, boolean pepperoni, boolean olives) { /* ... */ }
+}
+
+// The call site is a puzzle. Which flag is which?
+Pizza p = new Pizza(12, true, false, true);  // 12&quot; ... cheese? no pepperoni? olives?
+// Same-typed args also let you silently swap two of them and still compile."></pre>
+
+    <h3>The fluent builder</h3>
+    <p>The Builder pattern replaces that ladder with a <strong>static nested class</strong> whose setters each return <span class="key">this</span>, so calls chain. The outer type&rsquo;s constructor is made <span class="key">private</span> and takes the builder, so the only way to create one is through <span class="key">build()</span> &mdash; which produces a fully-formed, <strong>immutable</strong> object (all <span class="key">final</span> fields, no setters). The builder is the mutable scratch space; the product is frozen.</p>
+    <pre class="code" data-src="public final class Pizza {
+    private final int size;           // all final -&gt; immutable product
+    private final boolean cheese, pepperoni, olives;
+
+    private Pizza(Builder b) {         // only the Builder may call this
+        this.size = b.size; this.cheese = b.cheese;
+        this.pepperoni = b.pepperoni; this.olives = b.olives;
+    }
+
+    public static class Builder {
+        private int size = 12;
+        private boolean cheese, pepperoni, olives;
+        public Builder size(int s)      { this.size = s; return this; }      // return this -&gt; chain
+        public Builder cheese(boolean c){ this.cheese = c; return this; }
+        public Builder pepperoni(boolean p){ this.pepperoni = p; return this; }
+        public Builder olives(boolean o){ this.olives = o; return this; }
+        public Pizza build() { return new Pizza(this); }
+    }
+}
+
+Pizza p = new Pizza.Builder().size(14).cheese(true).olives(true).build();"></pre>
+
+    <h3>Required vs optional fields</h3>
+    <p>A builder can still enforce what&rsquo;s mandatory. Put <strong>required</strong> fields on the <em>builder&rsquo;s constructor</em> so you physically can&rsquo;t start building without them; leave <strong>optional</strong> fields to chained setters with sensible defaults. This keeps the &ldquo;you must supply X&rdquo; contract at compile time for the required part, while optional parts stay flexible.</p>
+    <pre class="code" data-src="public static class Builder {
+    private final int size;           // REQUIRED: no default, must pass it
+    private final String crust;       // REQUIRED
+    private boolean cheese = true;    // OPTIONAL: has a default
+    private boolean olives = false;   // OPTIONAL
+
+    public Builder(int size, String crust) {   // required args up front
+        this.size = size; this.crust = crust;
+    }
+    public Builder cheese(boolean c) { this.cheese = c; return this; }
+    public Builder olives(boolean o) { this.olives = o; return this; }
+    public Pizza build() { return new Pizza(this); }
+}
+
+// Can't forget the required parts - they're constructor arguments:
+Pizza p = new Pizza.Builder(14, &quot;thin&quot;).olives(true).build();"></pre>
+
+    <h3>Validate once, in build()</h3>
+    <p>Because construction is deferred to a single <span class="key">build()</span> call, that method is the perfect place to <strong>validate cross-field invariants</strong> &mdash; rules that involve more than one field and can only be checked when all values are present. Throw before the object exists and no half-valid instance can ever escape into your program.</p>
+    <pre class="code" data-src="public Pizza build() {
+    if (size &lt; 8 || size &gt; 24)
+        throw new IllegalArgumentException(&quot;size must be 8-24 inches&quot;);
+    if (olives &amp;&amp; crust.equals(&quot;stuffed&quot;))
+        throw new IllegalStateException(&quot;olives not allowed on stuffed crust&quot;);
+    return new Pizza(this);   // only reached if every invariant holds
+}"></pre>
+
+    <h3>Builders in the JDK and libraries</h3>
+    <p>You have been using builders all along. The JDK ships several, and most are the exact static-nested-class-with-chaining shape above. Recognizing them makes their APIs obvious.</p>
+    <pre class="code" data-src="// StringBuilder - the original: mutable scratch, then a frozen String.
+String s = new StringBuilder().append(&quot;a&quot;).append(1).append(true).toString();
+
+// Stream.builder() - accumulate elements, then seal into a Stream.
+Stream&lt;String&gt; st = Stream.&lt;String&gt;builder().add(&quot;x&quot;).add(&quot;y&quot;).build();
+
+// HttpRequest.newBuilder() - fluent, immutable HTTP requests (java.net.http).
+HttpRequest req = HttpRequest.newBuilder()
+        .uri(URI.create(&quot;https://example.com&quot;))
+        .header(&quot;Accept&quot;, &quot;application/json&quot;)
+        .GET()
+        .build();
+
+// Locale.Builder - validates language/region tags in build().
+Locale loc = new Locale.Builder().setLanguage(&quot;en&quot;).setRegion(&quot;US&quot;).build();"></pre>
+
+    <h3>When NOT to use a builder</h3>
+    <p>The pattern is ceremony, and ceremony has a cost. With only a couple of fields, a plain constructor or a <span class="key">record</span> is clearer and shorter &mdash; don&rsquo;t write twenty lines of builder to set two values. And when you <em>do</em> want a builder but hate the boilerplate, Lombok&rsquo;s <span class="key">@Builder</span> annotation generates the whole nested class and chained setters for you at compile time, so you keep the ergonomics without hand-writing them.</p>
+    <pre class="code" data-src="// Few fields? Just use a constructor - or better, a record (module 23).
+record Point(int x, int y) {}
+Point p = new Point(3, 4);                 // no builder needed
+
+// Want a builder without the boilerplate? Lombok generates it:
+@Builder
+public class User {
+    private final String name;
+    private final int age;
+}
+// Lombok emits User.builder().name(&quot;Ada&quot;).age(36).build() at compile time."></pre>
     
   </div>
 </section>
@@ -230,6 +337,9 @@ System.out.println("Same builder, different burgers.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; When is it worth it?</h3><p class="prompt">For a class with two required fields and no options, is a Builder a good idea?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Usually no — a plain constructor (or a record) is clearer. Builders pay off when there are <b>many fields, several optional</b>, when you want an immutable result, or when construction needs validation. Don’t add ceremony you don’t need.</div></details></div>
       <div class="exercise"><h3>2 &middot; Telescoping constructors</h3><p class="prompt">What problem with “telescoping constructors” (many overloads) does the Builder solve?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Overloads like <span class='key'>Burger(int)</span>, <span class='key'>Burger(int,bool)</span>, <span class='key'>Burger(int,bool,bool)</span> explode combinatorially and make call sites cryptic (which arg is which?). The Builder names each part and handles any subset of options readably.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Why return this?</h3><p class="prompt">Each setter in the builder ends with <span class="key">return this;</span>. What does that one line buy you, and what happens if a setter returns <span class="key">void</span> instead?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Returning <span class="key">this</span> is what makes the calls <b>chain</b> &mdash; each setter hands back the same builder so the next call can be appended: <span class="key">.cheese(true).bacon(true)</span>. If a setter returned <span class="key">void</span>, you&rsquo;d have to call each on its own statement (<span class="key">b.cheese(true); b.bacon(true);</span>), losing the fluent one-expression style that is the whole point.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Required vs optional</h3><p class="prompt">You want <span class="key">size</span> to be mandatory but <span class="key">cheese</span> optional. Where does each belong in the builder, and why can&rsquo;t a setter enforce &ldquo;required&rdquo;?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Put <b>required</b> fields as parameters of the <b>builder&rsquo;s constructor</b> &mdash; then the compiler forces the caller to supply them before any chaining begins. Leave <b>optional</b> fields to chained setters with defaults. A setter can&rsquo;t enforce &ldquo;required&rdquo; because the caller is free to simply never call it; only a constructor parameter is unskippable. (A <span class="key">build()</span> null-check is a weaker, runtime-only fallback.)</div></details></div>
+      <div class="exercise"><h3>5 &middot; Where does validation go?</h3><p class="prompt">A rule says &ldquo;olives are not allowed on stuffed crust.&rdquo; Should that check live in the individual setters or in <span class="key">build()</span>? Why?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">In <span class="key">build()</span>. It&rsquo;s a <b>cross-field invariant</b> &mdash; it depends on both <span class="key">olives</span> and <span class="key">crust</span>, which may be set in either order. A setter runs too early to see the other field. <span class="key">build()</span> is the single choke point where every value is present, so validating there guarantees no invalid <span class="key">Pizza</span> ever comes into existence.</div></details></div>
   </div>
 </section>
 
