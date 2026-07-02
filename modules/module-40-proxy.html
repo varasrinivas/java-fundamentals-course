@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Same interface, with a gatekeeper in front</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>A proxy is a celebrity&rsquo;s personal assistant.</strong> You call the star&rsquo;s office with the <em>same</em> request you&rsquo;d make of the star directly &mdash; &ldquo;can you do this shoot Friday?&rdquo; &mdash; but you reach the <b>assistant</b>, who presents the exact same interface as the star. The assistant decides what happens to your call: <b>forward it</b> to the star, <b>schedule it for later</b> because the star isn&rsquo;t &ldquo;created&rdquo; for this until needed (lazy), <b>screen it</b> if you&rsquo;re not on the approved list (access control), or <b>log it</b> in the calendar. You never notice the difference &mdash; the assistant answers with the same &ldquo;interface&rdquo; the star would &mdash; yet every real interaction is <em>controlled</em>. That is a Proxy: same interface as the real subject, standing in front to control access to it.</p>
+    </div>
     <p>A <strong>proxy</strong> implements the same interface as the real object and holds a reference to it (or creates it on demand). Callers think they’re talking to the real thing, but the proxy can add access control, caching, logging, or — very commonly — <em>lazy loading</em> of an expensive object.</p><pre class="code" data-src="interface Image { void display(); }
 class RealImage implements Image {        // heavy: loads from disk
     RealImage(String f){ loadFromDisk(f); }
@@ -170,6 +178,88 @@ class ImageProxy implements Image {       // lightweight stand-in
     }
 }"></pre><p>Java leans on proxies heavily: Hibernate returns proxies for lazy entity loading, Spring wraps beans in proxies to add transactions and security, and <span class='key'>java.lang.reflect.Proxy</span> builds them at runtime. The client code never changes — the proxy slips in transparently.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: client then proxy then check / defer then real object then forward"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">client</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">asks Image</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">proxy</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">stand-in</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">check / defer</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">control access</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">real object</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">made on demand</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">forward</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">display()</text></g></svg></div>
+
+    <h3>The intent: a stand-in that controls access</h3>
+    <p>The Gang of Four define a proxy as a <strong>surrogate</strong> for another object that controls access to it. The crucial constraint: the proxy implements the <em>same interface</em> as the real <strong>subject</strong>, so it is a drop-in replacement. Callers hold a reference typed as the interface and cannot tell whether they have the real object or a stand-in. Everything the proxy adds &mdash; a permission check, a cache lookup, a log line, a deferred construction &mdash; happens <em>around</em> a delegation to the real subject.</p>
+<pre class="code" data-src="interface Service {
+    String fetch(String key);
+}
+
+// Both the real subject and the proxy implement Service,
+// so a caller typed as Service is oblivious to which it holds.
+Service s = new LoggingProxy(new RealService());
+String v = s.fetch(&quot;user:42&quot;);   // proxy runs, then delegates"></pre>
+    <h3>The four flavors of proxy</h3>
+    <p>The pattern is one shape with several jobs. A <strong>virtual proxy</strong> defers creating an expensive object until it is first used (lazy loading). A <strong>protection proxy</strong> enforces access control, rejecting callers who lack permission. A <strong>remote proxy</strong> is a local stub for an object that actually lives in another JVM or on another machine, hiding the network call. A <strong>logging or caching proxy</strong> records access or memoizes results. Same structure, different reason to intercept.</p>
+<pre class="code" data-src="// Protection proxy: check before delegating.
+class SecuredService implements Service {
+    private final Service real;
+    private final User user;
+    SecuredService(Service real, User user) {
+        this.real = real; this.user = user;
+    }
+    public String fetch(String key) {
+        if (!user.canRead(key))
+            throw new SecurityException(&quot;denied: &quot; + key);
+        return real.fetch(key);          // access granted -&gt; delegate
+    }
+}"></pre>
+    <h3>A worked static proxy</h3>
+    <p>A <strong>static proxy</strong> is one you write by hand: a class that implements the interface, holds the real subject, and wraps each method with extra behavior before (or after) delegating. It is explicit and easy to read, but you must write one method per interface method &mdash; add a method to the interface and every hand-written proxy must be updated. This example adds logging and caches the first result.</p>
+<pre class="code" data-src="class CachingLoggingProxy implements Service {
+    private final Service real;
+    private final Map&lt;String, String&gt; cache = new HashMap&lt;&gt;();
+    CachingLoggingProxy(Service real) { this.real = real; }
+
+    public String fetch(String key) {
+        if (cache.containsKey(key)) {          // caching proxy
+            System.out.println(&quot;[cache] &quot; + key);
+            return cache.get(key);
+        }
+        System.out.println(&quot;[fetch] &quot; + key);  // logging proxy
+        String value = real.fetch(key);        // delegate to real subject
+        cache.put(key, value);
+        return value;
+    }
+}"></pre>
+    <h3>Java’s dynamic proxies</h3>
+    <p>Writing a class per interface is tedious, so Java ships a runtime proxy generator: <span class='key'>java.lang.reflect.Proxy.newProxyInstance</span> synthesizes a class implementing any set of interfaces on the fly. Every method call on the generated object is routed to a single <span class='key'>InvocationHandler.invoke(proxy, method, args)</span>, where you add your behavior and call <span class='key'>method.invoke(real, args)</span> to delegate. One handler covers every method &mdash; add a method to the interface and the proxy handles it automatically. The catch: JDK dynamic proxies only work for <em>interfaces</em>; proxying a concrete class needs bytecode libraries like CGLIB or ByteBuddy.</p>
+<pre class="code" data-src="import java.lang.reflect.*;
+
+// One handler intercepts every method of the target interface.
+Service real = new RealService();
+Service proxy = (Service) Proxy.newProxyInstance(
+    real.getClass().getClassLoader(),
+    new Class&lt;?&gt;[]{ Service.class },
+    (Object p, Method m, Object[] args) -&gt; {
+        System.out.println(&quot;-&gt; &quot; + m.getName());   // logging
+        Object result = m.invoke(real, args);       // delegate
+        System.out.println(&quot;&lt;- &quot; + m.getName());
+        return result;
+    });
+
+proxy.fetch(&quot;user:42&quot;);   // handler runs around the real call"></pre>
+    <h3>How frameworks lean on proxies</h3>
+    <p>Proxies are the quiet engine behind much of the Java ecosystem. <strong>Spring AOP</strong> wraps your beans in proxies to weave in cross-cutting concerns: a <span class='key'>@Transactional</span> method is really a proxy that opens a transaction, calls your method, and commits or rolls back &mdash; which is why calling one <span class='key'>@Transactional</span> method from another <em>within the same bean</em> skips the proxy and the transaction. <strong>Hibernate</strong> returns proxy entities for lazy associations, loading the row from the database only when you first touch a field. <strong>Mocking libraries</strong> like Mockito generate proxies that record calls and return stubbed answers instead of running real code.</p>
+<pre class="code" data-src="@Service
+class OrderService {
+    @Transactional                       // Spring wraps this bean in a proxy
+    public void placeOrder(Order o) {    // proxy: begin tx -&gt; run -&gt; commit
+        repository.save(o);
+        this.notifyWarehouse(o);         // SELF-call: bypasses the proxy!
+    }
+    @Transactional
+    public void notifyWarehouse(Order o) { /* NOT in its own tx here */ }
+}"></pre>
+    <h3>Proxy vs Decorator</h3>
+    <p>Structurally they are twins: both wrap an object and share its interface. The difference is <em>intent</em>. A <strong>Decorator</strong> <em>adds behavior</em> &mdash; you deliberately stack wrappers to compose new features (buffering, compression) and the decorator always talks to a subject it was handed. A <strong>Proxy</strong> <em>controls access</em> to a subject it typically owns or creates &mdash; it may decide <em>whether</em> and <em>when</em> to call the real object at all (deny it, defer it, cache past it). Decorator says &ldquo;same object, more powers&rdquo;; Proxy says &ldquo;same interface, guarded gateway.&rdquo;</p>
+<pre class="code" data-src="// Decorator: ADDS behavior, always delegates, composed by the caller.
+Reader r = new BufferedReader(new FileReader(&quot;data.txt&quot;));
+
+// Proxy: CONTROLS access, may skip the real call entirely.
+Service s = new SecuredService(new RealService(), user);
+//   -&gt; throws instead of delegating when access is denied,
+//      or (virtual proxy) delays creating the real object."></pre>
     
   </div>
 </section>
@@ -235,6 +325,9 @@ System.out.println("saved by not loading early? " + (costBeforeView &lt; realIma
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Proxy vs Decorator</h3><p class="prompt">Both wrap an object with the same interface. How does a Proxy differ in intent from a Decorator?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">A <b>Decorator</b> adds new behavior/features to the object. A <b>Proxy</b> controls <em>access</em> to it — lazy loading, permissions, caching, remoting — usually without changing what the object does. Same shape, different purpose.</div></details></div>
       <div class="exercise"><h3>2 &middot; Where would it help?</h3><p class="prompt">A page shows 100 high-res images but users scroll past most. How does a virtual proxy help?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Each image is a proxy that holds only the file path and a placeholder. The heavy bytes load <b>lazily</b> when an image actually scrolls into view, so you never pay to load the ones nobody sees.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Why an InvocationHandler?</h3><p class="prompt">With a hand-written static proxy you write one method per interface method. What does <span class='key'>java.lang.reflect.Proxy</span> give you instead, and what is its main limitation?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">A dynamic proxy routes <em>every</em> method call to a single <span class='key'>InvocationHandler.invoke(proxy, method, args)</span>, so one handler covers the whole interface &mdash; and any method you later add. The limitation: JDK proxies only implement <b>interfaces</b>. To proxy a concrete class you need a bytecode library like <span class='key'>CGLIB</span> or <span class='key'>ByteBuddy</span>.</div></details></div>
+      <div class="exercise"><h3>4 &middot; The self-invocation trap</h3><p class="prompt">A Spring bean has a <span class='key'>@Transactional</span> method <span class='key'>a()</span> that calls another <span class='key'>@Transactional</span> method <span class='key'>b()</span> on <span class='key'>this</span>. Why might <span class='key'>b()</span> not run in its own transaction?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The transaction is added by a <b>proxy</b> that wraps the bean. A caller from outside goes <em>through</em> the proxy, but <span class='key'>this.b()</span> is a direct call on the target object &mdash; it never touches the proxy, so its transactional advice is skipped. Fixes: call through an injected self-reference, or split <span class='key'>b()</span> into a separate bean.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Pick the flavor</h3><p class="prompt">Match each need to a proxy flavor: (a) hide that an object lives on another server; (b) skip an expensive DB load until a field is read; (c) reject callers without a role; (d) memoize repeated lookups.</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">(a) <b>remote proxy</b> &mdash; a local stub for a remote object; (b) <b>virtual proxy</b> &mdash; lazy creation/loading (Hibernate does this); (c) <b>protection proxy</b> &mdash; access control; (d) <b>caching proxy</b> &mdash; return a stored result instead of delegating. All share one interface with the real subject.</div></details></div>
   </div>
 </section>
 

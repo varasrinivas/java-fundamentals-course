@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Algorithms behind a common interface</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>A strategy is a GPS route setting.</strong> Your <b>destination</b> is fixed &mdash; the context of the trip never changes &mdash; but you get to choose the <em>algorithm</em> that plans the way there: <b>fastest</b>, <b>shortest</b>, or <b>avoid tolls</b>. Each setting is a self-contained way of computing a route, and they are perfectly <b>interchangeable</b>: the navigator does not care which one is active. Tap a different setting mid-trip and it <b>swaps at runtime</b> &mdash; the navigator just re-runs whichever strategy you plugged in, no rewiring of the app around it. That is Strategy: the <b>context</b> (navigator) holds a pluggable algorithm behind one interface, and <em>you</em> decide which implementation it runs.</p>
+    </div>
     <p>When you find a big <span class='key'>switch</span> choosing between behaviors, Strategy is usually the fix. Each behavior becomes a class implementing a shared interface; the context holds one and delegates to it. Swapping behavior is now a setter call, not an edit.</p><pre class="code" data-src="interface Route { int minutes(int km); }
 class ByCar  implements Route { public int minutes(int km){ return km * 1; } }
 class ByBike implements Route { public int minutes(int km){ return km * 4; } }
@@ -166,6 +174,84 @@ class Navigator {
     int eta(int km){ return strategy.minutes(km); }
 }"></pre><p>Because Java lambdas <em>are</em> implementations of single-method interfaces, Strategy often collapses to passing a function: <span class='key'>list.sort(Comparator.comparing(User::age))</span> passes a sorting strategy. It’s the runtime-flexible cousin of polymorphism, and it powers pricing rules, validators, and compression choices everywhere.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: Navigator then Route then ByCar / ByBike then use(strategy) then eta()"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">Navigator</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">context</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">Route</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">strategy interface</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">ByCar / ByBike</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">algorithms</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">use(strategy)</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">swap at runtime</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">eta()</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">delegates</text></g></svg></div>
+
+    <h3>Intent: a family of interchangeable algorithms</h3>
+    <p>The Gang of Four define Strategy as: <em>define a family of algorithms, encapsulate each one, and make them interchangeable</em>. The point is to let the algorithm <strong>vary independently</strong> of the client that uses it. The context is programmed against the interface, never a concrete implementation &mdash; so it is not hard-wired to any one algorithm and new ones can be added without touching it.</p>
+<pre class="code" data-src="interface DiscountStrategy {
+    int apply(int cents);        // the one operation every algorithm shares
+}
+class NoDiscount   implements DiscountStrategy { public int apply(int c){ return c; } }
+class TenPercent   implements DiscountStrategy { public int apply(int c){ return c - c / 10; } }
+class FlatFiveOff  implements DiscountStrategy { public int apply(int c){ return Math.max(0, c - 500); } }
+
+// The context depends only on the interface, so it never changes when a
+// new algorithm shows up - the algorithm varies independently of its user."></pre>
+    <h3>Replacing a sprawling switch on a &ldquo;type&rdquo;</h3>
+    <p>The classic smell that Strategy cures is a growing <span class='key'>switch</span> or <span class='key'>if/else</span> chain that branches on some &ldquo;kind&rdquo; field. Every new kind forces you to reopen and edit the method &mdash; a violation of the Open/Closed Principle. Strategy turns each branch into its own polymorphic object; the branch selection happens once, at the edge, when you pick the strategy.</p>
+<pre class="code" data-src="// BEFORE - one method that must be edited for every new shipping type.
+int fee(String type, int kg) {
+    switch (type) {
+        case &quot;standard&quot;: return kg * 100;
+        case &quot;express&quot;:  return kg * 250 + 500;
+        case &quot;drone&quot;:    return 2000;          // reopen + edit to add more
+        default: throw new IllegalArgumentException(type);
+    }
+}
+
+// AFTER - each case is a strategy object; the switch is gone.
+interface ShippingCost { int fee(int kg); }
+ShippingCost standard = kg -&gt; kg * 100;
+ShippingCost express  = kg -&gt; kg * 250 + 500;
+int total = express.fee(3);   // no branching at the call site"></pre>
+    <h3>The modern Java form: a lambda <em>is</em> the strategy</h3>
+    <p>A strategy interface almost always has a <strong>single abstract method</strong>, which makes it a <span class='key'>@FunctionalInterface</span>. That means you rarely write a named implementation class at all: a <strong>lambda</strong> or <strong>method reference</strong> already <em>is</em> an instance of the interface. The boilerplate of one class per algorithm collapses into an expression, while the pattern &mdash; pluggable behavior behind an interface &mdash; is unchanged.</p>
+<pre class="code" data-src="@FunctionalInterface
+interface Validator { boolean ok(String s); }
+
+// Each of these is a full Strategy implementation - no class needed.
+Validator notBlank = s -&gt; !s.isBlank();
+Validator isEmail  = s -&gt; s.contains(&quot;@&quot;);
+Validator maxLen   = s -&gt; s.length() &lt;= 140;
+
+// A method reference is a strategy too:
+Validator hasText  = String::isBlank;   // (then negate as needed)
+boolean good = notBlank.ok(&quot;hi&quot;) &amp;&amp; isEmail.ok(&quot;a@b.com&quot;);"></pre>
+    <h3>The canonical JDK example: <span class='key'>Comparator</span></h3>
+    <p>You have used Strategy for years without naming it. <span class='key'>Comparator&lt;T&gt;</span> passed to <span class='key'>Collections.sort</span>, <span class='key'>List.sort</span>, or <span class='key'>Stream.sorted</span> <em>is</em> a sorting strategy: the sort algorithm is fixed, but the ordering it uses is a pluggable object you supply. <span class='key'>Runnable</span> (the task a thread runs) and <span class='key'>Function</span> (a mapping applied by <span class='key'>Stream.map</span>) are strategies in the same spirit.</p>
+<pre class="code" data-src="List&lt;String&gt; names = new ArrayList&lt;&gt;(List.of(&quot;Ada&quot;, &quot;Bo&quot;, &quot;Cleo&quot;));
+
+// Pass a different Comparator strategy -&gt; different ordering, same sort.
+names.sort(Comparator.naturalOrder());          // Ada, Bo, Cleo
+names.sort(Comparator.comparingInt(String::length));  // Bo, Ada, Cleo
+names.sort(Comparator.reverseOrder());          // Cleo, Bo, Ada
+
+// Runnable is the strategy a Thread executes; Function is the strategy map() applies.
+Runnable task = () -&gt; System.out.println(&quot;run&quot;);
+names.stream().map(String::toUpperCase).forEach(System.out::println);"></pre>
+    <h3>Injecting one strategy, selecting from many</h3>
+    <p>A context usually receives its strategy through the <strong>constructor</strong> (or DI framework), which keeps it immutable and testable; a mutable setter is only needed when the algorithm must change during an object&rsquo;s life. When the choice is data-driven &mdash; a config value, a user click, a request field &mdash; register the strategies in a <span class='key'>Map&lt;String, Strategy&gt;</span> and look one up, instead of branching.</p>
+<pre class="code" data-src="class Checkout {
+    private final DiscountStrategy discount;   // injected, not hardcoded
+    Checkout(DiscountStrategy discount) { this.discount = discount; }
+    int total(int cents) { return discount.apply(cents); }
+}
+
+// Runtime selection without a switch: a registry keyed by a data value.
+Map&lt;String, DiscountStrategy&gt; byCode = Map.of(
+    &quot;NONE&quot;,  new NoDiscount(),
+    &quot;SAVE10&quot;, new TenPercent(),
+    &quot;FIVER&quot;,  new FlatFiveOff());
+DiscountStrategy chosen = byCode.getOrDefault(userCode, new NoDiscount());
+int owed = new Checkout(chosen).total(4200);"></pre>
+    <h3>Strategy vs State: same shape, different intent</h3>
+    <p>Strategy and State (module 45) have an <em>identical class diagram</em> &mdash; a context delegating to an object behind an interface &mdash; which is why they are so often confused. The difference is <strong>intent</strong>. In <b>Strategy</b>, the client picks the algorithm and it typically stays put; the strategies are unaware of each other and vary <em>how</em> one operation is done. In <b>State</b>, the objects represent phases of a lifecycle, they carry internal state, and they <em>swap themselves</em> as transitions happen &mdash; the behavior changes as the object&rsquo;s internal state changes.</p>
+<pre class="code" data-src="// STRATEGY: caller chooses the algorithm; it rarely changes itself.
+sorter = new Sorter(Comparator.reverseOrder());   // I decided the ordering
+
+// STATE: the object transitions itself between behaviors as events occur.
+// order.pay();     // Placed  -&gt; Paid   (state swaps the active behavior)
+// order.ship();    // Paid    -&gt; Shipped
+// Same structure, but here the &quot;strategy&quot; changes because internal state changed."></pre>
     
   </div>
 </section>
@@ -232,6 +318,9 @@ System.out.println("car faster than walking? " + (byCar &lt; byWalk));</textarea
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Refactor the switch</h3><p class="prompt">You see <span class='key'>switch(type){ case CARD: ...; case PAYPAL: ...; }</span> for payments. How does Strategy improve it?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Make a <span class='key'>PaymentStrategy</span> interface with one implementation per method; the context holds and calls one. Adding a payment type means adding a class, not editing the switch (also satisfies Open/Closed from module 12).</div></details></div>
       <div class="exercise"><h3>2 &middot; Lambda or class?</h3><p class="prompt">When is a full Strategy class better than passing a lambda?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">A lambda is perfect for a small, stateless one-off. Prefer a named class when the strategy has <b>state/config</b>, needs a <b>good name</b>, is <b>reused</b> in many places, or is complex enough to test on its own.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Name the JDK strategy</h3><p class="prompt">Which everyday JDK type do you pass to <span class='key'>list.sort(...)</span>, and why is it a textbook Strategy?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>Comparator&lt;T&gt;</span>. The sort <em>algorithm</em> is fixed inside <span class='key'>sort</span>, but the <b>ordering</b> is a pluggable object you supply &mdash; and because it is a functional interface you usually pass a lambda like <span class='key'>Comparator.comparing(User::age)</span>. Same context, swappable algorithm.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Strategy or State?</h3><p class="prompt">A traffic light cycles green&rarr;amber&rarr;red&rarr;green, each phase deciding what happens next. Is that Strategy or State?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><b>State.</b> The objects represent phases of a lifecycle and <em>transition themselves</em> as events occur, with behavior driven by internal state. Strategy would be the light asking <em>you</em> to pick one fixed algorithm and sticking with it &mdash; the two share a class diagram but differ in intent.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Select without a switch</h3><p class="prompt">A request carries a string like <span class='key'>"SAVE10"</span> that must choose a discount algorithm. How do you pick the strategy at runtime without an <span class='key'>if/else</span> chain?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Register the strategies once in a <span class='key'>Map&lt;String, DiscountStrategy&gt;</span> and do <span class='key'>map.getOrDefault(code, DEFAULT)</span>. Selection becomes a lookup, adding a strategy becomes a map entry, and the context still just calls <span class='key'>apply(...)</span> on whatever it got.</div></details></div>
   </div>
 </section>
 

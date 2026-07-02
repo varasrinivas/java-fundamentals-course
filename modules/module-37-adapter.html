@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>A translator between two interfaces</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127959; Real-world analogy</span>
+      <p><strong>An adapter is a travel power-plug adapter.</strong> Your laptop&rsquo;s charger has a plug shaped for the sockets back home &mdash; that plug is the <b>interface your client expects</b> (the <em>target</em>). The wall socket in a foreign hotel is an <b>existing, incompatible fixture</b> you cannot rewire (the <em>adaptee</em>). Rather than resolder your charger or tear open the wall, you slot a small <b>adapter</b> between them: it presents the shape your plug wants on one side and the shape the socket offers on the other, quietly <b>translating</b> without changing either side. In code the adapter <em>implements the target interface</em> and forwards each call to the wrapped object &mdash; the client never learns the difference.</p>
+    </div>
     <p>Your code expects one interface (the <em>target</em>); you have an existing class with a different, incompatible interface (the <em>adaptee</em>). Rather than rewrite either, you build an <strong>adapter</strong> that implements the target and forwards each call to the adaptee, translating as needed.</p><pre class="code" data-src="interface UsbC { String data(); }                 // what our app expects
 class MicroUsbDevice { String legacyData(){ return &quot;bits&quot;; } }  // incompatible
 
@@ -166,6 +174,98 @@ class MicroToUsbC implements UsbC {                // the adapter
 }
 UsbC port = new MicroToUsbC(new MicroUsbDevice());"></pre><p>Adapters are how you integrate legacy code, third-party libraries, or two systems that weren’t designed for each other. The JDK’s <span class='key'>Arrays.asList(...)</span> adapts an array to the <span class='key'>List</span> interface; <span class='key'>InputStreamReader</span> adapts a byte stream to a character stream.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: app wants UsbC then legacy device then adapter then translate then works"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">app wants UsbC</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">target</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">legacy device</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">incompatible</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">adapter</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">implements UsbC</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">translate</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">forward call</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">works</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">plug fits</text></g></svg></div>
+
+    <h3>Intent: convert one interface into another</h3>
+    <p>The formal Gang-of-Four intent is to <strong>convert the interface of a class into another interface clients expect</strong>, letting classes work together that otherwise couldn&rsquo;t because of incompatible interfaces. Note what Adapter does <em>not</em> do: it doesn&rsquo;t add features, and it doesn&rsquo;t change what the adaptee fundamentally does &mdash; it only re-shapes <em>how you call it</em>. Method names, argument order, units, and return types get translated; the behavior underneath stays the same.</p>
+    <pre class="code" data-src="// TARGET: the interface your code owns and calls against.
+interface PaymentGateway {
+    boolean charge(String customerId, long cents);
+}
+
+// ADAPTEE: a third-party SDK with a different, incompatible shape.
+class StripeSdk {                       // you cannot edit this class
+    Receipt makePayment(int amountInDollars, String token) { ... }
+}
+
+// The two are semantically similar but their method names, argument
+// order, units (cents vs dollars) and return types simply do not line up.
+// Adapter's job: make StripeSdk usable *as a* PaymentGateway."></pre>
+
+    <h3>Object adapter: hold and delegate (preferred)</h3>
+    <p>The <strong>object adapter</strong> keeps a reference to the adaptee as a field and forwards calls to it. This is the form you&rsquo;ll write 95% of the time in Java, because it relies on <em>composition</em> rather than inheritance. It works with any adaptee (even <span class='key'>final</span> classes), it can adapt more than one collaborator, and you can swap the wrapped instance &mdash; including a subclass or a mock &mdash; at runtime.</p>
+    <pre class="code" data-src="// OBJECT ADAPTER (preferred): the adapter HOLDS an adaptee and delegates.
+class StripeAdapter implements PaymentGateway {
+    private final StripeSdk stripe;                 // composition, not inheritance
+    StripeAdapter(StripeSdk stripe) { this.stripe = stripe; }
+
+    public boolean charge(String customerId, long cents) {
+        int dollars = (int) (cents / 100);          // translate units
+        Receipt r = stripe.makePayment(dollars, customerId);  // reorder/rename
+        return r.isPaid();                          // translate the result
+    }
+}
+
+// Client code depends only on the target - it never mentions StripeSdk:
+PaymentGateway gw = new StripeAdapter(new StripeSdk());
+gw.charge(&quot;cust_42&quot;, 4999);"></pre>
+
+    <h3>Class adapter: extend the adaptee</h3>
+    <p>The classic GoF diagram also shows a <strong>class adapter</strong> that <em>extends</em> the adaptee and implements the target. In languages with multiple inheritance of implementation (C++) you can extend two classes; in Java you get only single class inheritance, so a class adapter can subclass exactly one adaptee and must pick up the target from an <em>interface</em>. It binds you to one concrete adaptee at compile time and leaks the adaptee&rsquo;s API, so it&rsquo;s rarely the right call &mdash; use it only when you genuinely need to <span class='key'>override</span> some of the adaptee&rsquo;s methods.</p>
+    <pre class="code" data-src="// CLASS ADAPTER: the adapter EXTENDS the adaptee and implements the target.
+// Because Java has single inheritance of classes, this only works when the
+// adaptee is a class you can subclass AND the target is an *interface*.
+class StripeAdapter extends StripeSdk implements PaymentGateway {
+    public boolean charge(String customerId, long cents) {
+        int dollars = (int) (cents / 100);
+        Receipt r = makePayment(dollars, customerId);   // inherited, not delegated
+        return r.isPaid();
+    }
+}
+
+// Downsides vs the object form:
+//  - locked to ONE adaptee class (no swapping in a subclass at runtime)
+//  - inherits StripeSdk's whole public surface, leaking it through the adapter
+//  - impossible if the adaptee is final, or if you'd need to adapt two classes
+// Prefer the object adapter unless you specifically need to override adaptee methods."></pre>
+
+    <h3>Adapters already in the JDK</h3>
+    <p>You use adapters every day without naming them. <span class='key'>Arrays.asList</span> adapts a raw array to the <span class='key'>List</span> interface. <span class='key'>InputStreamReader</span> and <span class='key'>OutputStreamWriter</span> adapt byte streams (<span class='key'>InputStream</span>/<span class='key'>OutputStream</span>) to character streams (<span class='key'>Reader</span>/<span class='key'>Writer</span>), applying a charset in between. <span class='key'>Collections.enumeration</span> adapts a modern <span class='key'>Collection</span> back to the legacy <span class='key'>Enumeration</span> interface that older APIs demand. Each one presents an existing object through a different, expected interface.</p>
+    <pre class="code" data-src="// Arrays.asList adapts a fixed T[] to the List&lt;T&gt; interface (a view, not a copy):
+List&lt;String&gt; names = Arrays.asList(new String[]{&quot;Ada&quot;, &quot;Alan&quot;});
+// names.add(&quot;Grace&quot;);   // UnsupportedOperationException - backed by the array
+
+// InputStreamReader adapts a byte stream (InputStream) to a char stream (Reader),
+// decoding bytes into characters with a Charset:
+Reader r = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
+
+// OutputStreamWriter is the mirror image: chars -&gt; encoded bytes.
+Writer w = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
+
+// Collections.enumeration adapts a modern Collection to the legacy Enumeration API:
+Enumeration&lt;String&gt; e = Collections.enumeration(names);   // for old APIs that want it"></pre>
+
+    <h3>Adapter vs Decorator vs Facade</h3>
+    <p>These three structural patterns all <em>wrap</em> something, which is why they get confused. The distinction is in intent. An <strong>Adapter changes the interface</strong> &mdash; different type in, different type out, same behavior. A <strong>Decorator keeps the same interface</strong> and <em>adds behavior</em> (logging, caching, retries), so it can be stacked. A <strong>Facade simplifies a subsystem</strong>, offering one easy entry point over many classes. If you&rsquo;re translating a type &rarr; Adapter; enhancing the same type &rarr; Decorator; hiding complexity &rarr; Facade.</p>
+    <pre class="code" data-src="// ADAPTER  - CHANGES an interface. Same behavior, new shape the client expects.
+class StripeAdapter implements PaymentGateway { /* delegates to StripeSdk */ }
+
+// DECORATOR - KEEPS the same interface, ADDS behavior (wrap in, wrap out).
+class LoggingGateway implements PaymentGateway {
+    private final PaymentGateway inner;
+    public boolean charge(String c, long cents) {
+        log.info(&quot;charging {}&quot;, cents);
+        return inner.charge(c, cents);          // same type in and out
+    }
+}
+
+// FACADE - SIMPLIFIES a whole subsystem behind one convenient entry point.
+class Checkout {                                // hides gateway + inventory + email
+    void placeOrder(Cart cart) { /* orchestrates several subsystems */ }
+}
+// Rule of thumb: Adapter converts, Decorator adds, Facade simplifies."></pre>
+
+    <h3>When to reach for it</h3>
+    <p>Adapter earns its keep at the <strong>seams of your system</strong>: integrating a third-party library, wrapping a legacy API you can&rsquo;t (or shouldn&rsquo;t) modify, or making a vendor&rsquo;s type satisfy an interface your own code defines. By funneling the translation through a single class, you keep the foreign type from leaking across your codebase &mdash; if you later swap Stripe for PayPal, only the adapter changes. If instead you <em>own both sides</em> and they&rsquo;re just slightly out of sync, prefer fixing the interface directly; reach for an adapter when one side is fixed and out of your control.</p>
     
   </div>
 </section>
@@ -231,6 +331,9 @@ System.out.println("after adapter = " + adapted + "V, fits? " + (adapted == devi
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Adapter vs change the class</h3><p class="prompt">Why adapt a third-party class instead of just editing it to match your interface?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">You often <b>can’t edit it</b> (it’s a library/legacy code), and even if you could, changing it might break other users or get overwritten on upgrade. An adapter leaves the original untouched and isolates the translation in one place.</div></details></div>
       <div class="exercise"><h3>2 &middot; Name a JDK adapter</h3><p class="prompt"><span class='key'>Arrays.asList(myArray)</span> lets you treat an array as a <span class='key'>List</span>. Which roles are the target and the adaptee here?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The <b>target</b> is the <span class='key'>List</span> interface your code wants; the <b>adaptee</b> is the underlying array. The returned object adapts array access to the List API (note it’s fixed-size, since it’s backed by the array).</div></details></div>
+      <div class="exercise"><h3>3 &middot; Object vs class adapter</h3><p class="prompt">You must adapt a third-party class marked <span class='key'>final</span> to your own interface. Which form of adapter can you use, and why?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Only the <b>object adapter</b>. A class adapter would need to <span class='key'>extend</span> the adaptee, but a <span class='key'>final</span> class can&rsquo;t be subclassed. The object adapter simply <b>holds</b> an instance in a field and delegates, so it works regardless &mdash; one more reason composition is the default choice.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Adapter or Decorator?</h3><p class="prompt">You wrap a <span class='key'>PaymentGateway</span> so every charge is logged, but the wrapper still <em>is a</em> <span class='key'>PaymentGateway</span> with the same methods. Is that an Adapter or a Decorator?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">A <b>Decorator</b>. The interface is unchanged &mdash; same type in, same type out &mdash; you&rsquo;re only <em>adding behavior</em> (logging). An Adapter would <em>change</em> the interface (e.g. exposing a <span class='key'>StripeSdk</span> <em>as a</em> <span class='key'>PaymentGateway</span>). Adapter converts; Decorator adds.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Adapt a two-way stream</h3><p class="prompt">You have a byte-oriented <span class='key'>InputStream</span> from a socket but need to read <em>lines of text</em>. Which JDK adapters chain together to get there?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Wrap the <span class='key'>InputStream</span> in an <span class='key'>InputStreamReader</span> (byte&rarr;char adapter, with a charset), then wrap <em>that</em> in a <span class='key'>BufferedReader</span> to get <span class='key'>readLine()</span>: <span class='key'>new BufferedReader(new InputStreamReader(in, UTF_8))</span>. The <span class='key'>InputStreamReader</span> is the adapter that bridges the two stream interfaces.</div></details></div>
   </div>
 </section>
 
