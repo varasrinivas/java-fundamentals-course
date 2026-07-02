@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Two families, one hierarchy</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#128680; Real-world analogy</span>
+      <p><strong>An exception is a fire alarm that escalates up the call stack.</strong> When a method hits trouble it <b>pulls the alarm</b> (<span class='key'>throw</span>); the alarm rings its way up floor by floor &mdash; each method frame &mdash; until <b>someone on some floor responds</b> (a matching <span class='key'>catch</span>) and puts the fire out. If nobody answers all the way to the ground floor, the <b>building evacuates</b>: the thread dies and prints a stack trace. <b>Checked exceptions are the building code</b> &mdash; for known hazards the inspector (the compiler) won&rsquo;t sign off unless every room posts a plan to handle or declare them. And <span class='key'>finally</span> / try-with-resources are the <b>sprinklers and self-closing fire doors</b>: they run no matter what, alarm or not, so nothing is left burning behind you.</p>
+    </div>
     <p>Everything throwable descends from <span class='key'>Throwable</span>. The split that matters: <strong>checked</strong> exceptions (subclasses of <span class='key'>Exception</span> but not <span class='key'>RuntimeException</span>) <em>must</em> be caught or declared with <span class='key'>throws</span>. <strong>Unchecked</strong> exceptions (<span class='key'>RuntimeException</span> and friends) need no declaration.</p><pre class="code" data-src="// Checked: the compiler insists you handle it
 try {
     Files.readString(path);        // throws IOException (checked)
@@ -166,6 +174,99 @@ try {
 // Unchecked: no try required; usually a bug to fix, not catch
 int len = name.length();           // NPE if name == null"></pre><p>When an exception is thrown, the JVM <strong>unwinds the stack</strong>, popping frames until it finds a matching <span class='key'>catch</span>. A <span class='key'>finally</span> block runs either way — use it (or try-with-resources) to release resources.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: throw then unwind then find catch then handler then finally"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">throw</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">exception</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">unwind</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">pop frames</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">find catch</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">match type</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">handler</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">recover</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">finally</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">always runs</text></g></svg></div>
+
+    <h3>The Throwable hierarchy: Error vs Exception vs RuntimeException</h3>
+    <p>Every throwable object is a <span class='key'>Throwable</span>, which splits into two branches. <span class='key'>Error</span> signals conditions a normal program should not try to recover from &mdash; <span class='key'>OutOfMemoryError</span>, <span class='key'>StackOverflowError</span> &mdash; and is unchecked. <span class='key'>Exception</span> is the application branch, and <em>within</em> it sits <span class='key'>RuntimeException</span>. The rule is purely structural: anything under <span class='key'>RuntimeException</span> or <span class='key'>Error</span> is <strong>unchecked</strong>; every other <span class='key'>Exception</span> subclass is <strong>checked</strong>.</p>
+    <pre class="code" data-src="Throwable                     // root of everything you can throw/catch
+ ├─ Error                     // UNCHECKED - JVM/system failure, don't catch
+ │   ├─ OutOfMemoryError
+ │   └─ StackOverflowError
+ └─ Exception                 // application problems
+     ├─ IOException           // CHECKED  - must handle or declare
+     ├─ SQLException          // CHECKED
+     └─ RuntimeException      // UNCHECKED - usually a programming bug
+         ├─ NullPointerException
+         ├─ IllegalArgumentException
+         └─ IndexOutOfBoundsException"></pre>
+
+    <h3>Checked vs unchecked: the &ldquo;handle or declare&rdquo; rule</h3>
+    <p>For a <strong>checked</strong> exception the compiler enforces one rule: either <span class='key'>catch</span> it here, or add it to your <span class='key'>throws</span> clause and push the obligation to your caller. There is no third option &mdash; omit both and the code won&rsquo;t compile. Unchecked exceptions carry no such requirement. The design intent: checked = a foreseeable, recoverable condition outside your control (a file vanished, a socket dropped); unchecked = a bug in your own logic that a caller can&rsquo;t sensibly recover from. The debate is real &mdash; critics say checked exceptions leak implementation details and breed <span class='key'>catch</span>-and-ignore blocks &mdash; which is why newer languages dropped them.</p>
+    <pre class="code" data-src="// CHECKED: you must handle OR declare - this signature declares.
+static String load(Path p) throws IOException {
+    return Files.readString(p);      // IOException is checked
+}
+
+// UNCHECKED: no throws needed, compiler stays silent.
+static int parse(String s) {
+    return Integer.parseInt(s);      // NumberFormatException is a RuntimeException
+}"></pre>
+
+    <h3>try / catch / finally &mdash; and the finally-overrides-return trap</h3>
+    <p>A <span class='key'>finally</span> block runs whether the <span class='key'>try</span> completed, threw, or even executed a <span class='key'>return</span>. That guarantee makes it perfect for cleanup &mdash; but it hides a trap: a <span class='key'>return</span> (or <span class='key'>throw</span>) <em>inside</em> <span class='key'>finally</span> silently overrides whatever the <span class='key'>try</span> was about to return or throw, swallowing exceptions in the process. Never return from a <span class='key'>finally</span>.</p>
+    <pre class="code" data-src="static int surprise() {
+    try {
+        return 1;          // evaluated... but not yet returned
+    } finally {
+        return 2;          // OVERRIDES the try's return - method returns 2
+    }
+}
+// Worse: a throw in try is discarded if finally returns/throws.
+// Rule: use finally only to release resources, never to return or throw."></pre>
+
+    <h3>try-with-resources &amp; AutoCloseable</h3>
+    <p>Any object implementing <span class='key'>AutoCloseable</span> can be declared in the parentheses of a <span class='key'>try</span>. Its <span class='key'>close()</span> is called automatically when the block exits &mdash; normally or by exception &mdash; in reverse order of declaration, replacing the error-prone <span class='key'>finally</span> dance. A subtlety: if the body throws <em>and</em> <span class='key'>close()</span> also throws, the body&rsquo;s exception is the one that propagates and the close-time exception is attached as a <strong>suppressed</strong> exception (retrievable via <span class='key'>getSuppressed()</span>), so neither is lost.</p>
+    <pre class="code" data-src="// Resources declared here are closed automatically, in reverse order.
+try (var in  = Files.newBufferedReader(src);
+     var out = Files.newBufferedWriter(dst)) {
+    out.write(in.readLine());
+}   // out.close() then in.close() run here, even if write() threw
+
+// If both the body and close() throw, the body's exception wins and the
+// close() exception is kept via Throwable.getSuppressed() - nothing is hidden."></pre>
+
+    <h3>Multi-catch &amp; precise rethrow</h3>
+    <p>When several exception types need identical handling, one <span class='key'>catch (A | B e)</span> clause replaces the copy-paste. The caught variable is implicitly <span class='key'>final</span>, and its static type is the nearest common supertype, so you can only call methods shared by all branches. Since Java 7 the compiler is also smarter about <strong>precise rethrow</strong>: catching a broad <span class='key'>Exception</span> and rethrowing it lets callers see only the specific checked types that could actually reach that <span class='key'>catch</span>.</p>
+    <pre class="code" data-src="try {
+    riskyIo();                       // may throw IOException or SQLException
+} catch (IOException | SQLException e) {   // multi-catch: one handler, two types
+    log.error(&quot;operation failed&quot;, e);
+    throw new ServiceException(e);   // wrap and rethrow
+}
+// Note: the alternatives must be unrelated - you can't list a type
+// and its own subclass (e.g. IOException | FileNotFoundException) - redundant."></pre>
+
+    <h3>Custom exceptions &amp; chaining (preserve the cause)</h3>
+    <p>Define your own exception by extending <span class='key'>RuntimeException</span> (unchecked, the common modern default) or <span class='key'>Exception</span> (checked, when callers must react). When you catch a low-level failure and rethrow a domain-specific one, always pass the original as the <strong>cause</strong> &mdash; <span class='key'>new X(msg, cause)</span>. That keeps the full &ldquo;Caused by:&rdquo; chain in the stack trace; dropping the cause is the fastest way to lose the real reason for a failure.</p>
+    <pre class="code" data-src="class OrderException extends RuntimeException {
+    OrderException(String msg, Throwable cause) {
+        super(msg, cause);           // pass the cause up - don't discard it
+    }
+}
+
+try {
+    charge(card);
+} catch (IOException e) {
+    // WRONG: throw new OrderException(&quot;charge failed&quot;);   // loses the cause
+    throw new OrderException(&quot;charge failed&quot;, e);          // keeps &quot;Caused by: IOException&quot;
+}"></pre>
+
+    <h3>Best practices: don&rsquo;t swallow, throw early, don&rsquo;t use exceptions for flow</h3>
+    <p>Three habits separate robust code from fragile code. <strong>Never swallow</strong> &mdash; an empty <span class='key'>catch</span> block hides bugs that will resurface far from their cause; at minimum log with the exception object (which carries the stack trace). <strong>Throw early, catch late</strong>: validate arguments at the boundary and fail fast with <span class='key'>IllegalArgumentException</span>, but only catch where you can genuinely recover or add context. And <strong>don&rsquo;t use exceptions for control flow</strong> &mdash; they are far slower than a branch (partly from capturing the stack trace) and obscure intent; a plain <span class='key'>if</span> is clearer and faster.</p>
+    <pre class="code" data-src="// ANTI-PATTERN: swallowed - the failure vanishes silently.
+try { risky(); } catch (Exception e) { /* nothing */ }
+
+// ANTI-PATTERN: exceptions as control flow (slow + unreadable).
+try { return list.get(i); } catch (IndexOutOfBoundsException e) { return null; }
+
+// BETTER: throw early on bad input; check bounds instead of catching.
+static void withdraw(int amount) {
+    if (amount &lt;= 0)
+        throw new IllegalArgumentException(&quot;amount must be positive: &quot; + amount);
+    // ...proceed knowing the input is valid...
+}
+static &lt;T&gt; T at(List&lt;T&gt; list, int i) {
+    return (i &gt;= 0 &amp;&amp; i &lt; list.size()) ? list.get(i) : null;   // check, don't catch
+}"></pre>
     
   </div>
 </section>
@@ -229,6 +330,9 @@ System.out.println("Unchecked bugs are prevented, not caught.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Catch or declare</h3><p class="prompt">A method calls something that throws a checked <span class='key'>IOException</span> but doesn't catch it. What must its signature say to compile?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">It must declare <span class='key'>throws IOException</span>, propagating the obligation to its caller. Checked exceptions must be either caught or declared — there's no third option.</div></details></div>
       <div class="exercise"><h3>2 &middot; Catch or fix?</h3><p class="prompt">Should you wrap every array access in <span class='key'>try/catch</span> for <span class='key'>ArrayIndexOutOfBoundsException</span>?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">No. It's unchecked because it signals a bug — fix the index logic instead of catching it. Reserve <span class='key'>catch</span> for recoverable, often-checked conditions like a missing file or a dropped connection.</div></details></div>
+      <div class="exercise"><h3>3 &middot; What does this method return?</h3><p class="prompt">A method does <span class='key'>try { return 1; } finally { return 2; }</span>. What does it return, and why is this a code smell?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">It returns <b>2</b>. A <span class='key'>return</span> inside <span class='key'>finally</span> overrides the one in <span class='key'>try</span> &mdash; and if the <span class='key'>try</span> had thrown, that exception would be silently discarded too. Never <span class='key'>return</span> or <span class='key'>throw</span> from <span class='key'>finally</span>; use it only to release resources.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Where did the cause go?</h3><p class="prompt">You catch an <span class='key'>IOException</span> and <span class='key'>throw new ServiceException("failed")</span>. Debugging is painful &mdash; what did you forget, and what's the fix?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">You dropped the <b>cause</b>. Pass the original exception as the second constructor argument: <span class='key'>throw new ServiceException("failed", e)</span>. That preserves the &ldquo;Caused by:&rdquo; chain in the stack trace so you can see the real root failure (the <span class='key'>IOException</span>), not just your wrapper.</div></details></div>
+      <div class="exercise"><h3>5 &middot; try-with-resources and a suppressed exception</h3><p class="prompt">Inside a try-with-resources block the body throws, and then the resource's <span class='key'>close()</span> <em>also</em> throws. Which exception does the caller see, and where's the other one?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The caller sees the <b>body's</b> exception (the primary). The <span class='key'>close()</span> exception isn't lost &mdash; it's attached as a <b>suppressed</b> exception, retrievable via <span class='key'>e.getSuppressed()</span> and printed under &ldquo;Suppressed:&rdquo; in the stack trace. That's why try-with-resources beats a hand-written <span class='key'>finally</span>, where the close exception would mask the original.</div></details></div>
   </div>
 </section>
 

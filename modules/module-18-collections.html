@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Three interfaces, a handful of workhorse classes</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>The collections are different kinds of storage furniture.</strong> A <b>List</b> is a numbered row of shelves &mdash; things stay in the order you placed them, shelf&nbsp;3 is reachable instantly by number, and nothing stops you putting the same book on two shelves (<em>ordered, indexed, duplicates allowed</em>). A <b>Set</b> is a bag with a bouncer: try to drop in a duplicate and it silently rejects it, so every element is unique. A <b>Map</b> is a labelled filing cabinet (a dictionary): you never scan the drawers, you look up a folder by its <em>key</em> and pull out the <em>value</em> in one move. A <b>Queue/Deque</b> is a line of people &mdash; you join at one end and are served from the other. Pick the furniture by how you need to <em>store and reach</em> your data, then let Java worry about the mechanics.</p>
+    </div>
     <p>Program to the interface, choose the implementation for its performance: <span class='key'>List</span> (ordered, indexed — usually <span class='key'>ArrayList</span>), <span class='key'>Set</span> (no duplicates — <span class='key'>HashSet</span>), <span class='key'>Map</span> (key→value — <span class='key'>HashMap</span>).</p><pre class="code" data-src="Map&lt;String, Integer&gt; ages = new HashMap&lt;&gt;();
 ages.put(&quot;Ada&quot;, 36);
 ages.put(&quot;Alan&quot;, 41);
@@ -165,7 +173,106 @@ List&lt;String&gt; names = new ArrayList&lt;&gt;();
 names.add(&quot;Ada&quot;); names.add(&quot;Ada&quot;); // duplicates OK
 Set&lt;String&gt; unique = new HashSet&lt;&gt;(names); // -&gt; just one &quot;Ada&quot;"></pre><p>A <span class='key'>HashMap</span> turns a key into an array index: take the key's <span class='key'>hashCode()</span>, spread its bits, and reduce modulo the bucket count. Two keys landing in one bucket is a <strong>collision</strong>, handled by a short chain (which becomes a tree if it grows). When the table gets too full it <strong>resizes</strong> and rehashes.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: put(k, v) then hashCode() then h % capacity then collision? then resize ×2"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">put(k, v)</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">entry</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">hashCode()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">spread bits</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">h % capacity</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">bucket index</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">collision?</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">chain / tree</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">resize ×2</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">rehash</text></g></svg></div>
-    
+
+    <h3>The hierarchy: Collection vs Map</h3>
+    <p>The framework has <strong>two</strong> roots, not one. <span class='key'>Collection&lt;E&gt;</span> is the supertype of <span class='key'>List</span>, <span class='key'>Set</span> and <span class='key'>Queue</span> &mdash; anything that holds a bunch of individual elements. <span class='key'>Map&lt;K,V&gt;</span> is <em>deliberately not</em> a <span class='key'>Collection</span>: it stores key&rarr;value pairs, not single elements, so it lives on its own branch. That is why you can iterate a List directly but must go through <span class='key'>keySet()</span>, <span class='key'>values()</span> or <span class='key'>entrySet()</span> to walk a Map.</p>
+<pre class="code" data-src="// One shared supertype for element-holding collections:
+Collection&lt;String&gt; c = new ArrayList&lt;&gt;();   // List IS-A Collection
+c = new HashSet&lt;&gt;();                        // Set  IS-A Collection
+c.add(&quot;x&quot;); c.size(); c.contains(&quot;x&quot;);     // the common API
+
+// Map is a SEPARATE root - it is NOT a Collection:
+Map&lt;String,Integer&gt; m = new HashMap&lt;&gt;();
+// Collection&lt;?&gt; bad = m;                   // won't compile
+for (Map.Entry&lt;String,Integer&gt; e : m.entrySet())
+    System.out.println(e.getKey() + &quot;=&quot; + e.getValue());"></pre>
+
+    <h3>ArrayList vs LinkedList</h3>
+    <p><span class='key'>ArrayList</span> is a growable array: elements sit in one contiguous block, so <span class='key'>get(i)</span> is O(1) and iteration is cache-friendly. <span class='key'>LinkedList</span> is a doubly-linked chain of nodes: O(1) insert/remove <em>once you already hold the node</em>, but <span class='key'>get(i)</span> is O(n) because it walks the chain. In practice <strong>ArrayList wins almost always</strong> &mdash; even for queue-like use, <span class='key'>ArrayDeque</span> beats <span class='key'>LinkedList</span>. Reach for <span class='key'>LinkedList</span> only for a genuine list you constantly splice in the middle.</p>
+<pre class="code" data-src="List&lt;Integer&gt; a = new ArrayList&lt;&gt;();   // array-backed: random access, tight memory
+int x = a.get(9_000);                  // O(1)
+
+List&lt;Integer&gt; l = new LinkedList&lt;&gt;();  // node-backed: pointer-chasing
+int y = l.get(9_000);                  // O(n) - walks 9000 nodes
+
+// Rule of thumb: default to ArrayList; profile before choosing LinkedList."></pre>
+
+    <h3>The Set family: Hash, Linked, Tree</h3>
+    <p>All three reject duplicates; they differ only in iteration order and cost. <span class='key'>HashSet</span> is fastest (O(1) average) but iterates in an <em>unpredictable</em> order. <span class='key'>LinkedHashSet</span> keeps a linked list alongside the buckets so it iterates in <em>insertion order</em>, for a small memory cost. <span class='key'>TreeSet</span> is a red-black tree: it keeps elements <em>sorted</em> and offers range queries (<span class='key'>first</span>, <span class='key'>ceiling</span>, <span class='key'>headSet</span>), but every operation is O(log&nbsp;n) and elements must be <span class='key'>Comparable</span> (or you supply a <span class='key'>Comparator</span>).</p>
+<pre class="code" data-src="Set&lt;String&gt; h = new HashSet&lt;&gt;();        // no order guarantee, O(1)
+Set&lt;String&gt; k = new LinkedHashSet&lt;&gt;();  // remembers insertion order
+Set&lt;String&gt; t = new TreeSet&lt;&gt;();        // sorted, O(log n)
+
+h.add(&quot;pear&quot;); h.add(&quot;apple&quot;); h.add(&quot;pear&quot;);   // second &quot;pear&quot; ignored
+t.add(&quot;pear&quot;); t.add(&quot;apple&quot;);
+System.out.println(t);                  // [apple, pear] - sorted
+System.out.println(((TreeSet&lt;String&gt;) t).first()); // apple"></pre>
+
+    <h3>The Map family mirrors the Sets</h3>
+    <p>The Map implementations line up one-to-one with the Sets, because a <span class='key'>HashSet</span> is literally a <span class='key'>HashMap</span> with dummy values. <span class='key'>HashMap</span> gives O(1) average lookup with no order; <span class='key'>LinkedHashMap</span> preserves insertion order (and, with <span class='key'>accessOrder=true</span>, makes a ready-made LRU cache); <span class='key'>TreeMap</span> keeps keys sorted with O(log&nbsp;n) navigation. <span class='key'>HashMap</span> permits one <span class='key'>null</span> key and null values; <span class='key'>TreeMap</span> forbids null keys (it must compare them).</p>
+<pre class="code" data-src="Map&lt;String,Integer&gt; h = new HashMap&lt;&gt;();       // fastest, unordered
+Map&lt;String,Integer&gt; k = new LinkedHashMap&lt;&gt;(); // insertion order preserved
+Map&lt;String,Integer&gt; t = new TreeMap&lt;&gt;();       // keys kept sorted
+
+t.put(&quot;b&quot;, 2); t.put(&quot;a&quot;, 1); t.put(&quot;c&quot;, 3);
+System.out.println(t);            // {a=1, b=2, c=3} - sorted by key
+
+// Handy Map idioms:
+h.getOrDefault(&quot;x&quot;, 0);          // no NPE on a missing key
+h.merge(&quot;x&quot;, 1, Integer::sum);   // increment-or-insert a counter
+h.computeIfAbsent(&quot;y&quot;, key -&gt; new ArrayList&lt;&gt;()); // multimap pattern"></pre>
+
+    <h3>Fail-fast iterators &amp; safe removal</h3>
+    <p>Most collections return <strong>fail-fast</strong> iterators: if the collection is structurally modified while you iterate (via anything other than the iterator itself), they throw <span class='key'>ConcurrentModificationException</span> &mdash; a best-effort guard against subtle bugs, not a concurrency feature. To remove while looping, use <span class='key'>Iterator.remove()</span> or the one-liner <span class='key'>removeIf</span>.</p>
+<pre class="code" data-src="List&lt;Integer&gt; nums = new ArrayList&lt;&gt;(List.of(1, 2, 3, 4));
+
+// for (int n : nums) if (n % 2 == 0) nums.remove(n); // ConcurrentModificationException!
+
+// Correct: remove through the iterator...
+Iterator&lt;Integer&gt; it = nums.iterator();
+while (it.hasNext()) if (it.next() % 2 == 0) it.remove();
+
+// ...or just use removeIf:
+nums.removeIf(n -&gt; n % 2 == 0);"></pre>
+
+    <h3>Immutable factories: List.of, Set.of, Map.of</h3>
+    <p>Since Java 9, <span class='key'>List.of(...)</span>, <span class='key'>Set.of(...)</span> and <span class='key'>Map.of(...)</span> build compact <strong>unmodifiable</strong> collections in one line. They are stricter than the old collections: any mutating call throws <span class='key'>UnsupportedOperationException</span>, and they <em>reject <span class='key'>null</span> elements/keys/values</em> outright. Use them for constants and defensive copies; wrap them in <span class='key'>new ArrayList&lt;&gt;(...)</span> when you need a mutable version.</p>
+<pre class="code" data-src="List&lt;String&gt; days = List.of(&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;);  // immutable
+// days.add(&quot;Thu&quot;);        // UnsupportedOperationException
+// List.of(&quot;a&quot;, null);     // NullPointerException - nulls rejected
+
+Map&lt;String,Integer&gt; ports = Map.of(&quot;http&quot;, 80, &quot;https&quot;, 443);
+
+// Need a mutable copy? Wrap it:
+List&lt;String&gt; editable = new ArrayList&lt;&gt;(days);
+editable.add(&quot;Thu&quot;);       // fine"></pre>
+
+    <h3>Ordering: Comparable vs Comparator</h3>
+    <p><span class='key'>Comparable&lt;T&gt;</span> defines a type's <em>natural order</em> from the inside, via <span class='key'>compareTo</span> (this is what <span class='key'>TreeSet</span> and <span class='key'>Collections.sort</span> use by default). A <span class='key'>Comparator&lt;T&gt;</span> is an <em>external</em> ordering you pass in, letting you sort the same type many ways without touching it. Modern comparators compose fluently with <span class='key'>comparing</span>, <span class='key'>thenComparing</span> and <span class='key'>reversed</span>.</p>
+<pre class="code" data-src="record Person(String name, int age) {}
+
+List&lt;Person&gt; people = new ArrayList&lt;&gt;(/* ... */);
+
+// Sort by age, then break ties by name - no changes to Person:
+people.sort(Comparator.comparingInt(Person::age)
+                      .thenComparing(Person::name));
+
+people.sort(Comparator.comparing(Person::name).reversed()); // Z..A"></pre>
+
+    <h3>Prefer ArrayDeque over Stack and Vector</h3>
+    <p><span class='key'>Vector</span> and its subclass <span class='key'>Stack</span> are Java 1.0 relics: every method is <span class='key'>synchronized</span>, so you pay for locking even single-threaded, and <span class='key'>Stack</span> extends <span class='key'>Vector</span> so it exposes index access that breaks stack semantics. For a stack or queue today, use <span class='key'>ArrayDeque</span> &mdash; it is faster, unsynchronized, and implements <span class='key'>Deque</span> so it works as both. If you need thread safety, reach for <span class='key'>java.util.concurrent</span> types instead.</p>
+<pre class="code" data-src="// Legacy - avoid:
+// Stack&lt;Integer&gt; s = new Stack&lt;&gt;();   // synchronized, extends Vector
+
+// Modern stack (LIFO):
+Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();
+stack.push(1); stack.push(2);
+int top = stack.pop();      // 2
+
+// Same class as a queue (FIFO):
+Deque&lt;Integer&gt; queue = new ArrayDeque&lt;&gt;();
+queue.offer(1); queue.offer(2);
+int head = queue.poll();    // 1"></pre>
   </div>
 </section>
 
@@ -229,6 +336,9 @@ System.out.println("Same bucket = a collision (handled by chaining).");</textare
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Pick the structure</h3><p class="prompt">You need to remember which user IDs you've already emailed, and ask “did I email 4187?” millions of times. Which collection?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">A <span class='key'>HashSet&lt;Integer&gt;</span> (or a <span class='key'>Set</span>). Membership tests are O(1) average, and you don't care about order or duplicates — exactly a Set's job.</div></details></div>
       <div class="exercise"><h3>2 &middot; The broken key</h3><p class="prompt">You use a mutable object as a <span class='key'>HashMap</span> key, then change a field used in its <span class='key'>hashCode()</span>. Why can you no longer find it?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Its hash now points to a different bucket than where it was stored, so <span class='key'>get</span> looks in the wrong place. Map keys must be effectively immutable in their hashed fields.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Order matters</h3><p class="prompt">You build a <span class='key'>Map</span> of config keys and print it back to a user; the keys must appear in the exact order they were added. Which <span class='key'>Map</span> implementation, and why not plain <span class='key'>HashMap</span>?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Use <span class='key'>LinkedHashMap</span>: it keeps a linked list of entries in insertion order. A plain <span class='key'>HashMap</span> gives no order guarantee &mdash; iteration order depends on hashes and capacity and can change on resize. If instead you wanted the keys <em>sorted</em>, you'd use <span class='key'>TreeMap</span>.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Remove while looping</h3><p class="prompt">This loop throws <span class='key'>ConcurrentModificationException</span>:<br><span class='key'>for (String s : list) if (s.isBlank()) list.remove(s);</span><br>Give two correct ways to strip the blank strings.</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">(1) The one-liner <span class='key'>list.removeIf(String::isBlank)</span>. (2) An explicit <span class='key'>Iterator</span> and <span class='key'>it.remove()</span>. Both mutate the list <em>through</em> the iterator, so the fail-fast check doesn't trip. The enhanced <span class='key'>for</span> uses an iterator under the hood, and removing behind its back is what it detects.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Guard a constant</h3><p class="prompt">You expose <span class='key'>List&lt;String&gt; DEFAULTS</span> as a public constant and want callers unable to mutate it. What do you use, and what happens if a caller calls <span class='key'>add</span>?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Build it with <span class='key'>List.of(...)</span> (or wrap in <span class='key'>Collections.unmodifiableList</span>). Any mutating call &mdash; <span class='key'>add</span>, <span class='key'>set</span>, <span class='key'>remove</span> &mdash; throws <span class='key'>UnsupportedOperationException</span>. Bonus: <span class='key'>List.of</span> also rejects <span class='key'>null</span> elements, so the constant can never contain one.</div></details></div>
   </div>
 </section>
 

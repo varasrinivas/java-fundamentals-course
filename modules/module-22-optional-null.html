@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>A box that holds a value, or nothing</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127873; Real-world analogy</span>
+      <p><strong>A <span class='key'>null</span> reference is an unlabeled box.</strong> It sits on the shelf looking exactly like a box that holds something, so you happily reach in expecting contents &mdash; and the moment you do, it <b>detonates</b> as a <span class='key'>NullPointerException</span>. Nothing on the outside warned you it was empty. An <span class='key'>Optional&lt;T&gt;</span> is the <b>clearly-labeled gift box</b>: the label plainly says whether something is inside, so you are <em>forced to check</em> before reaching in. The difference isn’t the emptiness &mdash; both boxes can be empty &mdash; it’s that with <span class='key'>Optional</span> the <b>type system makes &ldquo;might be absent&rdquo; visible</b> instead of leaving it as a lurking surprise for whoever opens the box at runtime.</p>
+    </div>
     <p>An <span class='key'>Optional&lt;T&gt;</span> is a container that's either present (holds a T) or empty. Returning <span class='key'>Optional&lt;User&gt;</span> instead of <span class='key'>User</span> (which might be null) forces the caller to confront absence at compile time, not via a 2am stack trace.</p><pre class="code" data-src="Optional&lt;User&gt; found = repo.findById(42);
 
 // Don’t: found.get() blows up if empty
@@ -168,6 +176,97 @@ found.ifPresentOrElse(
     u -&gt; render(u),
     () -&gt; show404());"></pre><p>Use <span class='key'>map</span>, <span class='key'>filter</span>, <span class='key'>orElse</span>, and <span class='key'>ifPresent</span> to flow through the box without ever touching null. Reserve <span class='key'>Optional</span> for return types — not fields or parameters — and never call <span class='key'>get()</span> without checking.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: findById(42) then Optional.of then map(User::name) then orElse(...) then value"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">findById(42)</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">maybe null</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">Optional.of</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">wrap</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">map(User::name)</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">if present</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">orElse(...)</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fallback</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">value</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">never null</text></g></svg></div>
+    <h3>The billion-dollar mistake</h3>
+    <p>Tony Hoare, who introduced the null reference in 1965, later called it his <strong>&ldquo;billion-dollar mistake&rdquo;</strong> &mdash; decades of crashes, bugs, and vulnerabilities from a single unchecked assumption. The core problem: in Java <em>every</em> reference type silently admits <span class='key'>null</span>, so a method returning <span class='key'>User</span> could hand you back nothing and the compiler never objects.</p>
+    <p><span class='key'>Optional&lt;T&gt;</span> doesn’t abolish <span class='key'>null</span> &mdash; it can’t &mdash; but it moves &ldquo;might be absent&rdquo; <strong>into the type</strong>. A method that returns <span class='key'>Optional&lt;User&gt;</span> is documenting, in a way the compiler enforces, that the caller must deal with the empty case.</p>
+    <pre class="code" data-src="// The old world: null is a valid value for EVERY reference type.
+User u = repo.findByEmail(&quot;ghost@example.com&quot;);   // returns null if absent
+System.out.println(u.name());                     // NullPointerException at runtime
+
+// Nothing in `User`'s type said &quot;this might be missing&quot; - the compiler
+// waved it through. The absence only shows up as a 2am stack trace.
+
+// The Optional world: absence is baked into the return type.
+Optional&lt;User&gt; maybe = repo.findByEmail(&quot;ghost@example.com&quot;);
+// maybe.name();   // won't compile - Optional has no name(); you MUST unwrap first"></pre>
+    <h3>Creating an Optional: of, ofNullable, empty</h3>
+    <p>Three factories cover every case. <span class='key'>Optional.of(x)</span> wraps a value you <em>guarantee</em> is non-null &mdash; passing <span class='key'>null</span> to it throws immediately, which is a feature: it fails loudly at the source rather than far downstream. <span class='key'>Optional.ofNullable(x)</span> is the null-tolerant version, producing an empty Optional when <span class='key'>x</span> is <span class='key'>null</span>. <span class='key'>Optional.empty()</span> is the shared, canonical empty box.</p>
+    <pre class="code" data-src="Optional&lt;String&gt; a = Optional.of(&quot;Ada&quot;);        // value is present; NPE if you pass null
+Optional&lt;String&gt; b = Optional.ofNullable(maybeNull); // present if non-null, else empty
+Optional&lt;String&gt; c = Optional.empty();            // deliberately empty
+
+// Rule of thumb:
+//   Optional.of(x)         -&gt; use when x MUST be non-null (a bug if it isn't)
+//   Optional.ofNullable(x) -&gt; use when x might legitimately be null
+//   Optional.empty()       -&gt; the canonical &quot;nothing here&quot; value
+
+// A repository method typically bridges legacy nullable APIs like this:
+User row = jdbcFindUser(id);            // old-style API: may return null
+return Optional.ofNullable(row);        // hand callers a safe box"></pre>
+    <h3>Consuming without get(): map, flatMap, filter</h3>
+    <p>The whole point is to <em>flow through</em> the box rather than crack it open. <span class='key'>map</span> applies a function only when a value is present; on empty it short-circuits and stays empty. <span class='key'>filter</span> discards the value if a predicate fails, turning a present Optional into an empty one. Use <span class='key'>flatMap</span> when your mapping function <em>itself</em> returns an <span class='key'>Optional</span> &mdash; it flattens <span class='key'>Optional&lt;Optional&lt;X&gt;&gt;</span> down to <span class='key'>Optional&lt;X&gt;</span>, exactly like the stream operation of the same name.</p>
+    <pre class="code" data-src="record User(String name, Optional&lt;Address&gt; address) {}
+record Address(String city) {}
+
+Optional&lt;User&gt; user = repo.findById(42);
+
+// map: transform the value if present; empty stays empty.
+Optional&lt;String&gt; name = user.map(User::name);
+
+// filter: keep the value only if it matches; otherwise become empty.
+Optional&lt;User&gt; named = user.filter(u -&gt; !u.name().isBlank());
+
+// flatMap: like map, but the mapper ALREADY returns an Optional.
+// Using map here would give you Optional&lt;Optional&lt;Address&gt;&gt; - flatMap flattens it.
+Optional&lt;String&gt; city = user
+    .flatMap(User::address)     // Optional&lt;Address&gt;, not Optional&lt;Optional&lt;Address&gt;&gt;
+    .map(Address::city);        // Optional&lt;String&gt;"></pre>
+    <h3>Unwrapping: orElse vs orElseGet vs orElseThrow</h3>
+    <p>The trap here is <strong>eager vs lazy</strong>. <span class='key'>orElse(x)</span> evaluates its argument <em>every time</em>, present or not &mdash; harmless for a literal, wasteful (or wrong) if <span class='key'>x</span> is a database call or has side effects. <span class='key'>orElseGet(supplier)</span> invokes the supplier <em>only</em> when the Optional is empty, so it’s the right choice for anything expensive. <span class='key'>orElseThrow</span> unwraps or raises the exception you pick. For side effects rather than a value, reach for <span class='key'>ifPresent</span> or, when you need both branches, <span class='key'>ifPresentOrElse</span>.</p>
+    <pre class="code" data-src="// orElse: the fallback is ALWAYS evaluated, even when present. Fine for constants.
+String n1 = user.map(User::name).orElse(&quot;(unknown)&quot;);
+
+// orElseGet: the supplier runs ONLY when empty. Use it when the fallback is expensive.
+String n2 = user.map(User::name).orElseGet(() -&gt; loadDefaultNameFromDb());  // lazy
+
+// orElseThrow: unwrap, or blow up with a chosen exception if empty.
+User u = user.orElseThrow(() -&gt; new UserNotFoundException(42));
+User u2 = user.orElseThrow();   // no-arg (Java 10+): throws NoSuchElementException
+
+// Side effects instead of a return value:
+user.ifPresent(x -&gt; render(x));                 // run only if present
+user.ifPresentOrElse(                           // present branch + empty branch (Java 9+)
+    x -&gt; render(x),
+    () -&gt; show404());"></pre>
+    <h3>Why get() and isPresent()-then-get() are anti-patterns</h3>
+    <p>Calling <span class='key'>get()</span> on an empty Optional throws <span class='key'>NoSuchElementException</span> &mdash; you’ve simply traded a <span class='key'>NullPointerException</span> for a different runtime crash, gaining nothing. Guarding it with <span class='key'>isPresent()</span> first is little better: it reconstructs the exact null-check boilerplate <span class='key'>Optional</span> exists to eliminate, and the compiler won’t stop you from forgetting the guard next time. Prefer the higher-order methods (<span class='key'>map</span>, <span class='key'>orElse</span>, <span class='key'>ifPresent</span>), which make the absent case impossible to skip.</p>
+    <pre class="code" data-src="// ANTI-PATTERN 1: get() with no guard - throws NoSuchElementException if empty.
+String bad = user.get().name();        // just as fragile as a raw null dereference
+
+// ANTI-PATTERN 2: isPresent() then get() - rebuilds the null-check ceremony
+// Optional was invented to delete, and it's easy to forget the guard.
+if (user.isPresent()) {
+    String name = user.get().name();   // verbose and error-prone
+}
+
+// BETTER: express the same intent declaratively - impossible to &quot;forget the check&quot;.
+String name = user.map(User::name).orElse(&quot;(unknown)&quot;);"></pre>
+    <h3>Where Optional belongs (and where it doesn’t)</h3>
+    <p>Optional was designed for one job: a <strong>return type</strong> that signals &ldquo;this might produce nothing.&rdquo; It’s a poor fit as a <em>field</em> (it isn’t <span class='key'>Serializable</span> and adds an allocation per object), as a <em>parameter</em> (forcing callers to wrap arguments &mdash; overload the method instead), or inside a <em>collection</em> (an empty <span class='key'>List</span> already means &ldquo;none&rdquo;, so never return <span class='key'>Optional&lt;List&lt;T&gt;&gt;</span>). Where Optional shines with streams is <span class='key'>Optional.stream()</span>: it turns each box into a 0-or-1-element stream, so <span class='key'>flatMap(Optional::stream)</span> cleanly filters out the empties and unwraps the rest.</p>
+    <pre class="code" data-src="// GOOD: Optional as a return type - the intended use.
+Optional&lt;User&gt; findById(int id) { ... }
+
+// AVOID as a field    -&gt; Optional isn't Serializable and costs an allocation.
+// AVOID as a parameter -&gt; callers must wrap; overload or accept the plain type instead.
+// AVOID in collections -&gt; return an EMPTY collection, never Optional&lt;List&lt;T&gt;&gt;.
+List&lt;Order&gt; orders = findOrders(id);   // empty list means &quot;none&quot;, no Optional needed
+
+// Bridging to streams (Java 9+): Optional.stream() yields 0 or 1 elements,
+// so a stream of Optionals flatMaps down to just the present values.
+List&lt;User&gt; users = ids.stream()
+    .map(repo::findById)      // Stream&lt;Optional&lt;User&gt;&gt;
+    .flatMap(Optional::stream) // drops the empties, unwraps the rest
+    .toList();"></pre>
     
   </div>
 </section>
@@ -232,6 +331,9 @@ System.out.println("No surprise NullPointerException.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; The anti-pattern</h3><p class="prompt">Why is <span class='key'>optional.get()</span> right after <span class='key'>optional.isPresent()</span> frowned upon — and what's better?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">It rebuilds the null-check ceremony Optional was meant to remove, and forgetting the guard throws <span class='key'>NoSuchElementException</span>. Prefer <span class='key'>map</span>/<span class='key'>orElse</span>/<span class='key'>ifPresent</span>, which can't be misused that way.</div></details></div>
       <div class="exercise"><h3>2 &middot; Where not to use it</h3><p class="prompt">Is <span class='key'>Optional&lt;String&gt;</span> a good type for a class <em>field</em>? Why or why not?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Generally no. <span class='key'>Optional</span> isn't <span class='key'>Serializable</span>, adds an allocation per field, and muddies object state. It's designed for <b>return values</b>; for fields, a plain nullable reference (well-documented) is idiomatic.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Eager or lazy?</h3><p class="prompt">You write <span class='key'>opt.orElse(expensiveLookup())</span>. When is <span class='key'>expensiveLookup()</span> called, and how do you make it run only when needed?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>orElse</span> evaluates its argument <b>every time</b>, even when the Optional is present &mdash; so <span class='key'>expensiveLookup()</span> always runs. Switch to <span class='key'>orElseGet(() -&gt; expensiveLookup())</span>, whose supplier fires <b>only when the Optional is empty</b>.</div></details></div>
+      <div class="exercise"><h3>4 &middot; map or flatMap?</h3><p class="prompt">A <span class='key'>User</span> has <span class='key'>Optional&lt;Address&gt; address()</span>. Given an <span class='key'>Optional&lt;User&gt; user</span>, what do you get from <span class='key'>user.map(User::address)</span>, and how do you fix it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">You get <span class='key'>Optional&lt;Optional&lt;Address&gt;&gt;</span> &mdash; a box inside a box &mdash; because <span class='key'>address()</span> already returns an Optional. Use <span class='key'>user.flatMap(User::address)</span>, which flattens the nesting to a single <span class='key'>Optional&lt;Address&gt;</span>.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Optional in a collection?</h3><p class="prompt">A method looks up a user’s orders and sometimes there are none. Should it return <span class='key'>Optional&lt;List&lt;Order&gt;&gt;</span>? What’s the idiomatic choice?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">No &mdash; return an <b>empty <span class='key'>List</span></b> instead. A collection already has a natural &ldquo;nothing&rdquo; value (empty), so wrapping it in <span class='key'>Optional</span> adds a pointless layer and forces callers to unwrap before they can even iterate.</div></details></div>
   </div>
 </section>
 

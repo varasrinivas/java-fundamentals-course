@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>A lazy pipeline of operations</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>A stream is a factory conveyor belt.</strong> Raw parts enter at one end and glide past a line of stations &mdash; a <b>filter</b> station bumps rejects off the belt, a <b>map</b> station reshapes each part &mdash; but the belt is <b>demand-driven</b>: nothing actually moves until the <b>worker at the far end</b> (a <em>terminal operation</em> like <span class="key">collect</span> or <span class="key">sum</span>) starts pulling. That pull is <em>laziness</em>: describe the whole line first, and no part moves until someone needs a finished result. A <b>lambda</b> is the sticky note you hand a station &mdash; a one-off instruction like &ldquo;keep it only if it&rsquo;s even.&rdquo; And the belt is <b>single-use</b>: once the parts have run through and been consumed, you can&rsquo;t rewind it &mdash; you start a fresh belt from the source.</p>
+    </div>
     <p>A <strong>lambda</strong> is an anonymous function: <span class='key'>x -&gt; x * 2</span>. A <strong>stream</strong> is a one-shot sequence you transform with chained operations. Intermediate steps (<span class='key'>filter</span>, <span class='key'>map</span>) are <em>lazy</em> — nothing runs until a <strong>terminal</strong> operation (<span class='key'>collect</span>, <span class='key'>sum</span>, <span class='key'>forEach</span>) pulls values through.</p><pre class="code" data-src="List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5);
 
 int total = nums.stream()
@@ -167,7 +175,107 @@ int total = nums.stream()
 int t = 0;
 for (int n : nums) if (n % 2 == 0) t += n * 2;"></pre><p>Laziness means a single pass handles the whole chain — each element flows filter→map→terminal before the next begins. Switch <span class='key'>.stream()</span> to <span class='key'>.parallelStream()</span> and the same pipeline can run across cores.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: stream() then filter then map then collect / sum then result"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">stream()</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">source</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">filter</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">predicate</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">map</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">transform</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">collect / sum</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">terminal</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">result</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">value</text></g></svg></div>
-    
+    <h3>A lambda IS a functional interface</h3>
+    <p>Java has no standalone function type. A <strong>lambda is an instance of a functional interface</strong> &mdash; any interface with exactly one abstract method (a SAM: Single Abstract Method). The compiler infers <em>which</em> interface from the target type, then wires the lambda body to that one method. <span class="key">java.util.function</span> ships the four you meet constantly: <span class="key">Function&lt;T,R&gt;</span> (takes a T, returns an R), <span class="key">Predicate&lt;T&gt;</span> (T &rarr; boolean), <span class="key">Consumer&lt;T&gt;</span> (T &rarr; void), and <span class="key">Supplier&lt;T&gt;</span> (no input &rarr; T).</p>
+    <pre class="code" data-src="// A lambda is just an instance of a single-abstract-method interface.
+Predicate&lt;String&gt; isLong = s -&gt; s.length() &gt; 5;   // String -&gt; boolean
+Function&lt;String, Integer&gt; len = s -&gt; s.length();   // String -&gt; Integer
+Consumer&lt;String&gt; print = s -&gt; System.out.println(s); // String -&gt; void
+Supplier&lt;Double&gt; rnd = () -&gt; Math.random();        // () -&gt; Double
+
+boolean b = isLong.test(&quot;hello world&quot;); // true
+int n     = len.apply(&quot;Ada&quot;);           // 3
+print.accept(&quot;hi&quot;);                     // prints hi
+
+// Because it is really an interface instance, this is equivalent:
+Predicate&lt;String&gt; same = new Predicate&lt;&gt;() {
+    public boolean test(String s) { return s.length() &gt; 5; }
+};"></pre>
+
+    <h3>Method references: four flavours</h3>
+    <p>When a lambda does nothing but call one existing method, a <strong>method reference</strong> (<span class="key">Type::method</span>) says the same thing with less noise. There are four kinds, and knowing which is which stops the syntax from feeling arbitrary.</p>
+    <pre class="code" data-src="// 1. Static method:            ClassName::staticMethod
+Function&lt;String, Integer&gt; parse = Integer::parseInt;   // s -&gt; Integer.parseInt(s)
+
+// 2. Instance method of a PARTICULAR object:  obj::method
+Consumer&lt;String&gt; log = System.out::println;            // s -&gt; System.out.println(s)
+
+// 3. Instance method of an ARBITRARY object of a type: Type::method
+//    the first lambda arg becomes the receiver.
+Function&lt;String, String&gt; up = String::toUpperCase;     // s -&gt; s.toUpperCase()
+
+// 4. Constructor:              ClassName::new
+Supplier&lt;ArrayList&lt;String&gt;&gt; make = ArrayList::new;     // () -&gt; new ArrayList&lt;&gt;()"></pre>
+
+    <h3>The pipeline shape: source &rarr; intermediate &rarr; terminal</h3>
+    <p>Every stream pipeline has exactly three kinds of link. A <strong>source</strong> (<span class="key">stream()</span>, <span class="key">Stream.of</span>, <span class="key">IntStream.range</span>) starts it. Zero or more <strong>intermediate</strong> operations (<span class="key">filter</span>, <span class="key">map</span>, <span class="key">sorted</span>, <span class="key">limit</span>) return a <em>new stream</em> and are <strong>lazy</strong> &mdash; they only record what to do. Exactly one <strong>terminal</strong> operation (<span class="key">collect</span>, <span class="key">forEach</span>, <span class="key">count</span>, <span class="key">reduce</span>) is <strong>eager</strong>: it triggers the traversal and produces a value or side effect. No terminal, no work.</p>
+    <pre class="code" data-src="List&lt;String&gt; names = List.of(&quot;Ada&quot;, &quot;Alan&quot;, &quot;Grace&quot;, &quot;Linus&quot;);
+
+List&lt;String&gt; shortUpper = names.stream()   // SOURCE
+    .filter(s -&gt; s.length() &lt;= 4)          // INTERMEDIATE (lazy)
+    .map(String::toUpperCase)              // INTERMEDIATE (lazy)
+    .collect(Collectors.toList());         // TERMINAL (eager) -&gt; [ADA, ALAN]
+
+// Build the pipeline with no terminal, and nothing runs:
+names.stream().filter(s -&gt; { System.out.println(&quot;seen &quot; + s); return true; });
+// prints NOTHING - no terminal operation pulled any element through."></pre>
+
+    <h3>Laziness pays off: short-circuiting</h3>
+    <p>Because intermediate operations only run on demand, a terminal op can <strong>stop early</strong>. Short-circuiting ops like <span class="key">findFirst</span>, <span class="key">anyMatch</span>, and <span class="key">limit</span> quit as soon as the answer is known &mdash; so an expensive <span class="key">map</span> runs only for the elements actually needed, and even an <em>infinite</em> stream can terminate.</p>
+    <pre class="code" data-src="// Only the first matching element is computed - map does NOT run for all 1000.
+Optional&lt;Integer&gt; firstBig = Stream.iterate(1, n -&gt; n + 1)  // infinite!
+    .map(n -&gt; n * n)          // 1, 4, 9, 16, 25, ...
+    .filter(sq -&gt; sq &gt; 20)    // lazy: pulled one at a time
+    .findFirst();             // stops at 25 -&gt; Optional[25]
+
+// limit(n) caps an infinite source so the terminal op can finish.
+List&lt;Integer&gt; firstFive = Stream.iterate(0, n -&gt; n + 2)
+    .limit(5)
+    .collect(Collectors.toList());  // [0, 2, 4, 6, 8]"></pre>
+
+    <h3>map / filter / reduce / collect &amp; Collectors</h3>
+    <p><span class="key">map</span> transforms each element, <span class="key">filter</span> keeps a subset, <span class="key">reduce</span> folds the stream into a single value, and <span class="key">collect</span> accumulates results into a container using a <span class="key">Collector</span>. The <span class="key">Collectors</span> factory covers the common cases: <span class="key">toList</span>, <span class="key">joining</span>, <span class="key">groupingBy</span>, <span class="key">toMap</span>, and more.</p>
+    <pre class="code" data-src="List&lt;String&gt; words = List.of(&quot;apple&quot;, &quot;banana&quot;, &quot;avocado&quot;, &quot;cherry&quot;);
+
+// reduce: fold to one value (here, total length). Identity + accumulator.
+int totalLen = words.stream().reduce(0, (sum, w) -&gt; sum + w.length(), Integer::sum);
+
+// joining: concatenate with a separator.
+String csv = words.stream().collect(Collectors.joining(&quot;, &quot;)); // &quot;apple, banana, ...&quot;
+
+// groupingBy: partition into a Map&lt;Key, List&lt;T&gt;&gt;.
+Map&lt;Character, List&lt;String&gt;&gt; byInitial = words.stream()
+    .collect(Collectors.groupingBy(w -&gt; w.charAt(0)));
+// { a=[apple, avocado], b=[banana], c=[cherry] }"></pre>
+
+    <h3>Parallel streams: free cores, sharp edges</h3>
+    <p>Swap <span class="key">.stream()</span> for <span class="key">.parallelStream()</span> and the pipeline splits across a shared <span class="key">ForkJoinPool</span>. It can be a big win for CPU-heavy work over large datasets &mdash; but it is not free. Splitting and merging add <strong>overhead</strong> that swamps small inputs, and it demands your lambdas be <strong>stateless and side-effect-free</strong>: mutating shared state from a parallel pipeline is a data race. Prefer a <span class="key">Collector</span> over writing into an external list, and remember that <span class="key">forEach</span> gives no ordering guarantee (use <span class="key">forEachOrdered</span> if you need it).</p>
+    <pre class="code" data-src="// GOOD: stateless, associative reduction - safe and scalable in parallel.
+long count = bigList.parallelStream()
+    .filter(n -&gt; isPrime(n))   // pure predicate, no shared mutation
+    .count();
+
+// BAD: shared mutable state -&gt; data race, lost/duplicated updates.
+List&lt;Integer&gt; sink = new ArrayList&lt;&gt;();          // not thread-safe!
+bigList.parallelStream().forEach(sink::add);     // BROKEN under parallelism
+
+// RIGHT WAY: let the framework merge partial results for you.
+List&lt;Integer&gt; safe = bigList.parallelStream().collect(Collectors.toList());"></pre>
+
+    <h3>When there might be nothing: Optional</h3>
+    <p>Some terminals can legitimately produce <em>no</em> value &mdash; a filtered stream may be empty. Rather than return <span class="key">null</span>, these return an <span class="key">Optional&lt;T&gt;</span>: a box that either holds a value or is empty. <span class="key">findFirst</span>, <span class="key">findAny</span>, <span class="key">max</span>, <span class="key">min</span>, and the single-argument <span class="key">reduce</span> all hand you an <span class="key">Optional</span>, forcing you to decide what &ldquo;nothing matched&rdquo; means.</p>
+    <pre class="code" data-src="List&lt;Integer&gt; nums = List.of(1, 3, 5, 7);
+
+// No even number exists -&gt; an EMPTY Optional, not null, not an exception.
+Optional&lt;Integer&gt; firstEven = nums.stream()
+    .filter(n -&gt; n % 2 == 0)
+    .findFirst();
+
+int chosen = firstEven.orElse(-1);   // supply a fallback: -1
+
+// Single-arg reduce also returns Optional (no identity -&gt; may be empty).
+Optional&lt;Integer&gt; max = nums.stream().reduce((a, b) -&gt; a &gt; b ? a : b); // Optional[7]"></pre>
+
   </div>
 </section>
 
@@ -230,6 +338,9 @@ System.out.println("map(x*2) then sum = " + result);</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Lazy or eager?</h3><p class="prompt">A stream has <span class='key'>.filter(...).map(...)</span> but no terminal operation. How many elements get processed?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>Zero</b>. Intermediate operations are lazy — without a terminal op (<span class='key'>collect</span>, <span class='key'>count</span>, <span class='key'>forEach</span>…) nothing is pulled through and no work happens.</div></details></div>
       <div class="exercise"><h3>2 &middot; Reuse trap</h3><p class="prompt">You call a terminal op on a stream, then try to call another on the same stream variable. What happens?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><span class='key'>IllegalStateException</span> — “stream has already been operated upon or closed.” Streams are single-use; create a fresh one from the source to traverse again.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Lambda or method reference?</h3><p class="prompt">Rewrite <span class='key'>s -&gt; Integer.parseInt(s)</span> and <span class='key'>s -&gt; s.toUpperCase()</span> as method references. Which of the four kinds is each?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>Integer::parseInt</span> is a <b>static</b> method reference. <span class='key'>String::toUpperCase</span> is an <b>instance method of an arbitrary object</b> &mdash; the single lambda argument <span class='key'>s</span> becomes the receiver the method is called on.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Why an Optional?</h3><p class="prompt">A stream of prices is filtered to those over 1000, then <span class='key'>findFirst()</span> is called. Why does it return <span class='key'>Optional&lt;Price&gt;</span> instead of just <span class='key'>Price</span>?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The filter might match <em>nothing</em> &mdash; the stream could be empty after filtering. Returning <span class='key'>Optional</span> forces the caller to handle the &ldquo;no match&rdquo; case explicitly (<span class='key'>orElse</span>, <span class='key'>isPresent</span>, <span class='key'>ifPresent</span>) rather than risk a surprise <span class='key'>NullPointerException</span>.</div></details></div>
+      <div class="exercise"><h3>5 &middot; The parallel trap</h3><p class="prompt">Someone speeds up a pipeline with <span class='key'>parallelStream()</span> and collects results by calling <span class='key'>forEach(list::add)</span> on a plain <span class='key'>ArrayList</span>. What can go wrong, and what should they do instead?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>ArrayList</span> is not thread-safe; parallel threads calling <span class='key'>add</span> concurrently race &mdash; you can lose elements, get duplicates, or throw. Stream lambdas must be <b>stateless and side-effect-free</b>. The fix is to let the framework merge partial results: <span class='key'>.collect(Collectors.toList())</span>.</div></details></div>
   </div>
 </section>
 

@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Four flavors, one question: do you hold the outer instance?</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127968; Real-world analogy</span>
+      <p><strong>Nested classes are rooms on a property.</strong> A <b>static nested class</b> is a <b>standalone guest cottage</b> &mdash; it sits on the same lot for organization, but it has no key to the main house and can stand on its own. A non-static <b>inner class</b> is a <b>room inside the house</b> that always carries a key back to the whole building: wherever it goes it holds an implicit reference to its enclosing instance (<span class='key'>Outer.this</span>) and can open any of its cupboards. An <b>anonymous class</b> is a <b>pop-up tent</b> you pitch once, on the spot, for a single use &mdash; no permanent name on the mailbox. And because that keyed room and that tent both cling to the house, forgetting to fold them away is how the whole house is kept standing long after you meant to demolish it &mdash; the inner-class memory leak.</p>
+    </div>
     <p>A <strong>static nested</strong> class is just a top-level class scoped inside another — no link to an outer instance. A non-static <strong>inner</strong> class holds a hidden reference to its enclosing object, so it can use its fields. A <strong>local</strong> class is declared inside a method; an <strong>anonymous</strong> class is a local class with no name, defined and instantiated at once.</p><pre class="code" data-src="class Outer {
     int count = 1;
     static class Helper {}          // static nested: no Outer needed
@@ -169,7 +177,121 @@ Runnable r = new Runnable() {
 // Lambda — the concise successor
 Runnable r2 = () -&gt; System.out.println(&quot;hi&quot;);"></pre><p>Anonymous classes (and lambdas) <strong>capture</strong> local variables, which must be <span class='key'>final</span> or effectively final. Prefer <span class='key'>static</span> nested classes unless you truly need the outer instance — a non-static inner class quietly keeps the outer object alive, a classic memory leak.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: static nested then inner then local then anonymous then lambda"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">static nested</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">no outer ref</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">inner</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">holds outer</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">local</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">in a method</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">anonymous</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">on the spot</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">lambda</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">concise form</text></g></svg></div>
-    
+
+    <h3>Static nested vs inner: the hidden Outer.this</h3>
+    <p>The <span class='key'>static</span> keyword on a nested class is the whole ballgame. A <strong>static nested</strong> class is a normal top-level class that merely lives inside another for namespacing; it has <em>no</em> connection to any enclosing instance. A non-static <strong>inner</strong> class is compiled with a synthetic field holding a reference to the object that created it &mdash; reachable as <span class='key'>Outer.this</span> &mdash; which is why it can read the outer's private fields as if they were its own.</p>
+    <pre class="code" data-src="class Outer {
+    private int id = 7;
+
+    // STATIC nested: like a top-level class, just namespaced under Outer.
+    static class Parser {
+        // int peek() { return id; }   // WON'T COMPILE: no enclosing instance
+        int parse(String s) { return Integer.parseInt(s.trim()); }
+    }
+
+    // INNER (non-static): carries a hidden reference to the Outer instance.
+    class Cursor {
+        int currentId() { return id; }          // reads Outer.this.id freely
+        int outerId()   { return Outer.this.id; } // explicit qualified form
+    }
+}
+
+Outer.Parser p = new Outer.Parser();   // no Outer instance needed"></pre>
+
+    <h3>Instantiating an inner class: outer.new Inner()</h3>
+    <p>Because every inner instance is bound to exactly one outer instance, you can't create one out of thin air. Java has a rarely-seen syntax for it: <span class='key'>outer.new Inner()</span>. You'll almost never write this by hand &mdash; inner classes are usually built from <em>inside</em> the outer class, where <span class='key'>new Inner()</span> implicitly uses the current <span class='key'>this</span> &mdash; but it explains why <span class='key'>new Outer.Cursor()</span> won't compile.</p>
+    <pre class="code" data-src="Outer outer = new Outer();
+
+// An inner instance is always tied to ONE outer instance, so you must
+// create it *through* that instance with the unusual outer.new syntax:
+Outer.Cursor cur = outer.new Cursor();
+
+// new Outer.Cursor() alone won't compile - which Outer.this would it use?
+// The type name is Outer.Cursor; the factory is the enclosing object."></pre>
+
+    <h3>Local classes: a class inside a method</h3>
+    <p>You can declare a full, named class right inside a method body. Its scope is that block, and it can use the method's parameters and locals &mdash; as long as they're effectively final. Local classes are rare today (a lambda or a private static helper usually reads better), but they're worth recognizing when you need a small stateful type used only in one method.</p>
+    <pre class="code" data-src="List&lt;String&gt; namesLongerThan(List&lt;String&gt; in, int min) {
+    // A LOCAL class: declared inside a method, visible only here.
+    // It can use the surrounding effectively-final locals (min, in).
+    class LongEnough {
+        boolean test(String s) { return s.length() &gt;= min; }
+    }
+    LongEnough rule = new LongEnough();
+    List&lt;String&gt; out = new ArrayList&lt;&gt;();
+    for (String s : in) if (rule.test(s)) out.add(s);
+    return out;
+}"></pre>
+
+    <h3>Anonymous classes: one-shot implementations</h3>
+    <p>An anonymous class is a local class with no name: you subclass a type or implement an interface <em>and</em> instantiate it in a single expression. Before Java 8 this was the standard way to hand behavior to an API &mdash; Swing <span class='key'>ActionListener</span>s, <span class='key'>Comparator</span>s, <span class='key'>Runnable</span>s. It can add fields and override several methods, which is exactly what a lambda cannot do.</p>
+    <pre class="code" data-src="// Anonymous class = declare + subclass/implement + instantiate, all at once.
+// For years this was THE way to pass behavior (listeners, comparators).
+button.addActionListener(new ActionListener() {
+    @Override public void actionPerformed(ActionEvent e) {
+        System.out.println(&quot;clicked&quot;);
+    }
+});
+
+// Sorting with an inline Comparator, pre-lambda style:
+names.sort(new Comparator&lt;String&gt;() {
+    @Override public int compare(String a, String b) {
+        return a.length() - b.length();
+    }
+});"></pre>
+
+    <h3>Variable capture must be effectively final</h3>
+    <p>Local, anonymous, and lambda classes can <strong>capture</strong> the surrounding method's locals, but only if each is <span class='key'>final</span> or <em>effectively final</em> (assigned exactly once). The reason is mechanical: the captured value is <em>copied</em> into the generated class at construction. If the local could still change afterward, the copy and the original would silently diverge &mdash; so Java forbids capturing anything mutable.</p>
+    <pre class="code" data-src="void schedule(List&lt;Runnable&gt; queue) {
+    int ticket = nextTicket();        // effectively final: never reassigned
+    // ticket = 0;                     // uncommenting this breaks capture below
+
+    queue.add(new Runnable() {         // anonymous class captures 'ticket'
+        public void run() { System.out.println(&quot;ticket &quot; + ticket); }
+    });
+}
+// The capture is by VALUE of a final snapshot, not a live reference. That is
+// why a captured local must be final or effectively final: Java copies the
+// value into the generated class, so a later reassignment would be a lie."></pre>
+
+    <h3>Lambdas replace most anonymous classes &mdash; and this differs</h3>
+    <p>For a single-method (functional) interface, a lambda is the concise successor to an anonymous class. But they are not identical: a lambda does <strong>not</strong> create a new scope for <span class='key'>this</span>. Inside a lambda, <span class='key'>this</span> is the <em>enclosing</em> instance; inside an anonymous class, <span class='key'>this</span> is the anonymous object. Lambdas also don't compile to their own <span class='key'>Outer$1</span> class file and don't shadow local names.</p>
+    <pre class="code" data-src="class Widget {
+    Runnable asAnon() {
+        return new Runnable() {
+            public void run() {
+                // 'this' here is the anonymous Runnable object itself.
+                System.out.println(this.getClass());  // ...Widget$1
+            }
+        };
+    }
+    Runnable asLambda() {
+        return () -&gt; System.out.println(this.getClass());  // Widget
+        // A lambda does NOT introduce a new 'this'; 'this' is the Widget.
+        // Lambdas also don't shadow names or need a synthetic class file.
+    }
+}"></pre>
+
+    <h3>The memory-leak trap: pinning the outer instance</h3>
+    <p>Because a non-static inner class (and every anonymous class defined in an instance context) holds an implicit reference to its enclosing object, handing one to something long-lived &mdash; an event bus, a static cache, a background thread &mdash; keeps the <em>entire</em> outer object alive, even if the inner class never touches it. The fix is almost always: make it <span class='key'>static</span>, or use a lambda that captures nothing.</p>
+    <pre class="code" data-src="class Screen {                 // imagine a large, long-lived object
+    private final byte[] pixels = new byte[8_000_000];
+
+    // BAD: a non-static inner listener pins THIS Screen alive as long as the
+    // event source holds the listener - even after the Screen is 'done'.
+    Runnable badHandler() {
+        return new Runnable() {           // anonymous =&gt; inner =&gt; holds Screen.this
+            public void run() { /* doesn't even touch pixels */ }
+        };
+    }
+
+    // GOOD: a static nested class (or a lambda that captures nothing) has no
+    // implicit outer reference, so the Screen can be collected.
+    static class GoodHandler implements Runnable {
+        public void run() { /* ... */ }
+    }
+}"></pre>
+
   </div>
 </section>
 
@@ -234,6 +356,9 @@ System.out.println("Lambdas replaced most anonymous classes.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; static or not?</h3><p class="prompt">You write a nested <span class='key'>Comparator</span> that never touches the outer instance's fields. Static nested or inner — and why?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>Static nested.</b> It doesn't need the enclosing instance, so making it inner would needlessly hold a reference to the outer object (preventing GC and wasting memory). Default to static unless you need the outer state.</div></details></div>
       <div class="exercise"><h3>2 &middot; Capture rules</h3><p class="prompt">Why won't this compile: a lambda uses a local <span class='key'>int n</span> that the method reassigns later?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Captured locals must be <b>effectively final</b> — assigned once. Reassigning <span class='key'>n</span> makes it non-final, so the lambda can't capture it. Copy it into a new final variable, or avoid the reassignment.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Build the inner instance</h3><p class="prompt">Given <span class='key'>class Outer { class Inner {} }</span>, why won't <span class='key'>new Outer.Inner()</span> compile, and what's the correct way to make an <span class='key'>Inner</span> from outside <span class='key'>Outer</span>?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">An inner instance must be attached to an <em>outer</em> instance, and <span class='key'>new Outer.Inner()</span> supplies no <span class='key'>Outer.this</span>. Create the outer first, then use the qualified form: <span class='key'>Outer o = new Outer(); Outer.Inner in = o.new Inner();</span>.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Which this?</h3><p class="prompt">Inside a lambda you call <span class='key'>this.getClass()</span>; inside an anonymous class in the same method you do the same. Do they print the same class? Explain.</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">No. A lambda does not create its own <span class='key'>this</span> &mdash; <span class='key'>this</span> is the <b>enclosing instance</b>, so it prints the outer class. An anonymous class <em>is</em> its own object, so <span class='key'>this</span> is that anonymous instance (something like <span class='key'>Outer$1</span>). This is the most common lambda-vs-anonymous gotcha.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Spot the leak</h3><p class="prompt">A short-lived <span class='key'>Screen</span> object registers a non-static inner <span class='key'>Runnable</span> with a global event bus that lives for the whole program. Long after the screen closes, its 8&nbsp;MB pixel buffer is never collected. Why, and how do you fix it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The inner <span class='key'>Runnable</span> holds an implicit <span class='key'>Screen.this</span> reference, so as long as the bus keeps the runnable, it keeps the whole <span class='key'>Screen</span> (and its buffer) reachable &mdash; even though the runnable never uses it. Make the handler a <span class='key'>static</span> nested class, or a lambda that captures nothing, or unregister it when the screen closes.</div></details></div>
   </div>
 </section>
 

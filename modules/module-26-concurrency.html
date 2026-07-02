@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Tasks go to a pool; you get a Future</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127859; Real-world analogy</span>
+      <p><strong>Threads are cooks sharing one kitchen.</strong> Several cooks working at their own stations fly along in parallel &mdash; that is real multi-core speedup. But a <b>race condition</b> is two cooks lunging for the same knife or the same bowl of batter at the same instant: the result depends on who grabs first, and sometimes the batter is ruined. A <b>lock</b> (<span class="key">synchronized</span>) is the &ldquo;occupied&rdquo; sign on the single restroom &mdash; only one cook inside at a time, everyone else waits their turn. An <b>executor / thread pool</b> is a head chef handing tickets to a fixed crew of cooks, so you never hire a new cook per order. And <b>virtual threads</b> are cheap temp cooks you can bring in by the thousand: whenever one would just stand idle waiting on the oven (blocking on I/O), they step aside (<em>park</em>) and free the station for someone with real work &mdash; so thousands of mostly-waiting tasks cost almost nothing.</p>
+    </div>
     <p>Instead of <span class='key'>new Thread(...).start()</span>, you submit a task to an <strong>ExecutorService</strong> that owns a pool of worker threads. You get back a <span class='key'>Future</span> — a handle to the eventual result. The pool reuses threads, so you're not paying to create one per task.</p><pre class="code" data-src="try (var pool = Executors.newFixedThreadPool(2)) {
     Future&lt;Integer&gt; f = pool.submit(() -&gt; expensive());
     Integer result = f.get();     // blocks until ready
@@ -167,7 +175,78 @@ try (var vt = Executors.newVirtualThreadPerTaskExecutor()) {
         vt.submit(() -&gt; handle(request));   // millions, fine
 }"></pre><p><strong>Virtual threads</strong> are lightweight threads scheduled by the JVM onto a few OS threads. A blocking call (I/O, <span class='key'>sleep</span>) parks the virtual thread without tying up an OS thread — so the simple blocking style scales to massive concurrency.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: submit task then work queue then executor then run then Future"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">submit task</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">Runnable</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">work queue</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">buffered</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">executor</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">thread pool</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">run</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">on a worker</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">Future</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">result</text></g></svg></div>
-    
+    <h3>Starting a thread: <span class='key'>start()</span>, never <span class='key'>run()</span></h3>
+    <p>A thread runs a <span class='key'>Runnable</span> &mdash; a no-arg, no-return task. Pass it to a <span class='key'>Thread</span> and call <span class='key'>start()</span> to launch a <em>new</em> thread of execution. The classic beginner trap is calling <span class='key'>run()</span> directly: that just invokes the method on the <em>current</em> thread, like any ordinary call &mdash; no concurrency at all. Only <span class='key'>start()</span> asks the JVM for a fresh call stack. In modern code you rarely touch <span class='key'>Thread</span> by hand; you hand tasks to an executor instead.</p>
+    <pre class="code" data-src="Runnable task = () -&gt; System.out.println(&quot;on &quot; + Thread.currentThread());
+
+Thread t = new Thread(task);
+t.start();   // NEW thread runs task concurrently
+// t.run();  // WRONG: runs task on THIS thread, no concurrency
+
+t.join();    // wait for t to finish before continuing"></pre>
+    <h3>The core hazard: shared mutable state</h3>
+    <p>Concurrency bugs come from two or more threads touching the same mutable data without coordination. Even <span class='key'>count++</span> is unsafe: it is really <em>read, add one, write back</em>, and two threads can interleave those steps and lose an update &mdash; a <strong>race condition</strong>. Wrapping the access in <span class='key'>synchronized</span> makes it <strong>atomic</strong> and <strong>mutually exclusive</strong>: only one thread holds the lock (the object's monitor) at a time. Crucially, releasing a lock also <em>publishes</em> your writes, and acquiring the same lock makes them visible &mdash; the <strong>happens-before</strong> guarantee.</p>
+    <p><span class='key'>volatile</span> is the lighter tool: it guarantees <em>visibility</em> and ordering for a single field &mdash; a write is immediately seen by other threads &mdash; but it does <strong>not</strong> make compound actions like <span class='key'>count++</span> atomic. Use it for one-writer flags (a <span class='key'>volatile boolean running</span> stop signal), not for counters.</p>
+    <pre class="code" data-src="class Counter {
+    private int count = 0;
+
+    // Without synchronized, concurrent count++ loses updates.
+    synchronized void inc() { count++; }        // atomic + visible
+    synchronized int get()  { return count; }
+}
+
+// volatile: visibility only, NOT atomicity.
+volatile boolean running = true;   // safe stop-flag: one writer, many readers
+// volatile int n; n++;            // STILL a race: ++ is read-modify-write"></pre>
+    <h3>Prefer <span class='key'>java.util.concurrent</span> to hand-rolled locks</h3>
+    <p>Hand-written <span class='key'>synchronized</span> blocks are easy to get wrong. The <span class='key'>java.util.concurrent</span> package gives you correct, high-performance building blocks. <span class='key'>AtomicInteger</span> does lock-free counting via a hardware compare-and-swap, so <span class='key'>incrementAndGet()</span> is atomic without a lock. <span class='key'>ConcurrentHashMap</span> allows concurrent reads and writes without you synchronizing at all &mdash; and <span class='key'>compute</span> / <span class='key'>merge</span> update a key atomically. Reach for these first; drop to raw locks only when no ready-made tool fits.</p>
+    <pre class="code" data-src="AtomicInteger hits = new AtomicInteger();
+hits.incrementAndGet();          // atomic, lock-free
+
+ConcurrentHashMap&lt;String, Integer&gt; counts = new ConcurrentHashMap&lt;&gt;();
+counts.merge(&quot;/home&quot;, 1, Integer::sum);   // atomic per-key update
+// A plain HashMap here could corrupt its internal state under concurrency."></pre>
+    <h3>ExecutorService: submit work, collect results, shut down</h3>
+    <p>An <span class='key'>ExecutorService</span> owns a pool of worker threads. Submit a <span class='key'>Runnable</span> (no result) or a <span class='key'>Callable&lt;T&gt;</span> (returns <span class='key'>T</span>, may throw) and get back a <span class='key'>Future&lt;T&gt;</span>. Calling <span class='key'>future.get()</span> blocks until the result is ready. To actually overlap work, <em>submit all tasks first</em>, then collect. Always shut the pool down or the non-daemon worker threads keep the JVM alive &mdash; a <span class='key'>try</span>-with-resources block (Java 19+) or <span class='key'>shutdown()</span> handles it.</p>
+    <pre class="code" data-src="try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
+    List&lt;Future&lt;Integer&gt;&gt; futures = new ArrayList&lt;&gt;();
+    for (int i = 0; i &lt; 10; i++) {
+        int n = i;
+        futures.add(pool.submit(() -&gt; n * n));   // Callable&lt;Integer&gt;
+    }
+    int total = 0;
+    for (Future&lt;Integer&gt; f : futures)
+        total += f.get();      // blocks per result; tasks already ran in parallel
+}   // close() calls shutdown() and awaits termination"></pre>
+    <h3>Composing async steps with CompletableFuture</h3>
+    <p>A raw <span class='key'>Future</span> can only be polled or blocked on. <span class='key'>CompletableFuture</span> lets you <em>chain</em> asynchronous steps without blocking: <span class='key'>thenApply</span> transforms a result, <span class='key'>thenCompose</span> flat-maps another async call, and <span class='key'>thenCombine</span> joins two independent results. Each stage runs when its input is ready, on a pool thread, so you describe a pipeline rather than a sequence of blocking waits.</p>
+    <pre class="code" data-src="CompletableFuture.supplyAsync(() -&gt; fetchUser(id))      // async step 1
+    .thenApply(user -&gt; user.email())                   // transform, no blocking
+    .thenCompose(email -&gt; sendAsync(email))            // chain another async call
+    .exceptionally(ex -&gt; &quot;failed: &quot; + ex.getMessage())
+    .thenAccept(System.out::println);                  // consume the final result"></pre>
+    <h3>Virtual threads (Java 21): cheap to block</h3>
+    <p>A traditional <em>platform</em> thread wraps one OS thread and costs around a megabyte of stack, so a few thousand is the practical ceiling. A <strong>virtual thread</strong> is scheduled by the JVM onto a small pool of platform (carrier) threads; when it hits a blocking call it <em>parks</em> and releases its carrier instead of pinning an OS thread. That makes ordinary, straight-line blocking code scale to <strong>millions</strong> of concurrent tasks &mdash; ideal for <strong>I/O-bound</strong> work like handling web requests or fanning out to services. It is <strong>not</strong> a speedup for CPU-bound work: computation still needs cores, and you have no more of those. Same <span class='key'>Thread</span> API, radically different cost model.</p>
+    <pre class="code" data-src="// One virtual thread per task -- fine at massive scale.
+try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
+    for (int i = 0; i &lt; 1_000_000; i++)
+        pool.submit(() -&gt; {
+            var body = httpGet(url);   // blocks -&gt; parks, frees the carrier thread
+            process(body);
+        });
+}
+// Great for I/O-bound work; NOT faster for pure CPU crunching."></pre>
+    <h3>Deadlock: two locks, opposite order</h3>
+    <p>The most common multi-lock bug: thread A holds lock 1 and waits for lock 2, while thread B holds lock 2 and waits for lock 1. Neither can proceed &mdash; the program hangs forever. The classic fix is a <strong>consistent lock ordering</strong>: every thread that needs both locks always acquires them in the same global order, so the cycle can never form.</p>
+    <pre class="code" data-src="// DEADLOCK: two threads take the locks in opposite orders.
+// Thread A:                    Thread B:
+synchronized (lockA) {          synchronized (lockB) {
+    synchronized (lockB) {          synchronized (lockA) {   // waits forever
+        ...                             ...
+    }                               }
+}                               }
+
+// FIX: always acquire in the same order (e.g. lockA then lockB everywhere)."></pre>
   </div>
 </section>
 
@@ -231,6 +310,9 @@ System.out.println("Virtual threads: a thread PER task, millions cheap.");</text
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Why not new Thread per request?</h3><p class="prompt">A server does <span class='key'>new Thread(...).start()</span> per request and falls over under load. What's the executor fix?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Platform threads are heavy (~1MB stack each) and unbounded creation exhausts memory. Use a bounded <span class='key'>ExecutorService</span> to cap and reuse them — or virtual threads, which are light enough for one-per-request.</div></details></div>
       <div class="exercise"><h3>2 &middot; What does get() do?</h3><p class="prompt">You submit a task and immediately call <span class='key'>future.get()</span>. Did you gain any concurrency?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Barely — <span class='key'>get()</span> blocks until the result is ready, so calling it immediately serializes you again. Submit all tasks first, then collect results, to actually overlap their work.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Does volatile fix a counter?</h3><p class="prompt">Two threads run <span class='key'>count++</span> a million times each on a <span class='key'>volatile int count</span>. Is the final value reliably two million?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">No. <span class='key'>volatile</span> guarantees <em>visibility</em>, not <em>atomicity</em>. <span class='key'>count++</span> is read-modify-write, so two threads can read the same value and both write back the same increment, losing updates. Use <span class='key'>synchronized</span> or <span class='key'>AtomicInteger.incrementAndGet()</span> instead.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Spot the deadlock</h3><p class="prompt">Thread A does <span class='key'>synchronized(x){ synchronized(y){...} }</span> and thread B does <span class='key'>synchronized(y){ synchronized(x){...} }</span>. What can happen, and how do you prevent it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">They can <strong>deadlock</strong>: A holds <span class='key'>x</span> waiting for <span class='key'>y</span>, B holds <span class='key'>y</span> waiting for <span class='key'>x</span>, so neither proceeds. Fix it by imposing a <strong>consistent global lock order</strong> &mdash; every thread acquires <span class='key'>x</span> before <span class='key'>y</span> &mdash; so the cycle can't form.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Virtual threads for a CPU cruncher?</h3><p class="prompt">You have a batch of pure number-crunching tasks (no I/O) on an 8-core box. Will <span class='key'>newVirtualThreadPerTaskExecutor()</span> make it finish faster than a fixed pool of 8?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">No. Virtual threads shine for <strong>I/O-bound</strong> work because blocking calls park cheaply. Pure CPU work never blocks, so it still needs actual cores &mdash; spawning millions of virtual threads just adds scheduling overhead. For CPU-bound work, a fixed pool sized near the core count is the right tool.</div></details></div>
   </div>
 </section>
 

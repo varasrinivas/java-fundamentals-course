@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Tags on code, and an API to inspect them</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>Annotations are luggage tags; reflection is a pair of X-ray goggles.</strong> An <b>annotation</b> is a sticky note you staple to a class, field, or method &mdash; <span class="key">@Test</span>, <span class="key">@Deprecated</span>, <span class="key">@JsonProperty</span>. The tag carries <em>no behavior of its own</em>; it just sits there as metadata until some tool or framework walks by, reads it, and decides what to do. <b>Reflection</b> is the X-ray goggles a running program puts on to look inside its own classes &mdash; enumerating fields and methods, reading those tags, and even reaching in to read a private value or call a method <em>by name</em>, without the compiler ever knowing that name existed. A framework like Spring or JUnit wears the goggles, spots your tags, and wires everything up for you.</p>
+    </div>
     <p>An <strong>annotation</strong> like <span class='key'>@Override</span> or <span class='key'>@Test</span> is metadata. Its <span class='key'>@Retention</span> says how long it survives: <span class='key'>SOURCE</span> (compiler only), <span class='key'>CLASS</span> (in bytecode), or <span class='key'>RUNTIME</span> (readable while running). <strong>Reflection</strong> is the API that reads types at runtime and can act on those annotations.</p><pre class="code" data-src="@Retention(RetentionPolicy.RUNTIME)
 @interface Json { String name(); }     // a custom annotation
 
@@ -166,8 +174,97 @@ for (Field f : User.class.getDeclaredFields()) {
     Json j = f.getAnnotation(Json.class);
     if (j != null) System.out.println(f.getName() + &quot; -&gt; &quot; + j.name());
 }"></pre><p>This is how a serializer maps <span class='key'>name</span> to <span class='key'>"full_name"</span>, how JUnit finds <span class='key'>@Test</span> methods, and how Spring injects beans — all without you wiring it by hand. Reflection is powerful but slower and bypasses compile-time checks, so use it through frameworks, not as a default tool.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: @Json then @Retention then getClass() then read fields then invoke"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">@Json</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">annotation</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">@Retention</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">how long it lives</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">getClass()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">reflection</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">read fields</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">+ annotations</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">invoke</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">act on it</text></g></svg></div>
-    
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: @Json then @Retention then getClass() then read fields then invoke"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">@Json</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">annotation</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">@Retention</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">how long it lives</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">getClass()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">reflection</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">read fields</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">+ annotations</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">invoke</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">act on it</text></g>
+    <h3>Annotations are metadata &mdash; the built-ins do nothing on their own</h3>
+    <p>An annotation is just <strong>data attached to a program element</strong>. On its own it changes nothing at runtime; something has to <em>read</em> it. The JDK ships a handful whose &ldquo;reader&rdquo; is the compiler itself: <span class="key">@Override</span> makes the compiler verify you actually override a supertype method (a typo becomes an error, not a silent new method); <span class="key">@Deprecated</span> emits a warning at every use site; <span class="key">@SuppressWarnings</span> silences specific compiler warnings in its scope; and <span class="key">@FunctionalInterface</span> asserts the interface has exactly one abstract method so lambdas stay valid.</p>
+    <pre class="code" data-src="class Base { void greet() {} }
+
+class Sub extends Base {
+    @Override void greet() {}          // OK: really overrides Base.greet
+    // @Override void greable() {}     // compile error: nothing to override
+}
+
+@Deprecated               // callers get a warning; still compiles
+static int legacy() { return 0; }
+
+@FunctionalInterface      // compiler enforces: exactly one abstract method
+interface Transform { String apply(String s); }
+
+@SuppressWarnings(&quot;unchecked&quot;)
+List&lt;String&gt; raw = (List&lt;String&gt;) (List) new ArrayList();"></pre>
+
+    <h3>Retention: SOURCE, CLASS, RUNTIME &mdash; only RUNTIME is visible to reflection</h3>
+    <p><span class="key">@Retention</span> decides how long an annotation survives. <span class="key">SOURCE</span> is discarded by the compiler (e.g. <span class="key">@Override</span>) &mdash; useful only to source tools. <span class="key">CLASS</span> (the <strong>default</strong>) is written into the <span class="key">.class</span> file but <em>not</em> loaded by the JVM, so reflection can&rsquo;t see it. Only <span class="key">RUNTIME</span> is kept in memory and readable via reflection &mdash; which is why every framework annotation you inspect at run time is marked <span class="key">RUNTIME</span>. A separate <span class="key">@Target</span> restricts <em>where</em> the annotation may be placed (types, methods, fields, parameters&hellip;), turning misuse into a compile error.</p>
+    <pre class="code" data-src="import java.lang.annotation.*;
+
+@Retention(RetentionPolicy.RUNTIME)   // kept in memory -&gt; reflection can read it
+@Target({ElementType.METHOD, ElementType.FIELD})  // only on methods or fields
+@interface Audited { }
+
+// SOURCE  -&gt; gone after compile   (tools/compiler only)
+// CLASS   -&gt; in bytecode, NOT loaded (the default; invisible to reflection)
+// RUNTIME -&gt; loaded and reflectable
+
+// @Audited class Foo {}   // compile error: @Target forbids TYPE"></pre>
+
+    <h3>Defining a custom annotation with elements and defaults</h3>
+    <p>You declare one with <span class="key">@interface</span>. Its <strong>elements</strong> look like no-arg methods; each may have a <span class="key">default</span>. Element types are limited to primitives, <span class="key">String</span>, <span class="key">Class</span>, enums, other annotations, and arrays of those. A single element named <span class="key">value</span> can be supplied without naming it (<span class="key">@Column("id")</span> instead of <span class="key">@Column(value = "id")</span>).</p>
+    <pre class="code" data-src="@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+@interface Column {
+    String value();                 // the &quot;value&quot; element -&gt; can be positional
+    boolean nullable() default true;   // omit at use site to get the default
+}
+
+class User {
+    @Column(&quot;user_id&quot;)                       // value = &quot;user_id&quot;, nullable = true
+    long id;
+    @Column(value = &quot;email&quot;, nullable = false)
+    String email;
+}"></pre>
+
+    <h3>The reflection API: Class, fields, methods, invoke</h3>
+    <p>Every object can hand you its <span class="key">Class</span> object &mdash; the entry point to reflection &mdash; via <span class="key">obj.getClass()</span> or the literal <span class="key">Type.class</span>. From there, <span class="key">getDeclaredFields()</span> and <span class="key">getDeclaredMethods()</span> enumerate members <em>declared on this class</em> (including private ones; the non-<span class="key">Declared</span> variants return only public members, but include inherited ones). <span class="key">Field.get</span>/<span class="key">set</span> read and write values; <span class="key">Method.invoke</span> calls a method by name. Private members require <span class="key">setAccessible(true)</span> first &mdash; the switch that lets reflection defeat access control.</p>
+    <pre class="code" data-src="import java.lang.reflect.*;
+
+class Point { private int x = 3; int doubleX() { return x * 2; } }
+
+Point p = new Point();
+Class&lt;?&gt; c = p.getClass();
+
+Field f = c.getDeclaredField(&quot;x&quot;);
+f.setAccessible(true);          // bypass private
+int x = (int) f.get(p);         // 3  -- read the field reflectively
+f.set(p, 10);                   // write it
+
+Method m = c.getDeclaredMethod(&quot;doubleX&quot;);
+int r = (int) m.invoke(p);      // 20 -- call by name, no compile-time link"></pre>
+
+    <h3>How frameworks combine the two</h3>
+    <p>Almost every &ldquo;magic&rdquo; framework is the same recipe: <strong>scan for annotated members, then act via reflection</strong>. JUnit reflects over your test class, finds methods tagged <span class="key">@Test</span>, and <span class="key">invoke</span>s each. Spring scans beans for <span class="key">@Autowired</span> fields and reflectively injects dependencies. Jackson reads <span class="key">@JsonProperty</span> to map a field to a differently named JSON key while (de)serializing. You write declarative tags; the framework supplies the loop that reads and acts on them.</p>
+    <pre class="code" data-src="// A 20-line JUnit, conceptually:
+Object test = TestClass.class.getDeclaredConstructor().newInstance();
+for (Method m : TestClass.class.getDeclaredMethods()) {
+    if (m.isAnnotationPresent(Test.class)) {   // find the @Test tag
+        try {
+            m.invoke(test);                      // run it via reflection
+            System.out.println(m.getName() + &quot;: PASS&quot;);
+        } catch (InvocationTargetException e) {
+            System.out.println(m.getName() + &quot;: FAIL&quot;);
+        }
+    }
+}"></pre>
+
+    <h3>The costs: reflection is slower and unsafe</h3>
+    <p>Reflection is powerful precisely because it <em>escapes</em> the guarantees you normally rely on. It <strong>bypasses compile-time checks</strong>: a mistyped method name or wrong argument type becomes a runtime <span class="key">NoSuchMethodException</span> or <span class="key">ClassCastException</span>, not a red squiggle. It is <strong>slower</strong> than a direct call (member lookups, boxing of primitives, security checks &mdash; though the JIT recovers much of it on hot paths). And <span class="key">setAccessible(true)</span> <strong>breaks encapsulation</strong>, reaching into <span class="key">private</span> state the class never meant to expose &mdash; and on modern Java the module system can slam that door with an <span class="key">InaccessibleObjectException</span>. Rule of thumb: let frameworks use it; in your own code, prefer an interface, a lambda, or a plain method call.</p>
+    <pre class="code" data-src="Method m = obj.getClass().getMethod(&quot;saveAll&quot;, List.class);
+m.invoke(obj, data);   // typo in &quot;saveAll&quot;? compiles fine, blows up at RUNTIME
+
+// Direct call: the compiler verifies the name, args, and return type NOW.
+obj.saveAll(data);
+
+// setAccessible can be refused by the module system:
+//   java.lang.reflect.InaccessibleObjectException: module X does not &quot;opens&quot; Y"></pre>
   </div>
 </section>
 
@@ -233,6 +330,9 @@ System.out.println("Frameworks read these to wire your app.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Why RUNTIME retention?</h3><p class="prompt">Your custom annotation is read by a framework while the app runs, but it “isn't there” reflectively. What's the likely cause?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Its <span class='key'>@Retention</span> is the default (<span class='key'>CLASS</span>) or <span class='key'>SOURCE</span>, so it isn't kept for runtime. Add <span class='key'>@Retention(RetentionPolicy.RUNTIME)</span> so reflection can see it.</div></details></div>
       <div class="exercise"><h3>2 &middot; Reflection has a cost</h3><p class="prompt">Reflection can call any method by name at runtime. Name one downside that makes it a last resort for everyday code.</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">It bypasses compile-time type checking (errors surface at runtime), is slower than direct calls, and can break encapsulation. Great for frameworks; avoid it when a normal method call or interface would do.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Read a private field</h3><p class="prompt">You have a <span class='key'>Point</span> with a <span class='key'>private int x</span>. Sketch the reflection calls to read <span class='key'>x</span> from an instance <span class='key'>p</span>. What one call must you not forget?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>Field f = p.getClass().getDeclaredField("x");</span> then <span class='key'>f.setAccessible(true);</span> then <span class='key'>int x = (int) f.get(p);</span>. Without <span class='key'>setAccessible(true)</span> the private field throws <span class='key'>IllegalAccessException</span> (and on a locked-down module, <span class='key'>InaccessibleObjectException</span>).</div></details></div>
+      <div class="exercise"><h3>4 &middot; @Override on a typo</h3><p class="prompt">You meant to override <span class='key'>toString()</span> but wrote <span class='key'>toStrng()</span>. How does adding <span class='key'>@Override</span> save you, and what happens without it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">With <span class='key'>@Override</span> the compiler checks that a matching supertype method exists; the typo doesn't, so you get a <b>compile error</b>. Without it, <span class='key'>toStrng()</span> silently becomes a brand-new, never-called method and the real <span class='key'>toString()</span> still runs &mdash; a bug that ships. This is exactly the &ldquo;annotation read by the compiler&rdquo; case.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Design a @Column</h3><p class="prompt">Define a custom <span class='key'>@Column</span> annotation an ORM could read at runtime: it needs a column name and an optional &ldquo;not null&rdquo; flag defaulting to allowing nulls. Which meta-annotations and elements do you write?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Mark it <span class='key'>@Retention(RetentionPolicy.RUNTIME)</span> (so the ORM's reflection can see it) and <span class='key'>@Target(ElementType.FIELD)</span>. Declare <span class='key'>String value();</span> for the name (positional) and <span class='key'>boolean nullable() default true;</span> for the optional flag. Use as <span class='key'>@Column("email")</span> or <span class='key'>@Column(value="email", nullable=false)</span>.</div></details></div>
   </div>
 </section>
 

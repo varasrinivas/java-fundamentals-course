@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Records carry data; sealed types bound the options</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>A record is a pre-printed form.</strong> Think of a rubber-stamped intake form with a fixed set of labeled blanks &mdash; <em>Name</em>, <em>Age</em> &mdash; and nothing else. Handing someone the form fills in all the tedious paperwork for you: the way to <b>create</b> it (the constructor), how to <b>read each blank</b> (the accessors), how to tell if <b>two filled forms are the same</b> (<span class="key">equals</span>/<span class="key">hashCode</span>), and how to <b>read it aloud</b> (<span class="key">toString</span>). A <b>sealed type</b> is the <em>guest list</em> at the door: it names <b>exactly</b> which subtypes are allowed in &mdash; no gate-crashers &mdash; so everyone can reason about the complete crowd. And <b>pattern matching</b> is the <em>bouncer</em>: in one smooth motion they check the ID (the type test) and pull the details straight off it (bind the fields), instead of squinting at it, then reaching back into the wallet a second time.</p>
+    </div>
     <p>A <strong>record</strong> is an immutable data carrier. One line generates the constructor, accessors, <span class='key'>equals</span>, <span class='key'>hashCode</span>, and <span class='key'>toString</span>. A <strong>sealed</strong> interface lists exactly which types may implement it — so the compiler can check a <span class='key'>switch</span> covers them all.</p><pre class="code" data-src="record Point(int x, int y) {}      // all the boilerplate, generated
 
 sealed interface Shape permits Circle, Square {}
@@ -167,7 +175,130 @@ double area = switch (shape) {        // exhaustive: no default needed
     case Square s -&gt; s.s() * s.s();
 };"></pre><p><strong>Pattern matching</strong> in <span class='key'>switch</span> tests the type and binds the value in one step — and with a sealed hierarchy the compiler <em>fails the build</em> if you forget a case. Records can be deconstructed too: <span class='key'>case Point(int x, int y)</span>.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: record Point then x, y then equals/hashCode then switch pattern then deconstruct"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">record Point</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">declare</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">x, y</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">components</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">equals/hashCode</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">auto-generated</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">switch pattern</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">match type</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">deconstruct</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">bind fields</text></g></svg></div>
-    
+    <h3>Records are transparent, immutable data carriers</h3>
+    <p>A record's identity <em>is</em> its data. From the header <span class='key'>record Point(int x, int y)</span> the compiler derives everything a value class needs: a <strong>canonical constructor</strong>, a <span class='key'>private final</span> field per component, a matching <strong>accessor</strong>, and value-based <span class='key'>equals</span>, <span class='key'>hashCode</span>, and <span class='key'>toString</span>. "Transparent" is the key promise &mdash; the accessors always report exactly the state the constructor received, so the record can never lie about its own contents.</p>
+    <p>Two Java surprises worth internalising: the accessor is named after the component (<span class='key'>p.x()</span>), <strong>not</strong> the JavaBean <span class='key'>getX()</span>; and the fields are <span class='key'>final</span>, so a record is shallowly immutable &mdash; there are no setters to generate.</p>
+    <pre class="code" data-src="record Point(int x, int y) {}   // that's the whole class
+
+Point p = new Point(3, 4);
+int a = p.x();                   // accessor is named x(), NOT getX()
+int b = p.y();
+
+Point q = new Point(3, 4);
+p.equals(q);                     // true - value equality, component by component
+p.hashCode() == q.hashCode();    // true - derived from the same components
+p.toString();                    // &quot;Point[x=3, y=4]&quot; - generated for you
+
+// The x, y fields are private and final; a record is shallowly immutable.
+// p.x = 9;   // won't compile: no setter, no mutable field"></pre>
+    <h3>The compact constructor: validate and normalize</h3>
+    <p>You rarely want the raw canonical constructor. Java offers a <strong>compact constructor</strong> &mdash; the record name with a body but <em>no parameter list</em>. Its body runs first, then the compiler appends the field assignments. That makes it the natural home for <strong>validation</strong> (reject bad input) and <strong>normalization</strong> (trim a string, defensively copy a list): assign to the <em>parameter</em> and the tidied value flows into the final field.</p>
+    <p>You can still write the canonical constructor in full when you prefer &mdash; but then <span class='key'>this.field = ...</span> for every component is on you. The compact form exists precisely to spare you that ceremony.</p>
+    <pre class="code" data-src="record Range(int lo, int hi) {
+    // COMPACT constructor: no parameter list, no field assignment.
+    // Runs BEFORE the generated field assignments - ideal for validation.
+    Range {
+        if (lo &gt; hi)
+            throw new IllegalArgumentException(&quot;lo &gt; hi&quot;);
+        // Normalise: reassigning the PARAMETER updates the final field.
+        hi = Math.max(hi, lo);
+    }
+}
+
+record Name(String first, String last) {
+    // You may instead write the CANONICAL constructor in full - but then
+    // you must assign every field yourself.
+    Name(String first, String last) {
+        this.first = first.strip();
+        this.last  = last.strip();
+    }
+}"></pre>
+    <h3>What records can't do &mdash; and when not to use one</h3>
+    <p>Records trade flexibility for guarantees. Every record implicitly extends <span class='key'>java.lang.Record</span>, so it <strong>cannot extend any other class</strong> (single inheritance is spent) &mdash; though it may implement interfaces freely. It also <strong>cannot declare extra instance fields</strong>: all state must live in the header, which is what lets the generated <span class='key'>equals</span> stay honest. Static fields, static methods, instance methods, and even a custom accessor are all allowed.</p>
+    <p>So skip the record when you need mutability, inheritance from a class, or hidden/derived state that isn't part of the value's identity. A record is for <em>data you carry</em>, not for an entity with behaviour and a lifecycle.</p>
+    <pre class="code" data-src="// A record ALWAYS implicitly extends java.lang.Record, so...
+// record Money(int cents) extends Number {}   // ERROR: can't extend a class
+
+record Money(int cents) implements Comparable&lt;Money&gt; {  // interfaces: fine
+    // No EXTRA instance fields allowed - state lives only in the header.
+    // private int cachedHash;   // ERROR: instance field not permitted
+
+    static final Money ZERO = new Money(0);   // static fields: fine
+
+    public int compareTo(Money other) {       // adding methods: fine
+        return Integer.compare(cents, other.cents);
+    }
+}
+
+// Not a fit when you need mutability, hidden/derived state, or an
+// identity distinct from your data - reach for a normal class then."></pre>
+    <h3>Sealed types: a closed, known set of subtypes</h3>
+    <p>An interface or class marked <span class='key'>sealed</span> lists its allowed implementers with <span class='key'>permits</span>. Ordinary interfaces are open &mdash; anyone, anywhere, can implement them &mdash; which is exactly why the compiler can never know it has seen every case. Sealing draws a boundary: <span class='key'>Shape</span> is Circle, Square, or Triangle, and <strong>nothing else</strong>. That closed set is what powers exhaustive switches.</p>
+    <p>Each permitted subtype must in turn be <span class='key'>final</span>, <span class='key'>sealed</span>, or <span class='key'>non-sealed</span>, so the hierarchy can't quietly grow. Records are implicitly <span class='key'>final</span>, which is why <span class='key'>sealed interface</span> + <span class='key'>record</span> is the canonical pairing for modeling a fixed set of alternatives (an algebraic "sum type").</p>
+    <pre class="code" data-src="// A sealed type names its permitted subtypes - a closed, known set.
+sealed interface Shape permits Circle, Square, Triangle {}
+
+record Circle(double r)            implements Shape {}
+record Square(double side)         implements Shape {}
+record Triangle(double b, double h) implements Shape {}
+
+// Each permitted subtype must pick ONE of: final, sealed, or non-sealed.
+// Records are implicitly final, so they satisfy this automatically.
+// sealed class Node permits Leaf, Branch {}
+// final     class Leaf   extends Node {}
+// non-sealed class Branch extends Node {}   // re-opens THIS branch
+
+// Same-file shortcut: omit `permits` if all subtypes are in this file."></pre>
+    <h3>Pattern matching for instanceof</h3>
+    <p>The classic <span class='key'>instanceof</span>-then-cast dance writes the type twice and invites the two to drift apart. <strong>Pattern matching</strong> collapses it: <span class='key'>o instanceof String s</span> tests the type and, on success, binds the freshly-cast value to the <strong>pattern variable</strong> <span class='key'>s</span> in one move.</p>
+    <p>The subtle, powerful part is <em>scope by flow</em>: <span class='key'>s</span> is in scope wherever the compiler can prove the match succeeded &mdash; the rest of an <span class='key'>&amp;&amp;</span> chain, the <span class='key'>if</span> body, or everything after an early <span class='key'>return</span> in the negated case. This flow-sensitive scoping is why the pattern variable never leaks somewhere it might be unbound.</p>
+    <pre class="code" data-src="Object o = &quot;hello&quot;;
+
+// OLD: test, then cast, then use - the type is written twice.
+if (o instanceof String) {
+    String s = (String) o;
+    System.out.println(s.length());
+}
+
+// NEW: test AND bind in one move. `s` is the pattern variable.
+if (o instanceof String s) {
+    System.out.println(s.length());   // s is in scope here
+}
+
+// The binding's scope follows flow: it's available where the test is
+// KNOWN true - including the rest of a &amp;&amp; chain, and after an early return.
+if (o instanceof String s &amp;&amp; s.length() &gt; 3) { /* s usable */ }
+
+static int len(Object o) {
+    if (!(o instanceof String s)) return -1;
+    return s.length();   // s is in scope: we only reach here if it matched
+}"></pre>
+    <h3>Switch patterns &amp; record deconstruction (Java 21)</h3>
+    <p>As of Java 21, <span class='key'>switch</span> accepts type patterns as cases, and over a <strong>sealed</strong> hierarchy it is checked for <strong>exhaustiveness</strong>: cover every permitted subtype and you need no <span class='key'>default</span>; miss one and the compiler <em>fails the build</em>. Add a future subtype to the sealed interface and every non-exhaustive switch lights up red &mdash; the compiler becomes your to-do list.</p>
+    <p><strong>Record deconstruction patterns</strong> go further: <span class='key'>case Circle(double r)</span> matches the type <em>and</em> pulls the components into fresh variables in one shot, and nest for records-of-records. A <span class='key'>when</span> clause adds a boolean guard. One caveat: a pattern switch does not silently swallow <span class='key'>null</span> &mdash; handle it with <span class='key'>case null</span> or it throws <span class='key'>NullPointerException</span>.</p>
+    <pre class="code" data-src="sealed interface Shape permits Circle, Square {}
+record Circle(double r)    implements Shape {}
+record Square(double side) implements Shape {}
+
+// Java 21: switch over a sealed type is EXHAUSTIVE - no default needed.
+static double area(Shape shape) {
+    return switch (shape) {
+        case Circle c -&gt; Math.PI * c.r() * c.r();
+        case Square s -&gt; s.side() * s.side();
+        // Delete either case and the build FAILS: not exhaustive.
+    };
+}
+
+// RECORD DECONSTRUCTION pattern: bind the components directly.
+static String describe(Shape shape) {
+    return switch (shape) {
+        case Circle(double r) when r &gt; 10 -&gt; &quot;big circle&quot;;  // guard
+        case Circle(double r)             -&gt; &quot;circle r=&quot; + r;
+        case Square(double side)          -&gt; &quot;square &quot; + side;
+    };
+}
+
+// null must be handled explicitly - `case null` or it throws NPE."></pre>
   </div>
 </section>
 
@@ -232,6 +363,9 @@ System.out.println("Two equal Points are .equals() for free.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; What you get free</h3><p class="prompt">List the members the compiler generates for <span class='key'>record User(String name, int age) {}</span>.</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">A canonical constructor <span class='key'>User(String, int)</span>; accessors <span class='key'>name()</span> and <span class='key'>age()</span>; plus <span class='key'>equals</span>, <span class='key'>hashCode</span>, and <span class='key'>toString</span> derived from both components. All fields are <span class='key'>final</span>.</div></details></div>
       <div class="exercise"><h3>2 &middot; Why sealed helps</h3><p class="prompt">How does sealing <span class='key'>Shape permits Circle, Square</span> let you drop the <span class='key'>default</span> branch in a switch?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The compiler knows the <em>complete</em> set of subtypes, so it can verify your <span class='key'>switch</span> handles all of them. That makes <span class='key'>default</span> unnecessary — and turns a forgotten case into a compile error instead of a runtime surprise.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Validate in the constructor</h3><p class="prompt">Write a <span class='key'>record Percent(int value)</span> that rejects anything outside 0&ndash;100. Which constructor form is cleanest, and where does the check go?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Use the <b>compact constructor</b>: <span class='key'>Percent { if (value &lt; 0 || value &gt; 100) throw new IllegalArgumentException(); }</span>. No parameter list, no <span class='key'>this.value = value</span> &mdash; the compiler appends the assignment after your check runs, so an invalid <span class='key'>Percent</span> can never be constructed.</div></details></div>
+      <div class="exercise"><h3>4 &middot; getX or x?</h3><p class="prompt">Given <span class='key'>record User(String name, int age) {}</span>, how do you read the name &mdash; and what does <span class='key'>new User("Ada", 36).equals(new User("Ada", 36))</span> return?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The accessor is <span class='key'>u.name()</span>, <em>not</em> <span class='key'>getName()</span> &mdash; records don't follow the JavaBean convention. The <span class='key'>equals</span> returns <b>true</b>: records have value equality generated from every component, so two Users with identical <span class='key'>name</span> and <span class='key'>age</span> are equal.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Deconstruct in a switch</h3><p class="prompt">Over <span class='key'>sealed interface Shape permits Circle, Square</span> with record components, write a switch arm that matches a <span class='key'>Circle</span> and binds its radius directly &mdash; no <span class='key'>c.r()</span> call. What happens if you later add <span class='key'>Triangle</span> to the <span class='key'>permits</span> list?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Use a <b>record deconstruction pattern</b>: <span class='key'>case Circle(double r) -&gt; Math.PI * r * r;</span> &mdash; the component is bound as <span class='key'>r</span> in one step. Add <span class='key'>Triangle</span> and every exhaustive switch that lacks a <span class='key'>Triangle</span> case <b>stops compiling</b>, pointing you at exactly what to update.</div></details></div>
   </div>
 </section>
 

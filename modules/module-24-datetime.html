@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Immutable types for each kind of “when”</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p>Three clocks tell you three different truths. A <span class='key'>LocalDateTime</span> is the <b>wall calendar and clock in your kitchen</b> &mdash; it reads &ldquo;2026-07-02, 09:00,&rdquo; but on its own it can&rsquo;t say <em>which</em> 9 a.m. on the planet, so it&rsquo;s ambiguous across the world. An <span class='key'>Instant</span> is a single <b>universal stopwatch</b> counting seconds since a fixed epoch &mdash; it names the <em>same</em> moment everywhere, so two servers on opposite coasts agree on it exactly. A <span class='key'>ZonedDateTime</span> is that kitchen clock <b>pinned to a specific city</b>: because it knows its <span class='key'>ZoneId</span>, it also knows the daylight-saving rules and can translate itself to and from the universal stopwatch. Choosing the wrong clock is the root of most date bugs &mdash; store machine events as the stopwatch, show humans the pinned city clock.</p>
+    </div>
     <p>Pick the type that matches the concept: <span class='key'>LocalDate</span> (a calendar date, no time), <span class='key'>LocalTime</span> (a time, no date), <span class='key'>LocalDateTime</span> (both, no zone), <span class='key'>Instant</span> (a point on the UTC timeline), <span class='key'>ZonedDateTime</span> (date-time + zone). Amounts are <span class='key'>Duration</span> (seconds) and <span class='key'>Period</span> (days/months).</p><pre class="code" data-src="LocalDate today = LocalDate.now();
 LocalDate due   = today.plusDays(30);     // returns a NEW date
 boolean overdue = due.isBefore(today);    // false
@@ -164,6 +172,76 @@ Duration call = Duration.ofMinutes(90);
 Instant start = Instant.now();
 Instant end   = start.plus(call);          // immutable arithmetic"></pre><p>Every type is <strong>immutable</strong>: <span class='key'>plusDays</span> returns a new value, like Strings. That makes them thread-safe and predictable. Format with <span class='key'>DateTimeFormatter</span> (ISO-8601 by default), and store machine timestamps as <span class='key'>Instant</span>, human appointments as <span class='key'>ZonedDateTime</span>.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: LocalDate then LocalDateTime then Duration then ZonedDateTime then format"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">LocalDate</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">date only</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">LocalDateTime</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">+ time</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Duration</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">an amount</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">ZonedDateTime</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">+ zone</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">format</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">ISO text</text></g></svg></div>
+
+    <h3>Why <span class='key'>java.time</span> replaced <span class='key'>Date</span> and <span class='key'>Calendar</span></h3>
+    <p>The legacy <span class='key'>java.util.Date</span> and <span class='key'>Calendar</span> were famously broken: they are <strong>mutable</strong> (so any code holding a reference can change your date under you), <strong>not thread-safe</strong> (the old <span class='key'>SimpleDateFormat</span> corrupts output when shared across threads), and riddled with traps like <em>zero-based months</em> and a year offset of 1900. <span class='key'>java.time</span> (JSR-310, Java 8) fixes all of this with immutable, thread-safe, clearly-named types &mdash; and every month is 1-based at last.</p>
+<pre class="code" data-src="// Legacy trap: months are 0-based, year is 1900-based, and Date is MUTABLE.
+Date d = new Date(2026 - 1900, 6, 2);  // July?? no — month 6 is JULY, year math by hand
+d.setMonth(11);                        // someone just mutated your date
+
+// java.time: 1-based month, immutable, self-explanatory.
+LocalDate day = LocalDate.of(2026, 7, 2);  // 2 July 2026, exactly as written
+// day.plusMonths(5) returns a NEW LocalDate; 'day' can never change."></pre>
+    <h3>The human-facing types: <span class='key'>LocalDate</span>, <span class='key'>LocalTime</span>, <span class='key'>LocalDateTime</span></h3>
+    <p>The <em>Local</em> family models what a human writes on a form &mdash; a date, a time, or both &mdash; with <strong>no time zone attached</strong>. <span class='key'>LocalDate</span> is a calendar date (a birthday, an invoice date); <span class='key'>LocalTime</span> is a clock reading (a shop opens at 09:00 in <em>every</em> town); <span class='key'>LocalDateTime</span> combines them. Because there is no zone, a <span class='key'>LocalDateTime</span> does <em>not</em> identify a unique instant on the global timeline &mdash; it is deliberately ambiguous until you attach a zone.</p>
+<pre class="code" data-src="LocalDate birthday = LocalDate.of(1995, 3, 14);
+LocalTime opening  = LocalTime.of(9, 0);            // 09:00, zone-agnostic
+LocalDateTime appt = LocalDateTime.of(2026, 7, 2, 14, 30);
+
+int dom       = birthday.getDayOfMonth();           // 14
+DayOfWeek dow = birthday.getDayOfWeek();            // TUESDAY
+LocalDate next = appt.toLocalDate().plusWeeks(2);   // pull the date part out"></pre>
+    <h3>Machine time vs zoned time: <span class='key'>Instant</span>, <span class='key'>ZonedDateTime</span>, <span class='key'>ZoneId</span></h3>
+    <p>An <span class='key'>Instant</span> is a single point on the UTC timeline &mdash; nanoseconds since 1970-01-01T00:00:00Z. It is the right type for logs, database timestamps, and anything two machines must agree on. To show that instant to a person you attach a <span class='key'>ZoneId</span> (a region like <span class='key'>Europe/Paris</span>, which carries its full history of DST rules) and get a <span class='key'>ZonedDateTime</span>. A fixed <span class='key'>ZoneOffset</span> like <span class='key'>+05:30</span> is just a constant shift with <em>no</em> DST knowledge &mdash; prefer a region id when daylight saving matters.</p>
+<pre class="code" data-src="Instant now = Instant.now();                        // e.g. 2026-07-02T13:30:00Z (UTC)
+
+ZoneId paris = ZoneId.of(&quot;Europe/Paris&quot;);           // a region, knows DST history
+ZonedDateTime local = now.atZone(paris);            // same instant, Paris wall time
+
+// Convert a human ZonedDateTime back to a universal Instant:
+Instant back = local.toInstant();                   // equals 'now'
+
+// A raw offset has no DST rules — fine for storage, wrong for a city's clock:
+ZoneOffset ist = ZoneOffset.of(&quot;+05:30&quot;);           // constant, never shifts"></pre>
+    <h3>Amounts of time: <span class='key'>Duration</span> (machine) vs <span class='key'>Period</span> (human)</h3>
+    <p>Two different ideas of “how much time.” A <span class='key'>Duration</span> is a machine amount measured in <strong>seconds and nanoseconds</strong> &mdash; a fixed number of ticks. A <span class='key'>Period</span> is a human amount measured in <strong>years, months, and days</strong> &mdash; conceptual calendar units. The difference bites across a DST boundary: adding a <span class='key'>Period</span> of one day keeps the same wall-clock time (it may be 23 or 25 real hours later), while adding a <span class='key'>Duration</span> of 24 hours adds exactly that many ticks and can land on a <em>different</em> wall-clock hour.</p>
+<pre class="code" data-src="// Night of a spring-forward DST change in New York (clocks jump 02:00 -&gt; 03:00).
+ZoneId ny = ZoneId.of(&quot;America/New_York&quot;);
+ZonedDateTime before = ZonedDateTime.of(2026, 3, 8, 1, 30, 0, 0, ny);
+
+// Period: 1 calendar day — same wall time next day (only 23 real hours pass).
+ZonedDateTime nextDay = before.plus(Period.ofDays(1));   // 2026-03-09T01:30 -05:00
+
+// Duration: exactly 24 hours of ticks — lands an hour later on the clock.
+ZonedDateTime plus24h = before.plus(Duration.ofHours(24)); // 2026-03-09T02:30 -04:00
+
+Duration call = Duration.ofMinutes(90);   // 5_400 seconds
+Period tenure = Period.of(1, 6, 0);       // 1 year, 6 months, 0 days"></pre>
+    <h3>The fluent, immutable API: <span class='key'>plusDays</span>, <span class='key'>withYear</span>, adjusters</h3>
+    <p>Every mutator-looking call returns a <strong>new</strong> object and leaves the receiver untouched, exactly like <span class='key'>String</span>. That makes the types safe to share across threads and lets you chain transformations fluently. <span class='key'>plusX</span>/<span class='key'>minusX</span> shift by an amount, <span class='key'>withX</span> replaces one field, and <span class='key'>TemporalAdjusters</span> express calendar rules like “first Monday of next month.” The classic bug is calling one of these and <em>discarding</em> the result.</p>
+<pre class="code" data-src="LocalDate d = LocalDate.of(2026, 7, 2);
+
+LocalDate chained = d.plusMonths(1)      // each call returns a NEW date
+                     .withDayOfMonth(1)   // set the day field
+                     .minusDays(1);       // -&gt; last day of July 2026
+
+LocalDate firstMon = d.with(
+        TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+
+d.plusDays(7);          // BUG: result thrown away, 'd' is unchanged
+d = d.plusDays(7);      // correct: reassign to keep the new value"></pre>
+    <h3>Formatting &amp; parsing with <span class='key'>DateTimeFormatter</span></h3>
+    <p>Types render themselves as <strong>ISO-8601</strong> by default, so <span class='key'>toString</span> and <span class='key'>parse</span> round-trip without any formatter. For custom output use a <span class='key'>DateTimeFormatter</span> &mdash; unlike the old <span class='key'>SimpleDateFormat</span>, it is <strong>immutable and thread-safe</strong>, so you can safely keep one in a <span class='key'>static final</span> field. Prefer the localized built-ins or explicit patterns; a <span class='key'>parse</span> that doesn’t match throws <span class='key'>DateTimeParseException</span>.</p>
+<pre class="code" data-src="LocalDate d = LocalDate.parse(&quot;2026-07-02&quot;);        // ISO by default, no formatter
+String iso = d.toString();                          // &quot;2026-07-02&quot;
+
+// Thread-safe: safe to share as a constant, unlike SimpleDateFormat.
+DateTimeFormatter fmt = DateTimeFormatter.ofPattern(&quot;dd MMM yyyy&quot;);
+String pretty = d.format(fmt);                      // &quot;02 Jul 2026&quot;
+LocalDate back = LocalDate.parse(&quot;02 Jul 2026&quot;, fmt);
+
+// Mismatched input throws DateTimeParseException:
+// LocalDate.parse(&quot;07/02/2026&quot;);   // not ISO -&gt; exception"></pre>
     
   </div>
 </section>
@@ -230,6 +308,9 @@ System.out.println("end after start? " + (endDay &gt; startDay));</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Pick the type</h3><p class="prompt">You're recording the exact moment a server handled a request, to compare across machines. <span class='key'>LocalDateTime</span> or <span class='key'>Instant</span>?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>Instant</b> — a zone-free point on the UTC timeline, ideal for machine timestamps and cross-machine comparison. <span class='key'>LocalDateTime</span> has no zone, so two of them from different regions aren't comparable.</div></details></div>
       <div class="exercise"><h3>2 &middot; Did it mutate?</h3><p class="prompt"><span class='key'>LocalDate d = ...; d.plusDays(7);</span> then you print <span class='key'>d</span>. Why is it unchanged?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">java.time types are immutable — <span class='key'>plusDays</span> returns a <em>new</em> date and you ignored it. Capture the result: <span class='key'>d = d.plusDays(7);</span>.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Duration or Period?</h3><p class="prompt">You add “one day” to a <span class='key'>ZonedDateTime</span> the night the clocks spring forward. Which gives the <em>same</em> wall-clock time the next morning &mdash; <span class='key'>Duration.ofHours(24)</span> or <span class='key'>Period.ofDays(1)</span>?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>Period.ofDays(1)</b>. A <span class='key'>Period</span> is a human calendar amount, so it keeps the wall-clock time and only 23 real hours pass across a spring-forward. <span class='key'>Duration.ofHours(24)</span> adds exactly 24 hours of ticks, landing one clock-hour later.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Store the timestamp</h3><p class="prompt">A user in Tokyo and a user in London both trigger an event. You want to store each event so the two are directly comparable regardless of where they happened. What type do you persist, and how do you show it to each user?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Persist an <span class='key'>Instant</span> (a UTC point on the global timeline) &mdash; two Instants are always comparable. To display, attach each user’s <span class='key'>ZoneId</span> with <span class='key'>instant.atZone(zone)</span> to get a <span class='key'>ZonedDateTime</span> in their local time.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Reuse the formatter</h3><p class="prompt">Coming from older Java, you cached a <span class='key'>SimpleDateFormat</span> in a <span class='key'>static</span> field and got garbled dates under load. Can you safely keep a <span class='key'>DateTimeFormatter</span> in a <span class='key'>static final</span> field instead?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>Yes.</b> <span class='key'>DateTimeFormatter</span> is immutable and thread-safe, so a single shared <span class='key'>static final</span> instance is the recommended pattern. <span class='key'>SimpleDateFormat</span> is mutable and holds parsing state, which is why sharing it across threads corrupts output.</div></details></div>
   </div>
 </section>
 
