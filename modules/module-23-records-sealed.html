@@ -381,5 +381,147 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('appinstalled', () => { if (btn) btn.hidden = true; });
 })();
 </script>
+<!-- ── Global module menu (auto-injected) ───────────────────────────── -->
+<style id="mod-menu-styles">
+.mm-btn{cursor:pointer;background:none;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px}
+.mm-btn .mm-ico{display:inline-flex;flex-direction:column;gap:3px}
+.mm-btn .mm-ico span{display:block;width:15px;height:2px;background:currentColor;border-radius:2px}
+.mm-overlay{position:fixed;inset:0;z-index:200;background:rgba(8,8,16,0.6);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity var(--transition),visibility var(--transition)}
+.mm-overlay.open{opacity:1;visibility:visible}
+.mm-drawer{position:fixed;top:0;right:0;bottom:0;z-index:201;width:min(400px,88vw);display:flex;flex-direction:column;background:var(--bg-surface);border-left:1px solid var(--bg-elevated);box-shadow:-14px 0 40px rgba(0,0,0,.5);transform:translateX(100%);transition:transform var(--transition)}
+.mm-overlay.open .mm-drawer{transform:translateX(0)}
+.mm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 12px}
+.mm-head h2{font-family:var(--font-display);font-weight:600;font-size:1.05rem;color:var(--text-primary)}
+.mm-close{cursor:pointer;background:none;border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-secondary);font-size:1.1rem;line-height:1;padding:5px 10px;transition:var(--transition)}
+.mm-close:hover{color:var(--accent-coral,#ef476f);border-color:var(--accent-coral,#ef476f)}
+.mm-search-wrap{padding:0 20px 12px}
+.mm-search{width:100%;background:var(--bg-primary);border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-primary);font-family:var(--font-body);font-size:.9rem;padding:9px 12px}
+.mm-search::placeholder{color:var(--text-muted)}
+.mm-search:focus{outline:none;border-color:var(--accent-cyan)}
+.mm-list{flex:1;overflow-y:auto;padding:0 12px 20px}
+.mm-track{font-family:var(--font-code);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:16px 8px 6px}
+.mm-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius);text-decoration:none;color:var(--text-secondary);transition:background var(--transition),color var(--transition)}
+.mm-item .mm-num{font-family:var(--font-code);font-weight:700;font-size:.72rem;color:var(--accent-cyan);background:var(--bg-elevated);padding:3px 7px;border-radius:6px;flex-shrink:0}
+.mm-item .mm-t{font-size:.9rem;line-height:1.3}
+.mm-item:hover{background:var(--bg-elevated);color:var(--text-primary)}
+.mm-item.current{background:var(--bg-elevated)}
+.mm-item.current .mm-t{color:var(--accent-cyan);font-weight:600}
+.mm-empty{color:var(--text-muted);font-size:.9rem;padding:20px 10px}
+@media(prefers-reduced-motion:reduce){.mm-overlay,.mm-drawer{transition-duration:0ms}}
+</style>
+<script>
+(function(){
+  if(window.__modMenu)return;window.__modMenu=1;
+  var M=[
+    ["01","The JVM: Your Code's Real Computer","module-01-jvm-machine.html","Track 1 — The Machine"],
+    ["02","Stack, Heap & the Garbage Collector","module-02-memory-model.html","Track 1 — The Machine"],
+    ["03","From Source to Bytecode","module-03-bytecode.html","Track 1 — The Machine"],
+    ["04","Static Types, Primitives & Boxing","module-04-types-and-vars.html","Track 2 — The Language"],
+    ["05","Objects, Classes & Constructors","module-05-objects-classes.html","Track 2 — The Language"],
+    ["06","Inheritance & Polymorphism","module-06-inheritance.html","Track 2 — The Language"],
+    ["07","Interfaces & Abstract Classes","module-07-interfaces.html","Track 2 — The Language"],
+    ["08","Encapsulation & Immutability","module-08-encapsulation.html","Track 2 — The Language"],
+    ["09","Polymorphism: Overloading vs Overriding","module-09-polymorphism.html","Track 2 — The Language"],
+    ["10","Composition over Inheritance","module-10-composition.html","Track 2 — The Language"],
+    ["11","Static Members & Class Design","module-11-static-members.html","Track 2 — The Language"],
+    ["12","SOLID Principles","module-12-solid-principles.html","Track 2 — The Language"],
+    ["13","Enums & Constant Types","module-13-enums.html","Track 2 — The Language"],
+    ["14","Packages & Access Control","module-14-packages-access.html","Track 2 — The Language"],
+    ["15","Strings & Text","module-15-strings.html","Track 2 — The Language"],
+    ["16","The equals & hashCode Contract","module-16-equals-hashcode.html","Track 2 — The Language"],
+    ["17","Generics & Type Erasure","module-17-generics.html","Track 2 — The Language"],
+    ["18","The Collections Framework","module-18-collections.html","Track 2 — The Language"],
+    ["19","Checked vs Unchecked Exceptions","module-19-exceptions.html","Track 2 — The Language"],
+    ["20","Nested, Inner & Anonymous Classes","module-20-nested-classes.html","Track 2 — The Language"],
+    ["21","Lambdas & the Streams API","module-21-lambdas-streams.html","Track 3 — Modern Java"],
+    ["22","Optional & the Billion-Dollar Bug","module-22-optional-null.html","Track 3 — Modern Java"],
+    ["23","Records, Sealed Types & Pattern Matching","module-23-records-sealed.html","Track 3 — Modern Java"],
+    ["24","Dates & Times (java.time)","module-24-datetime.html","Track 3 — Modern Java"],
+    ["25","Annotations & Reflection","module-25-annotations-reflection.html","Track 3 — Modern Java"],
+    ["26","Threads, Executors & Virtual Threads","module-26-concurrency.html","Track 3 — Modern Java"],
+    ["27","Maven, Gradle & the Classpath","module-27-build-tools.html","Track 4 — The Ecosystem"],
+    ["28","JUnit & Modern Testing","module-28-testing.html","Track 4 — The Ecosystem"],
+    ["29","Dependency Injection & Spring","module-29-spring-di.html","Track 5 — Real-World Java"],
+    ["30","Databases: JDBC & JPA","module-30-persistence-jdbc.html","Track 5 — Real-World Java"],
+    ["31","JSON with Jackson","module-31-json-jackson.html","Track 5 — Real-World Java"],
+    ["32","The HTTP Client (java.net.http)","module-32-http-client.html","Track 5 — Real-World Java"],
+    ["33","Logging Done Right","module-33-logging.html","Track 5 — Real-World Java"],
+    ["34","Singleton","module-34-singleton.html","Track 6 — Design Patterns"],
+    ["35","Factory Method","module-35-factory-method.html","Track 6 — Design Patterns"],
+    ["36","Builder","module-36-builder.html","Track 6 — Design Patterns"],
+    ["37","Adapter","module-37-adapter.html","Track 6 — Design Patterns"],
+    ["38","Decorator","module-38-decorator.html","Track 6 — Design Patterns"],
+    ["39","Facade","module-39-facade.html","Track 6 — Design Patterns"],
+    ["40","Proxy","module-40-proxy.html","Track 6 — Design Patterns"],
+    ["41","Strategy","module-41-strategy.html","Track 6 — Design Patterns"],
+    ["42","Observer","module-42-observer.html","Track 6 — Design Patterns"],
+    ["43","Command","module-43-command.html","Track 6 — Design Patterns"],
+    ["44","Template Method","module-44-template-method.html","Track 6 — Design Patterns"],
+    ["45","State","module-45-state.html","Track 6 — Design Patterns"],
+    ["46","Abstract Factory","module-46-abstract-factory.html","Track 7 — More Design Patterns"],
+    ["47","Prototype","module-47-prototype.html","Track 7 — More Design Patterns"],
+    ["48","Bridge","module-48-bridge.html","Track 7 — More Design Patterns"],
+    ["49","Composite","module-49-composite.html","Track 7 — More Design Patterns"],
+    ["50","Flyweight","module-50-flyweight.html","Track 7 — More Design Patterns"],
+    ["51","Chain of Responsibility","module-51-chain-of-responsibility.html","Track 7 — More Design Patterns"],
+    ["52","Iterator","module-52-iterator.html","Track 7 — More Design Patterns"],
+    ["53","Mediator","module-53-mediator.html","Track 7 — More Design Patterns"],
+    ["54","Memento","module-54-memento.html","Track 7 — More Design Patterns"],
+    ["55","Visitor","module-55-visitor.html","Track 7 — More Design Patterns"],
+    ["56","Interpreter","module-56-interpreter.html","Track 7 — More Design Patterns"]
+  ];
+  var here=location.pathname.split("/").pop();
+
+  // Build the "All Modules" trigger button and drop it into the nav's links group.
+  var links=document.querySelector(".module-nav .links");
+  var btn=document.createElement("button");
+  btn.type="button";btn.className="mm-btn module-nav-mmbtn";
+  btn.setAttribute("aria-haspopup","dialog");btn.setAttribute("aria-expanded","false");
+  btn.innerHTML='<span class="mm-ico"><span></span><span></span><span></span></span>All Modules';
+  if(links){links.insertBefore(btn,links.firstChild);
+    // match the nav link styling
+    var probe=links.querySelector("a");
+    if(probe){var cs=getComputedStyle(probe);btn.style.color=cs.color;btn.style.border=cs.border;btn.style.borderRadius=cs.borderRadius;btn.style.padding=cs.padding;btn.style.fontSize=cs.fontSize;}
+  } else {document.body.appendChild(btn);btn.style.position="fixed";btn.style.top="12px";btn.style.right="12px";btn.style.zIndex="202";btn.style.color="var(--text-secondary)";btn.style.border="1px solid var(--bg-elevated)";btn.style.borderRadius="var(--radius)";btn.style.padding="6px 12px";}
+
+  // Build the drawer.
+  var ov=document.createElement("div");ov.className="mm-overlay";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");ov.setAttribute("aria-label","Course modules");
+  var rows="",lastTrack="";
+  for(var i=0;i<M.length;i++){var m=M[i];
+    if(m[3]!==lastTrack){rows+='<div class="mm-track">'+m[3]+'</div>';lastTrack=m[3];}
+    var cur=m[2]===here?" current":"";
+    rows+='<a class="mm-item'+cur+'" href="'+m[2]+'" data-s="'+(m[0]+" "+m[1]).toLowerCase()+'"'+(cur?' aria-current="page"':'')+'><span class="mm-num">'+m[0]+'</span><span class="mm-t">'+m[1]+'</span></a>';
+  }
+  ov.innerHTML='<div class="mm-drawer"><div class="mm-head"><h2>All Modules</h2><button type="button" class="mm-close" aria-label="Close">&times;</button></div><div class="mm-search-wrap"><input type="search" class="mm-search" placeholder="Filter modules…" aria-label="Filter modules"></div><div class="mm-list">'+rows+'<div class="mm-empty" hidden>No modules match.</div></div></div>';
+  document.body.appendChild(ov);
+
+  var drawer=ov.querySelector(".mm-drawer");
+  var search=ov.querySelector(".mm-search");
+  var items=[].slice.call(ov.querySelectorAll(".mm-item"));
+  var tracks=[].slice.call(ov.querySelectorAll(".mm-track"));
+  var empty=ov.querySelector(".mm-empty");
+  var lastFocus=null;
+
+  function open(){lastFocus=document.activeElement;ov.classList.add("open");btn.setAttribute("aria-expanded","true");document.body.style.overflow="hidden";setTimeout(function(){search.focus();},50);
+    var c=ov.querySelector(".mm-item.current");if(c)c.scrollIntoView({block:"center"});}
+  function close(){ov.classList.remove("open");btn.setAttribute("aria-expanded","false");document.body.style.overflow="";if(lastFocus)lastFocus.focus();}
+  function filter(){var q=search.value.trim().toLowerCase();var any=false;
+    items.forEach(function(it){var show=!q||it.getAttribute("data-s").indexOf(q)>-1;it.style.display=show?"":"none";if(show)any=true;});
+    tracks.forEach(function(tr){var n=tr.nextElementSibling,vis=false;while(n&&n.classList.contains("mm-item")){if(n.style.display!=="none")vis=true;n=n.nextElementSibling;}tr.style.display=vis?"":"none";});
+    empty.hidden=any;}
+
+  btn.addEventListener("click",open);
+  ov.querySelector(".mm-close").addEventListener("click",close);
+  ov.addEventListener("click",function(e){if(e.target===ov)close();});
+  search.addEventListener("input",filter);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ov.classList.contains("open"))close();});
+  // simple focus trap
+  ov.addEventListener("keydown",function(e){if(e.key!=="Tab"||!ov.classList.contains("open"))return;
+    var f=ov.querySelectorAll("a,button,input");if(!f.length)return;var first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+})();
+</script>
+
 </body>
 </html>

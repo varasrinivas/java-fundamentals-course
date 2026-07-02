@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Identity vs value, and the rule that ties them together</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#128218; Real-world analogy</span>
+      <p><strong>equals and hashCode are a library catalog.</strong> Two physical copies of the same title are &ldquo;the same book&rdquo; because they share an <b>ISBN</b> &mdash; that is <b>logical equality</b> (what <span class='key'>equals</span> tests), not &ldquo;the same physical object&rdquo; (what <span class='key'>==</span> tests). The <b>shelf number</b> is the <span class='key'>hashCode</span>: a quick label telling the librarian which shelf to walk to before scanning the few books there. The rule that makes the catalog work: <b>equal books must get the same shelf number</b>. If you re-shelved an identical copy under a different number (equal objects, different hash), a patron following the catalog would walk to the wrong shelf and swear the book isn&rsquo;t in the library &mdash; even though it is. That is <em>exactly</em> how a broken <span class='key'>hashCode</span> loses entries in a <span class='key'>HashMap</span>.</p>
+    </div>
     <p><span class='key'>==</span> asks “same object?” (identity). <span class='key'>equals()</span> asks “same value?” — but only if the class overrides it; the default <span class='key'>Object.equals</span> is just <span class='key'>==</span>. The <strong>contract</strong>: if <span class='key'>a.equals(b)</span>, then <span class='key'>a.hashCode() == b.hashCode()</span> <em>must</em> hold.</p><pre class="code" data-src="class Point {
     final int x, y;
     Point(int x, int y) { this.x = x; this.y = y; }
@@ -166,7 +174,88 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
     @Override public int hashCode() { return Objects.hash(x, y); }
 }"></pre><p>Override both, together, using the same fields. Why? A <span class='key'>HashMap</span> first picks a bucket by <span class='key'>hashCode()</span>, then confirms with <span class='key'>equals()</span>. If equal objects produce different hashes, they land in different buckets and the map can't find what it stored. (This is exactly why <span class='key'>record</span>s, which generate both, are so handy.)</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: a == b then a.equals(b) then hashCode() then same bucket then found"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">a == b</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">identity</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">a.equals(b)</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">value</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">hashCode()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">must agree</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">same bucket</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">HashMap</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">found</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lookup works</text></g></svg></div>
-    
+    <h3>Reference equality vs logical equality</h3>
+    <p><span class='key'>==</span> compares <em>references</em>: are these two names pointing at the very same object on the heap? <span class='key'>.equals</span> is a <em>method</em>, so it can mean whatever the class decides &mdash; usually &ldquo;same value.&rdquo; The catch: <span class='key'>Object</span>&rsquo;s default <span class='key'>equals</span> is literally <span class='key'>this == other</span>. So until <em>you</em> override it, value-equality and identity are the same thing, and two distinct-but-identical objects are &ldquo;not equal.&rdquo;</p>
+    <pre class="code" data-src="String a = new String(&quot;hi&quot;);
+String b = new String(&quot;hi&quot;);
+System.out.println(a == b);        // false - two different objects
+System.out.println(a.equals(b));   // true  - String overrides equals
+
+class Money { int cents; Money(int c){ cents = c; } }   // no equals()
+Money m1 = new Money(500), m2 = new Money(500);
+System.out.println(m1 == m2);        // false
+System.out.println(m1.equals(m2));   // false! inherited Object.equals is =="></pre>
+    <h3>The equals contract: five rules, one classic trap</h3>
+    <p>A correct <span class='key'>equals</span> must be <strong>reflexive</strong> (<span class='key'>x.equals(x)</span>), <strong>symmetric</strong> (<span class='key'>x.equals(y)</span> iff <span class='key'>y.equals(x)</span>), <strong>transitive</strong>, <strong>consistent</strong> (same answer every call, given unchanged fields), and return <strong>false for null</strong> (never throw). Symmetry is the one people break &mdash; typically by letting a subclass compare against its parent. Below, a plain <span class='key'>Point</span> can equal a <span class='key'>ColorPoint</span> but never the reverse, so <span class='key'>equals</span> disagrees with itself depending on the order.</p>
+    <pre class="code" data-src="Point p        = new Point(1, 2);
+ColorPoint cp  = new ColorPoint(1, 2, RED);
+
+// ColorPoint.equals also checks color, so it rejects a plain Point:
+p.equals(cp);   // true  - Point only looks at x, y
+cp.equals(p);   // false - ColorPoint also demands matching color
+// x.equals(y) != y.equals(x)  =&gt;  SYMMETRY BROKEN.
+// A HashSet containing p might now behave differently after adding cp."></pre>
+    <h3>The hashCode contract, and why you override both together</h3>
+    <p>The rule is one-directional: <strong>equal objects MUST return the same hashCode</strong>; unequal objects <em>may</em> share one (a <em>collision</em> &mdash; allowed, just slower). It must also be consistent across calls while the object&rsquo;s equals-relevant fields don&rsquo;t change. Overriding <span class='key'>equals</span> but not <span class='key'>hashCode</span> is the cardinal sin: your objects are now &ldquo;equal&rdquo; yet scatter to different hashes, silently breaking every hash-based collection. Override the pair using the <em>same fields</em>.</p>
+    <pre class="code" data-src="// equal  =&gt; SAME hash   (mandatory)
+// unequal =&gt; hashes MAY collide   (allowed, hurts performance only)
+
+// WRONG: equals overridden, hashCode not -&gt; two equal objects,
+//        two different (identity) hashes -&gt; lost in a HashMap.
+class Iso { String code; /* equals() uses code, but NO hashCode() */ }
+
+// RIGHT: both derived from the same field.
+class Iso2 {
+    final String code;
+    @Override public boolean equals(Object o) {
+        return o instanceof Iso2 i &amp;&amp; code.equals(i.code);
+    }
+    @Override public int hashCode() { return code.hashCode(); }
+}"></pre>
+    <h3>How HashMap actually uses them: bucket, then confirm</h3>
+    <p>A <span class='key'>HashMap</span> is an array of <em>buckets</em>. On <span class='key'>put</span> or <span class='key'>get</span> it takes the key&rsquo;s <span class='key'>hashCode</span>, spreads the bits, and maps it to a bucket index &mdash; that&rsquo;s the O(1) jump to the right shelf. Within that one bucket it walks the (usually tiny) list and uses <span class='key'>equals</span> to find the exact key. So <span class='key'>hashCode</span> chooses <em>where</em> to look and <span class='key'>equals</span> confirms <em>what</em> was found. Break the first and you never reach the right bucket; break the second and you can&rsquo;t confirm the match.</p>
+    <pre class="code" data-src="Map&lt;Point, String&gt; m = new HashMap&lt;&gt;();
+m.put(new Point(1, 2), &quot;origin-ish&quot;);
+
+String v = m.get(new Point(1, 2));   // a DIFFERENT object, equal by value
+// Lookup steps:
+//   1. hashCode(key) -&gt; bucket index          (finds the shelf)
+//   2. scan that bucket, key.equals(stored)   (finds the entry)
+System.out.println(v);   // &quot;origin-ish&quot; - works only if BOTH agree"></pre>
+    <h3>Writing them correctly with java.util.Objects</h3>
+    <p>Hand-written null checks are where bugs hide. <span class='key'>Objects.equals(a, b)</span> is null-safe (two nulls are equal, and it never NPEs), and <span class='key'>Objects.hash(f1, f2, ...)</span> combines any number of fields into one hash. One caveat: <span class='key'>Objects.hash</span> takes a varargs array, so it <strong>allocates</strong> on every call &mdash; fine almost everywhere, but on a hot path you should hand-roll the classic <span class='key'>31 * result + field</span> loop to avoid the array.</p>
+    <pre class="code" data-src="import java.util.Objects;
+
+class User {
+    final String name; final int id;
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;                 // fast path
+        if (!(o instanceof User u)) return false;
+        return id == u.id &amp;&amp; Objects.equals(name, u.name);  // null-safe
+    }
+    @Override public int hashCode() {
+        return Objects.hash(name, id);   // convenient; allocates a varargs array
+    }
+    // Hot-path alternative (no allocation):
+    //   int h = Integer.hashCode(id);
+    //   h = 31 * h + (name == null ? 0 : name.hashCode());
+}"></pre>
+    <h3>Pitfalls: mutable keys, the getClass trap, and records</h3>
+    <p>Two traps sink real code. First, <strong>never mutate a field used in equals/hashCode while the object is a key</strong> in a map or set &mdash; its hash changes, so it lands in the wrong bucket and becomes unreachable even by itself. Prefer immutable keys. Second, the <span class='key'>instanceof</span>-vs-<span class='key'>getClass</span> debate: <span class='key'>instanceof</span> can quietly break symmetry across subclasses (as shown earlier), while <span class='key'>getClass()</span> comparison guarantees symmetry but declares that no subclass can ever equal its parent. And the modern escape hatch: a <span class='key'>record</span> auto-generates a correct, matched <span class='key'>equals</span>/<span class='key'>hashCode</span> over all its components &mdash; reach for it when you just need a value type.</p>
+    <pre class="code" data-src="// PITFALL 1 - mutating a live key.
+Set&lt;StringBuilder&gt; set = new HashSet&lt;&gt;();   // (illustrative; SB uses identity)
+var key = new java.util.ArrayList&lt;Integer&gt;();
+Set&lt;List&lt;Integer&gt;&gt; s = new HashSet&lt;&gt;();
+s.add(key);
+key.add(99);              // hashCode changed while stored
+s.contains(key);          // false! same object, now unreachable
+
+// PITFALL 2 - getClass gives symmetry; instanceof allows subtype equality.
+//   getClass():  if (o == null || getClass() != o.getClass()) return false;
+//   instanceof:  if (!(o instanceof Point p)) return false;  // subclasses can slip in
+
+// THE EASY WIN - a record writes both for you, correctly:
+record PointR(int x, int y) {}   // equals + hashCode over x, y, generated"></pre>
   </div>
 </section>
 
@@ -233,6 +322,9 @@ System.out.println("Equal objects MUST share a hashCode.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; The vanishing key</h3><p class="prompt">You override <span class='key'>equals()</span> but forget <span class='key'>hashCode()</span>, then use the object as a <span class='key'>HashMap</span> key. What goes wrong?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The default <span class='key'>hashCode</span> is identity-based, so two equal objects usually get different hashes and different buckets. <span class='key'>get</span> looks in the wrong bucket and returns null — the entry is effectively lost.</div></details></div>
       <div class="exercise"><h3>2 &middot; Hash quality</h3><p class="prompt">Is <span class='key'>hashCode() { return 1; }</span> a <em>correct</em> implementation? Is it a <em>good</em> one?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Correct (equal objects share it, so the contract holds) but terrible: every key collides into one bucket, degrading the map to a linked list — O(n) lookups. A good hash spreads values across buckets.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Mutating a key</h3><p class="prompt">You put an object into a <span class='key'>HashSet</span>, then change a field that <span class='key'>equals</span>/<span class='key'>hashCode</span> depend on. Why can <span class='key'>set.contains(sameObject)</span> now return <span class='key'>false</span>?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The set placed it in a bucket chosen by its <em>original</em> hash. Mutation changes the hash, so <span class='key'>contains</span> now computes a <em>different</em> bucket and looks in the wrong place &mdash; the object is stranded, unreachable even by its own reference. Moral: use immutable objects as keys.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Symmetry across a subclass</h3><p class="prompt"><span class='key'>ColorPoint extends Point</span> and its <span class='key'>equals</span> also compares color, using <span class='key'>instanceof Point</span>. Why does this violate the contract, and which clause?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><b>Symmetry.</b> A plain <span class='key'>Point p</span> with the same x/y says <span class='key'>p.equals(cp)</span> is true (it ignores color), but <span class='key'>cp.equals(p)</span> is false (it demands matching color). Fixes: use <span class='key'>getClass()</span> equality (no cross-type equals), or favor composition over inheritance for value types.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Objects.hash on a hot path</h3><p class="prompt"><span class='key'>Objects.hash(a, b, c)</span> is clean and correct. Why might a profiler flag it inside a tight loop, and what do you replace it with?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>Objects.hash</span> takes <span class='key'>Object...</span> varargs, so each call boxes primitives and <b>allocates a temporary array</b>. In hot code that is measurable GC pressure. Hand-roll the standard accumulation: <span class='key'>int h = 1; h = 31*h + Integer.hashCode(a); ...</span> &mdash; no array, no boxing.</div></details></div>
   </div>
 </section>
 
@@ -382,5 +474,147 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('appinstalled', () => { if (btn) btn.hidden = true; });
 })();
 </script>
+<!-- ── Global module menu (auto-injected) ───────────────────────────── -->
+<style id="mod-menu-styles">
+.mm-btn{cursor:pointer;background:none;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px}
+.mm-btn .mm-ico{display:inline-flex;flex-direction:column;gap:3px}
+.mm-btn .mm-ico span{display:block;width:15px;height:2px;background:currentColor;border-radius:2px}
+.mm-overlay{position:fixed;inset:0;z-index:200;background:rgba(8,8,16,0.6);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity var(--transition),visibility var(--transition)}
+.mm-overlay.open{opacity:1;visibility:visible}
+.mm-drawer{position:fixed;top:0;right:0;bottom:0;z-index:201;width:min(400px,88vw);display:flex;flex-direction:column;background:var(--bg-surface);border-left:1px solid var(--bg-elevated);box-shadow:-14px 0 40px rgba(0,0,0,.5);transform:translateX(100%);transition:transform var(--transition)}
+.mm-overlay.open .mm-drawer{transform:translateX(0)}
+.mm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 12px}
+.mm-head h2{font-family:var(--font-display);font-weight:600;font-size:1.05rem;color:var(--text-primary)}
+.mm-close{cursor:pointer;background:none;border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-secondary);font-size:1.1rem;line-height:1;padding:5px 10px;transition:var(--transition)}
+.mm-close:hover{color:var(--accent-coral,#ef476f);border-color:var(--accent-coral,#ef476f)}
+.mm-search-wrap{padding:0 20px 12px}
+.mm-search{width:100%;background:var(--bg-primary);border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-primary);font-family:var(--font-body);font-size:.9rem;padding:9px 12px}
+.mm-search::placeholder{color:var(--text-muted)}
+.mm-search:focus{outline:none;border-color:var(--accent-cyan)}
+.mm-list{flex:1;overflow-y:auto;padding:0 12px 20px}
+.mm-track{font-family:var(--font-code);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:16px 8px 6px}
+.mm-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius);text-decoration:none;color:var(--text-secondary);transition:background var(--transition),color var(--transition)}
+.mm-item .mm-num{font-family:var(--font-code);font-weight:700;font-size:.72rem;color:var(--accent-cyan);background:var(--bg-elevated);padding:3px 7px;border-radius:6px;flex-shrink:0}
+.mm-item .mm-t{font-size:.9rem;line-height:1.3}
+.mm-item:hover{background:var(--bg-elevated);color:var(--text-primary)}
+.mm-item.current{background:var(--bg-elevated)}
+.mm-item.current .mm-t{color:var(--accent-cyan);font-weight:600}
+.mm-empty{color:var(--text-muted);font-size:.9rem;padding:20px 10px}
+@media(prefers-reduced-motion:reduce){.mm-overlay,.mm-drawer{transition-duration:0ms}}
+</style>
+<script>
+(function(){
+  if(window.__modMenu)return;window.__modMenu=1;
+  var M=[
+    ["01","The JVM: Your Code's Real Computer","module-01-jvm-machine.html","Track 1 — The Machine"],
+    ["02","Stack, Heap & the Garbage Collector","module-02-memory-model.html","Track 1 — The Machine"],
+    ["03","From Source to Bytecode","module-03-bytecode.html","Track 1 — The Machine"],
+    ["04","Static Types, Primitives & Boxing","module-04-types-and-vars.html","Track 2 — The Language"],
+    ["05","Objects, Classes & Constructors","module-05-objects-classes.html","Track 2 — The Language"],
+    ["06","Inheritance & Polymorphism","module-06-inheritance.html","Track 2 — The Language"],
+    ["07","Interfaces & Abstract Classes","module-07-interfaces.html","Track 2 — The Language"],
+    ["08","Encapsulation & Immutability","module-08-encapsulation.html","Track 2 — The Language"],
+    ["09","Polymorphism: Overloading vs Overriding","module-09-polymorphism.html","Track 2 — The Language"],
+    ["10","Composition over Inheritance","module-10-composition.html","Track 2 — The Language"],
+    ["11","Static Members & Class Design","module-11-static-members.html","Track 2 — The Language"],
+    ["12","SOLID Principles","module-12-solid-principles.html","Track 2 — The Language"],
+    ["13","Enums & Constant Types","module-13-enums.html","Track 2 — The Language"],
+    ["14","Packages & Access Control","module-14-packages-access.html","Track 2 — The Language"],
+    ["15","Strings & Text","module-15-strings.html","Track 2 — The Language"],
+    ["16","The equals & hashCode Contract","module-16-equals-hashcode.html","Track 2 — The Language"],
+    ["17","Generics & Type Erasure","module-17-generics.html","Track 2 — The Language"],
+    ["18","The Collections Framework","module-18-collections.html","Track 2 — The Language"],
+    ["19","Checked vs Unchecked Exceptions","module-19-exceptions.html","Track 2 — The Language"],
+    ["20","Nested, Inner & Anonymous Classes","module-20-nested-classes.html","Track 2 — The Language"],
+    ["21","Lambdas & the Streams API","module-21-lambdas-streams.html","Track 3 — Modern Java"],
+    ["22","Optional & the Billion-Dollar Bug","module-22-optional-null.html","Track 3 — Modern Java"],
+    ["23","Records, Sealed Types & Pattern Matching","module-23-records-sealed.html","Track 3 — Modern Java"],
+    ["24","Dates & Times (java.time)","module-24-datetime.html","Track 3 — Modern Java"],
+    ["25","Annotations & Reflection","module-25-annotations-reflection.html","Track 3 — Modern Java"],
+    ["26","Threads, Executors & Virtual Threads","module-26-concurrency.html","Track 3 — Modern Java"],
+    ["27","Maven, Gradle & the Classpath","module-27-build-tools.html","Track 4 — The Ecosystem"],
+    ["28","JUnit & Modern Testing","module-28-testing.html","Track 4 — The Ecosystem"],
+    ["29","Dependency Injection & Spring","module-29-spring-di.html","Track 5 — Real-World Java"],
+    ["30","Databases: JDBC & JPA","module-30-persistence-jdbc.html","Track 5 — Real-World Java"],
+    ["31","JSON with Jackson","module-31-json-jackson.html","Track 5 — Real-World Java"],
+    ["32","The HTTP Client (java.net.http)","module-32-http-client.html","Track 5 — Real-World Java"],
+    ["33","Logging Done Right","module-33-logging.html","Track 5 — Real-World Java"],
+    ["34","Singleton","module-34-singleton.html","Track 6 — Design Patterns"],
+    ["35","Factory Method","module-35-factory-method.html","Track 6 — Design Patterns"],
+    ["36","Builder","module-36-builder.html","Track 6 — Design Patterns"],
+    ["37","Adapter","module-37-adapter.html","Track 6 — Design Patterns"],
+    ["38","Decorator","module-38-decorator.html","Track 6 — Design Patterns"],
+    ["39","Facade","module-39-facade.html","Track 6 — Design Patterns"],
+    ["40","Proxy","module-40-proxy.html","Track 6 — Design Patterns"],
+    ["41","Strategy","module-41-strategy.html","Track 6 — Design Patterns"],
+    ["42","Observer","module-42-observer.html","Track 6 — Design Patterns"],
+    ["43","Command","module-43-command.html","Track 6 — Design Patterns"],
+    ["44","Template Method","module-44-template-method.html","Track 6 — Design Patterns"],
+    ["45","State","module-45-state.html","Track 6 — Design Patterns"],
+    ["46","Abstract Factory","module-46-abstract-factory.html","Track 7 — More Design Patterns"],
+    ["47","Prototype","module-47-prototype.html","Track 7 — More Design Patterns"],
+    ["48","Bridge","module-48-bridge.html","Track 7 — More Design Patterns"],
+    ["49","Composite","module-49-composite.html","Track 7 — More Design Patterns"],
+    ["50","Flyweight","module-50-flyweight.html","Track 7 — More Design Patterns"],
+    ["51","Chain of Responsibility","module-51-chain-of-responsibility.html","Track 7 — More Design Patterns"],
+    ["52","Iterator","module-52-iterator.html","Track 7 — More Design Patterns"],
+    ["53","Mediator","module-53-mediator.html","Track 7 — More Design Patterns"],
+    ["54","Memento","module-54-memento.html","Track 7 — More Design Patterns"],
+    ["55","Visitor","module-55-visitor.html","Track 7 — More Design Patterns"],
+    ["56","Interpreter","module-56-interpreter.html","Track 7 — More Design Patterns"]
+  ];
+  var here=location.pathname.split("/").pop();
+
+  // Build the "All Modules" trigger button and drop it into the nav's links group.
+  var links=document.querySelector(".module-nav .links");
+  var btn=document.createElement("button");
+  btn.type="button";btn.className="mm-btn module-nav-mmbtn";
+  btn.setAttribute("aria-haspopup","dialog");btn.setAttribute("aria-expanded","false");
+  btn.innerHTML='<span class="mm-ico"><span></span><span></span><span></span></span>All Modules';
+  if(links){links.insertBefore(btn,links.firstChild);
+    // match the nav link styling
+    var probe=links.querySelector("a");
+    if(probe){var cs=getComputedStyle(probe);btn.style.color=cs.color;btn.style.border=cs.border;btn.style.borderRadius=cs.borderRadius;btn.style.padding=cs.padding;btn.style.fontSize=cs.fontSize;}
+  } else {document.body.appendChild(btn);btn.style.position="fixed";btn.style.top="12px";btn.style.right="12px";btn.style.zIndex="202";btn.style.color="var(--text-secondary)";btn.style.border="1px solid var(--bg-elevated)";btn.style.borderRadius="var(--radius)";btn.style.padding="6px 12px";}
+
+  // Build the drawer.
+  var ov=document.createElement("div");ov.className="mm-overlay";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");ov.setAttribute("aria-label","Course modules");
+  var rows="",lastTrack="";
+  for(var i=0;i<M.length;i++){var m=M[i];
+    if(m[3]!==lastTrack){rows+='<div class="mm-track">'+m[3]+'</div>';lastTrack=m[3];}
+    var cur=m[2]===here?" current":"";
+    rows+='<a class="mm-item'+cur+'" href="'+m[2]+'" data-s="'+(m[0]+" "+m[1]).toLowerCase()+'"'+(cur?' aria-current="page"':'')+'><span class="mm-num">'+m[0]+'</span><span class="mm-t">'+m[1]+'</span></a>';
+  }
+  ov.innerHTML='<div class="mm-drawer"><div class="mm-head"><h2>All Modules</h2><button type="button" class="mm-close" aria-label="Close">&times;</button></div><div class="mm-search-wrap"><input type="search" class="mm-search" placeholder="Filter modules…" aria-label="Filter modules"></div><div class="mm-list">'+rows+'<div class="mm-empty" hidden>No modules match.</div></div></div>';
+  document.body.appendChild(ov);
+
+  var drawer=ov.querySelector(".mm-drawer");
+  var search=ov.querySelector(".mm-search");
+  var items=[].slice.call(ov.querySelectorAll(".mm-item"));
+  var tracks=[].slice.call(ov.querySelectorAll(".mm-track"));
+  var empty=ov.querySelector(".mm-empty");
+  var lastFocus=null;
+
+  function open(){lastFocus=document.activeElement;ov.classList.add("open");btn.setAttribute("aria-expanded","true");document.body.style.overflow="hidden";setTimeout(function(){search.focus();},50);
+    var c=ov.querySelector(".mm-item.current");if(c)c.scrollIntoView({block:"center"});}
+  function close(){ov.classList.remove("open");btn.setAttribute("aria-expanded","false");document.body.style.overflow="";if(lastFocus)lastFocus.focus();}
+  function filter(){var q=search.value.trim().toLowerCase();var any=false;
+    items.forEach(function(it){var show=!q||it.getAttribute("data-s").indexOf(q)>-1;it.style.display=show?"":"none";if(show)any=true;});
+    tracks.forEach(function(tr){var n=tr.nextElementSibling,vis=false;while(n&&n.classList.contains("mm-item")){if(n.style.display!=="none")vis=true;n=n.nextElementSibling;}tr.style.display=vis?"":"none";});
+    empty.hidden=any;}
+
+  btn.addEventListener("click",open);
+  ov.querySelector(".mm-close").addEventListener("click",close);
+  ov.addEventListener("click",function(e){if(e.target===ov)close();});
+  search.addEventListener("input",filter);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ov.classList.contains("open"))close();});
+  // simple focus trap
+  ov.addEventListener("keydown",function(e){if(e.key!=="Tab"||!ov.classList.contains("open"))return;
+    var f=ov.querySelectorAll("a,button,input");if(!f.length)return;var first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+})();
+</script>
+
 </body>
 </html>

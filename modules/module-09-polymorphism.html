@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Three kinds: ad-hoc, subtype, parametric</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>Two words that pick a meaning at two different moments.</strong> Say the verb <b>&ldquo;open&rdquo;</b> to a bank clerk: which action they take depends entirely on <em>what you hand them</em> &mdash; a key means open a <b>door</b>, a signed form means open an <b>account</b>. That choice is made the instant you speak, purely from the <em>kind of thing</em> in your hand. That is <b>overloading</b>: the compiler reads the argument types and locks in which <span class="key">open(&hellip;)</span> you meant, before the program ever runs. Now hand a stack of different <b>shapes</b> to an artist and say &ldquo;draw yourself.&rdquo; Each shape &mdash; circle, square, star &mdash; draws itself its own way, and you don&rsquo;t decide which; the <em>actual shape in hand</em> does, at the moment it acts. That is <b>overriding</b>: one call, <span class="key">shape.draw()</span>, dispatched at runtime by the real object.</p>
+    </div>
     <p><strong>Overloading</strong> (ad-hoc polymorphism) is many methods with the <em>same name but different parameter lists</em>. The <strong>compiler</strong> picks one based on the <em>static</em> (declared) types of the arguments — it’s decided before the program runs.</p><pre class="code" data-src="void print(int n)    { ... }
 void print(String s) { ... }
 print(42);      // compiler picks print(int)
@@ -164,6 +172,90 @@ class Dog extends Animal { @Override String speak() { return &quot;Woof&quot;; }
 Animal a = new Dog();
 a.speak();      // runtime picks Dog.speak()  (overriding)"></pre><p>The trap: overloading is chosen by <em>declared</em> type, overriding by <em>actual</em> type. An <span class='key'>Object</span> reference to a String will pick <span class='key'>print(Object)</span>, not <span class='key'>print(String)</span> — even though it’s really a String.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: method call then overload? then compile-time then override? then runtime"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">method call</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">same name</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">overload?</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by arg types</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">compile-time</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">static type</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">override?</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">by object</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">runtime</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">dynamic dispatch</text></g></svg></div>
+
+    <h3>Two dispatches, two moments</h3>
+    <p>Overloading is <strong>static dispatch</strong>: the compiler chooses one method signature from the <em>declared</em> types of the arguments and bakes that choice into the bytecode. Overriding is <strong>dynamic dispatch</strong>: the exact same call site defers to the object&rsquo;s <em>actual</em> runtime class. Because Java methods are virtual by default, the second choice happens on every instance call &mdash; but only for instance methods, and only among already-selected overloads.</p>
+    <pre class="code" data-src="void greet(Object o) { System.out.println(&quot;Object&quot;); }
+void greet(String s) { System.out.println(&quot;String&quot;); }
+
+Object ref = &quot;hello&quot;;   // declared type Object, actual type String
+greet(ref);             // prints &quot;Object&quot;  -- overload picked by DECLARED type
+greet(&quot;hello&quot;);         // prints &quot;String&quot;  -- literal's static type is String
+
+// Overriding is the mirror image: chosen by the ACTUAL object.
+class Animal { String speak() { return &quot;...&quot;; } }
+class Cat extends Animal { @Override String speak() { return &quot;Meow&quot;; } }
+Animal a = new Cat();
+a.speak();              // &quot;Meow&quot; -- dynamic dispatch by real type, not &quot;Animal&quot;"></pre>
+
+    <h3>Overload resolution order</h3>
+    <p>When several overloads could accept a call, the compiler tries them in <strong>three phases</strong> and stops at the first that fits: (1) match by exact type or a <em>widening</em> primitive conversion, (2) allow <em>autoboxing/unboxing</em>, (3) allow <em>varargs</em>. Earlier phases win, which is why <span class="key">f(1)</span> prefers a <span class="key">long</span> parameter over an <span class="key">Integer</span> one. If two candidates tie with neither being &ldquo;more specific,&rdquo; you get a <strong>compile-time ambiguity error</strong> &mdash; never a silent runtime guess.</p>
+    <pre class="code" data-src="void f(long x)          { System.out.println(&quot;long (widening)&quot;); }
+void f(Integer x)       { System.out.println(&quot;Integer (boxing)&quot;); }
+void f(int... x)        { System.out.println(&quot;int... (varargs)&quot;); }
+
+f(1);   // prints &quot;long (widening)&quot;
+// Phase 1: exact int? none. Try WIDENING int-&gt;long: match. Done.
+// Boxing (Integer) and varargs are lower priority, so they never win here.
+
+// Ambiguity is a COMPILE ERROR, not a runtime coin-flip:
+void g(Integer x, long y) {}
+void g(int x, Long y) {}
+// g(1, 1);   // error: reference to g is ambiguous -- neither is more specific"></pre>
+
+    <h3>The rules an override must obey</h3>
+    <p>A real override needs the <strong>same name and parameter types</strong> as the inherited method, but Java relaxes three things in the subclass: the return type may be <strong>covariant</strong> (a subtype of the original), visibility may be <strong>widened</strong> (never narrowed), and the <strong>throws</strong> clause may drop or narrow checked exceptions (never broaden them). Annotate with <span class="key">@Override</span> so the compiler verifies you matched a real supertype method rather than accidentally writing a new overload.</p>
+    <pre class="code" data-src="class Shape {
+    protected Shape copy() throws IOException { return this; }
+}
+
+class Circle extends Shape {
+    @Override
+    public Circle copy() {          // (1) COVARIANT return: Circle is-a Shape  -- OK
+        return new Circle();        // (2) WIDER visibility: protected -&gt; public -- OK
+    }                               // (3) FEWER checked exceptions: dropped IOException -- OK
+}
+
+// These would NOT compile as overrides:
+//   Shape copy() { ... }               with private       -&gt; narrows visibility
+//   Object copy() { ... }              -&gt; Object is not a subtype of Shape (return not covariant)
+//   Shape copy() throws Exception {}   -&gt; broadens the checked exception
+// Always add @Override: it makes the compiler verify you actually overrode something."></pre>
+
+    <h3>Fields and statics are hidden, not overridden</h3>
+    <p>Only <strong>instance methods</strong> are polymorphic. A field or a <span class="key">static</span> method in a subclass with the same name <em>hides</em> the parent&rsquo;s &mdash; it does not override it. Hidden members are resolved by the <strong>declared (static) type</strong> of the reference, exactly like overloading. So through a <span class="key">Base</span> reference you see <span class="key">Base</span>&rsquo;s field and static method even when the object is really a <span class="key">Sub</span>. Shadowing fields across a hierarchy is a classic source of confusion; prefer private fields with accessors.</p>
+    <pre class="code" data-src="class Base {
+    String tag = &quot;base-field&quot;;
+    static String who() { return &quot;Base.who&quot;; }
+    String name()       { return &quot;Base.name&quot;; }   // instance method: overridable
+}
+class Sub extends Base {
+    String tag = &quot;sub-field&quot;;                      // HIDES Base.tag, not overrides
+    static String who() { return &quot;Sub.who&quot;; }      // HIDES the static method
+    @Override String name() { return &quot;Sub.name&quot;; } // truly overrides
+}
+
+Base b = new Sub();
+b.tag;      // &quot;base-field&quot;  -- fields use the DECLARED (static) type
+b.who();    // &quot;Base.who&quot;    -- static methods are hidden, resolved by declared type
+b.name();   // &quot;Sub.name&quot;    -- ONLY instance methods dispatch on the real object"></pre>
+
+    <h3>Polymorphism through supertypes</h3>
+    <p>The payoff of overriding is writing code against an <strong>interface or abstract type</strong> and letting each concrete class supply behavior. Callers name only the supertype; dynamic dispatch routes each call to the right implementation, and new subtypes drop in without touching the calling code. This &ldquo;program to the supertype&rdquo; habit is the mechanism behind almost every design pattern later in this course.</p>
+    <pre class="code" data-src="interface Notifier { void send(String msg); }
+
+class EmailNotifier implements Notifier {
+    public void send(String msg) { /* SMTP ... */ }
+}
+class SmsNotifier implements Notifier {
+    public void send(String msg) { /* gateway ... */ }
+}
+
+// Program to the SUPERTYPE: this method never names a concrete class.
+void alertAll(List&lt;Notifier&gt; channels, String msg) {
+    for (Notifier n : channels) n.send(msg);   // each dispatches to its real type
+}
+// Add a SlackNotifier tomorrow and alertAll keeps working, untouched."></pre>
     
   </div>
 </section>
@@ -230,6 +322,9 @@ System.out.println("Same operator, resolved by type.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Declared vs actual</h3><p class="prompt">With <span class='key'>print(Object)</span> and <span class='key'>print(String)</span> defined, what does <span class='key'>Object o = "hi"; print(o);</span> call?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><span class='key'>print(Object)</span>. Overload resolution uses the <b>declared</b> type of <span class='key'>o</span> (Object), decided at compile time — even though the value is really a String. Overriding, by contrast, would use the real type.</div></details></div>
       <div class="exercise"><h3>2 &middot; Override or overload?</h3><p class="prompt">You write <span class='key'>public boolean equals(MyType o)</span> intending to override <span class='key'>Object.equals</span>. Why doesn’t it?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><span class='key'>Object.equals</span> takes an <span class='key'>Object</span> parameter; yours takes <span class='key'>MyType</span>, so it’s a different signature — an <b>overload</b>, not an override. Collections still call <span class='key'>equals(Object)</span>. Use <span class='key'>@Override</span> so the compiler catches this.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Which overload for f(1)?</h3><p class="prompt">Given <span class='key'>f(long)</span>, <span class='key'>f(Integer)</span>, and <span class='key'>f(int...)</span>, which does <span class='key'>f(1)</span> call?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>f(long)</span>. Overload resolution runs in phases: exact/widening first, then boxing, then varargs. <span class='key'>int&rarr;long</span> is a widening primitive conversion (phase 1), so it beats boxing to <span class='key'>Integer</span> (phase 2) and the <span class='key'>int...</span> varargs (phase 3).</div></details></div>
+      <div class="exercise"><h3>4 &middot; Which field wins?</h3><p class="prompt">With <span class='key'>Base</span> and <span class='key'>Sub</span> each declaring <span class='key'>String tag</span>, what is <span class='key'>((Base) new Sub()).tag</span>?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>Base</span>&rsquo;s <span class='key'>tag</span>. Fields are never overridden &mdash; they are <b>hidden</b> and resolved by the <b>declared type</b> of the reference. The cast to <span class='key'>Base</span> selects <span class='key'>Base.tag</span>, even though the object is a <span class='key'>Sub</span>. Only instance methods dispatch on the real object.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Legal override?</h3><p class="prompt">A superclass declares <span class='key'>public Number get() throws IOException</span>. Can a subclass override it with <span class='key'>protected Integer get()</span> (no throws)?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">No &mdash; because of <b>visibility</b>. Returning <span class='key'>Integer</span> is a valid <b>covariant</b> return (Integer is-a Number) and dropping the checked <span class='key'>IOException</span> is allowed, but narrowing <span class='key'>public</span> to <span class='key'>protected</span> reduces visibility, which an override may never do. Widen it back to <span class='key'>public</span> and it compiles.</div></details></div>
   </div>
 </section>
 
@@ -379,5 +474,147 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('appinstalled', () => { if (btn) btn.hidden = true; });
 })();
 </script>
+<!-- ── Global module menu (auto-injected) ───────────────────────────── -->
+<style id="mod-menu-styles">
+.mm-btn{cursor:pointer;background:none;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px}
+.mm-btn .mm-ico{display:inline-flex;flex-direction:column;gap:3px}
+.mm-btn .mm-ico span{display:block;width:15px;height:2px;background:currentColor;border-radius:2px}
+.mm-overlay{position:fixed;inset:0;z-index:200;background:rgba(8,8,16,0.6);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity var(--transition),visibility var(--transition)}
+.mm-overlay.open{opacity:1;visibility:visible}
+.mm-drawer{position:fixed;top:0;right:0;bottom:0;z-index:201;width:min(400px,88vw);display:flex;flex-direction:column;background:var(--bg-surface);border-left:1px solid var(--bg-elevated);box-shadow:-14px 0 40px rgba(0,0,0,.5);transform:translateX(100%);transition:transform var(--transition)}
+.mm-overlay.open .mm-drawer{transform:translateX(0)}
+.mm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 12px}
+.mm-head h2{font-family:var(--font-display);font-weight:600;font-size:1.05rem;color:var(--text-primary)}
+.mm-close{cursor:pointer;background:none;border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-secondary);font-size:1.1rem;line-height:1;padding:5px 10px;transition:var(--transition)}
+.mm-close:hover{color:var(--accent-coral,#ef476f);border-color:var(--accent-coral,#ef476f)}
+.mm-search-wrap{padding:0 20px 12px}
+.mm-search{width:100%;background:var(--bg-primary);border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-primary);font-family:var(--font-body);font-size:.9rem;padding:9px 12px}
+.mm-search::placeholder{color:var(--text-muted)}
+.mm-search:focus{outline:none;border-color:var(--accent-cyan)}
+.mm-list{flex:1;overflow-y:auto;padding:0 12px 20px}
+.mm-track{font-family:var(--font-code);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:16px 8px 6px}
+.mm-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius);text-decoration:none;color:var(--text-secondary);transition:background var(--transition),color var(--transition)}
+.mm-item .mm-num{font-family:var(--font-code);font-weight:700;font-size:.72rem;color:var(--accent-cyan);background:var(--bg-elevated);padding:3px 7px;border-radius:6px;flex-shrink:0}
+.mm-item .mm-t{font-size:.9rem;line-height:1.3}
+.mm-item:hover{background:var(--bg-elevated);color:var(--text-primary)}
+.mm-item.current{background:var(--bg-elevated)}
+.mm-item.current .mm-t{color:var(--accent-cyan);font-weight:600}
+.mm-empty{color:var(--text-muted);font-size:.9rem;padding:20px 10px}
+@media(prefers-reduced-motion:reduce){.mm-overlay,.mm-drawer{transition-duration:0ms}}
+</style>
+<script>
+(function(){
+  if(window.__modMenu)return;window.__modMenu=1;
+  var M=[
+    ["01","The JVM: Your Code's Real Computer","module-01-jvm-machine.html","Track 1 — The Machine"],
+    ["02","Stack, Heap & the Garbage Collector","module-02-memory-model.html","Track 1 — The Machine"],
+    ["03","From Source to Bytecode","module-03-bytecode.html","Track 1 — The Machine"],
+    ["04","Static Types, Primitives & Boxing","module-04-types-and-vars.html","Track 2 — The Language"],
+    ["05","Objects, Classes & Constructors","module-05-objects-classes.html","Track 2 — The Language"],
+    ["06","Inheritance & Polymorphism","module-06-inheritance.html","Track 2 — The Language"],
+    ["07","Interfaces & Abstract Classes","module-07-interfaces.html","Track 2 — The Language"],
+    ["08","Encapsulation & Immutability","module-08-encapsulation.html","Track 2 — The Language"],
+    ["09","Polymorphism: Overloading vs Overriding","module-09-polymorphism.html","Track 2 — The Language"],
+    ["10","Composition over Inheritance","module-10-composition.html","Track 2 — The Language"],
+    ["11","Static Members & Class Design","module-11-static-members.html","Track 2 — The Language"],
+    ["12","SOLID Principles","module-12-solid-principles.html","Track 2 — The Language"],
+    ["13","Enums & Constant Types","module-13-enums.html","Track 2 — The Language"],
+    ["14","Packages & Access Control","module-14-packages-access.html","Track 2 — The Language"],
+    ["15","Strings & Text","module-15-strings.html","Track 2 — The Language"],
+    ["16","The equals & hashCode Contract","module-16-equals-hashcode.html","Track 2 — The Language"],
+    ["17","Generics & Type Erasure","module-17-generics.html","Track 2 — The Language"],
+    ["18","The Collections Framework","module-18-collections.html","Track 2 — The Language"],
+    ["19","Checked vs Unchecked Exceptions","module-19-exceptions.html","Track 2 — The Language"],
+    ["20","Nested, Inner & Anonymous Classes","module-20-nested-classes.html","Track 2 — The Language"],
+    ["21","Lambdas & the Streams API","module-21-lambdas-streams.html","Track 3 — Modern Java"],
+    ["22","Optional & the Billion-Dollar Bug","module-22-optional-null.html","Track 3 — Modern Java"],
+    ["23","Records, Sealed Types & Pattern Matching","module-23-records-sealed.html","Track 3 — Modern Java"],
+    ["24","Dates & Times (java.time)","module-24-datetime.html","Track 3 — Modern Java"],
+    ["25","Annotations & Reflection","module-25-annotations-reflection.html","Track 3 — Modern Java"],
+    ["26","Threads, Executors & Virtual Threads","module-26-concurrency.html","Track 3 — Modern Java"],
+    ["27","Maven, Gradle & the Classpath","module-27-build-tools.html","Track 4 — The Ecosystem"],
+    ["28","JUnit & Modern Testing","module-28-testing.html","Track 4 — The Ecosystem"],
+    ["29","Dependency Injection & Spring","module-29-spring-di.html","Track 5 — Real-World Java"],
+    ["30","Databases: JDBC & JPA","module-30-persistence-jdbc.html","Track 5 — Real-World Java"],
+    ["31","JSON with Jackson","module-31-json-jackson.html","Track 5 — Real-World Java"],
+    ["32","The HTTP Client (java.net.http)","module-32-http-client.html","Track 5 — Real-World Java"],
+    ["33","Logging Done Right","module-33-logging.html","Track 5 — Real-World Java"],
+    ["34","Singleton","module-34-singleton.html","Track 6 — Design Patterns"],
+    ["35","Factory Method","module-35-factory-method.html","Track 6 — Design Patterns"],
+    ["36","Builder","module-36-builder.html","Track 6 — Design Patterns"],
+    ["37","Adapter","module-37-adapter.html","Track 6 — Design Patterns"],
+    ["38","Decorator","module-38-decorator.html","Track 6 — Design Patterns"],
+    ["39","Facade","module-39-facade.html","Track 6 — Design Patterns"],
+    ["40","Proxy","module-40-proxy.html","Track 6 — Design Patterns"],
+    ["41","Strategy","module-41-strategy.html","Track 6 — Design Patterns"],
+    ["42","Observer","module-42-observer.html","Track 6 — Design Patterns"],
+    ["43","Command","module-43-command.html","Track 6 — Design Patterns"],
+    ["44","Template Method","module-44-template-method.html","Track 6 — Design Patterns"],
+    ["45","State","module-45-state.html","Track 6 — Design Patterns"],
+    ["46","Abstract Factory","module-46-abstract-factory.html","Track 7 — More Design Patterns"],
+    ["47","Prototype","module-47-prototype.html","Track 7 — More Design Patterns"],
+    ["48","Bridge","module-48-bridge.html","Track 7 — More Design Patterns"],
+    ["49","Composite","module-49-composite.html","Track 7 — More Design Patterns"],
+    ["50","Flyweight","module-50-flyweight.html","Track 7 — More Design Patterns"],
+    ["51","Chain of Responsibility","module-51-chain-of-responsibility.html","Track 7 — More Design Patterns"],
+    ["52","Iterator","module-52-iterator.html","Track 7 — More Design Patterns"],
+    ["53","Mediator","module-53-mediator.html","Track 7 — More Design Patterns"],
+    ["54","Memento","module-54-memento.html","Track 7 — More Design Patterns"],
+    ["55","Visitor","module-55-visitor.html","Track 7 — More Design Patterns"],
+    ["56","Interpreter","module-56-interpreter.html","Track 7 — More Design Patterns"]
+  ];
+  var here=location.pathname.split("/").pop();
+
+  // Build the "All Modules" trigger button and drop it into the nav's links group.
+  var links=document.querySelector(".module-nav .links");
+  var btn=document.createElement("button");
+  btn.type="button";btn.className="mm-btn module-nav-mmbtn";
+  btn.setAttribute("aria-haspopup","dialog");btn.setAttribute("aria-expanded","false");
+  btn.innerHTML='<span class="mm-ico"><span></span><span></span><span></span></span>All Modules';
+  if(links){links.insertBefore(btn,links.firstChild);
+    // match the nav link styling
+    var probe=links.querySelector("a");
+    if(probe){var cs=getComputedStyle(probe);btn.style.color=cs.color;btn.style.border=cs.border;btn.style.borderRadius=cs.borderRadius;btn.style.padding=cs.padding;btn.style.fontSize=cs.fontSize;}
+  } else {document.body.appendChild(btn);btn.style.position="fixed";btn.style.top="12px";btn.style.right="12px";btn.style.zIndex="202";btn.style.color="var(--text-secondary)";btn.style.border="1px solid var(--bg-elevated)";btn.style.borderRadius="var(--radius)";btn.style.padding="6px 12px";}
+
+  // Build the drawer.
+  var ov=document.createElement("div");ov.className="mm-overlay";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");ov.setAttribute("aria-label","Course modules");
+  var rows="",lastTrack="";
+  for(var i=0;i<M.length;i++){var m=M[i];
+    if(m[3]!==lastTrack){rows+='<div class="mm-track">'+m[3]+'</div>';lastTrack=m[3];}
+    var cur=m[2]===here?" current":"";
+    rows+='<a class="mm-item'+cur+'" href="'+m[2]+'" data-s="'+(m[0]+" "+m[1]).toLowerCase()+'"'+(cur?' aria-current="page"':'')+'><span class="mm-num">'+m[0]+'</span><span class="mm-t">'+m[1]+'</span></a>';
+  }
+  ov.innerHTML='<div class="mm-drawer"><div class="mm-head"><h2>All Modules</h2><button type="button" class="mm-close" aria-label="Close">&times;</button></div><div class="mm-search-wrap"><input type="search" class="mm-search" placeholder="Filter modules…" aria-label="Filter modules"></div><div class="mm-list">'+rows+'<div class="mm-empty" hidden>No modules match.</div></div></div>';
+  document.body.appendChild(ov);
+
+  var drawer=ov.querySelector(".mm-drawer");
+  var search=ov.querySelector(".mm-search");
+  var items=[].slice.call(ov.querySelectorAll(".mm-item"));
+  var tracks=[].slice.call(ov.querySelectorAll(".mm-track"));
+  var empty=ov.querySelector(".mm-empty");
+  var lastFocus=null;
+
+  function open(){lastFocus=document.activeElement;ov.classList.add("open");btn.setAttribute("aria-expanded","true");document.body.style.overflow="hidden";setTimeout(function(){search.focus();},50);
+    var c=ov.querySelector(".mm-item.current");if(c)c.scrollIntoView({block:"center"});}
+  function close(){ov.classList.remove("open");btn.setAttribute("aria-expanded","false");document.body.style.overflow="";if(lastFocus)lastFocus.focus();}
+  function filter(){var q=search.value.trim().toLowerCase();var any=false;
+    items.forEach(function(it){var show=!q||it.getAttribute("data-s").indexOf(q)>-1;it.style.display=show?"":"none";if(show)any=true;});
+    tracks.forEach(function(tr){var n=tr.nextElementSibling,vis=false;while(n&&n.classList.contains("mm-item")){if(n.style.display!=="none")vis=true;n=n.nextElementSibling;}tr.style.display=vis?"":"none";});
+    empty.hidden=any;}
+
+  btn.addEventListener("click",open);
+  ov.querySelector(".mm-close").addEventListener("click",close);
+  ov.addEventListener("click",function(e){if(e.target===ov)close();});
+  search.addEventListener("input",filter);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ov.classList.contains("open"))close();});
+  // simple focus trap
+  ov.addEventListener("keydown",function(e){if(e.key!=="Tab"||!ov.classList.contains("open"))return;
+    var f=ov.querySelectorAll("a,button,input");if(!f.length)return;var first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+})();
+</script>
+
 </body>
 </html>

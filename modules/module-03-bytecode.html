@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>A stack machine, not a register machine</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127859; Real-world analogy</span>
+      <p><strong>Compiling Java is like a chef writing a recipe that any kitchen on earth can cook.</strong> Your <span class='key'>.java</span> source is the recipe written in the chef&rsquo;s <b>native language</b> &mdash; expressive, readable, full of shorthand only humans follow. <b>javac</b> is the <b>translator</b>: it doesn&rsquo;t cook anything, it rewrites the recipe into a set of small, unambiguous <b>picture-instructions</b> &mdash; that is the <b>bytecode</b> in the <span class='key'>.class</span> file. Those picture-cards are deliberately dumb and standardized (&ldquo;put ingredient on counter,&rdquo; &ldquo;combine top two items&rdquo;), so <b>any kitchen</b> &mdash; a Windows kitchen, a Linux kitchen, an ARM phone kitchen &mdash; can follow them. The <b>JVM</b> is the <b>line cook</b>: it reads the cards one at a time and works on a single <b>prep counter</b> (the operand stack), setting items down and combining them. Before starting, a <b>health inspector</b> (the bytecode verifier) checks the cards make sense &mdash; you never combine two items when only one is on the counter. Ship the cards, not the chef&rsquo;s prose, and every kitchen produces the same dish.</p>
+    </div>
     <p>Your CPU has registers; the JVM has an <strong>operand stack</strong>. To compute <span class='key'>2 + 3</span>, bytecode <em>pushes</em> 2, <em>pushes</em> 3, then <span class='key'>iadd</span> pops both and pushes 5. Every method is a little stack program.</p><pre class="code" data-src="// Source
 int r = 2 + 3 * 4;
 
@@ -167,6 +175,84 @@ imul            // 3*4 -&gt; push 12
 iadd            // 2+12 -&gt; push 14
 istore_1        // pop into local r"></pre><p>Compilation is a pipeline: source text → <strong>tokens</strong> (lexing) → an <strong>AST</strong> (parsing + type checking) → <strong>bytecode</strong> plus a <strong>constant pool</strong> of names and literals. You can read any of it with <span class='key'>javap -c YourClass</span>.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: .java then tokens then AST then .class then constant pool"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">.java</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">source</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">tokens</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">lexer</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">AST</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">parser + types</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">.class</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">bytecode</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">constant pool</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">symbols</text></g></svg></div>
+
+    <h3>What javac actually does: .java &rarr; .class</h3>
+    <p>javac is <em>not</em> a machine-code compiler. It reads one or more <span class='key'>.java</span> files, type-checks them, and writes one <span class='key'>.class</span> file <strong>per class</strong> (including a separate file for each nested and anonymous class, named like <span class='key'>Outer$1.class</span>). No linking step, no executable &mdash; each class is compiled independently against the types it can see on the classpath.</p>
+<pre class="code" data-src="$ javac Hello.java          # one source file...
+$ ls
+Hello.class  Hello.java     # ...produces one .class per class
+
+# A class with a nested + anonymous class fans out:
+$ javac Outer.java
+$ ls *.class
+Outer.class  Outer$Inner.class  Outer$1.class"></pre>
+    <h3>Anatomy of a .class file &amp; the constant pool</h3>
+    <p>Every <span class='key'>.class</span> file starts with the 4-byte magic number <span class='key'>0xCAFEBABE</span>, then version numbers, then the <strong>constant pool</strong> &mdash; a table of every string literal, class name, method name, and type descriptor the class refers to. Bytecode never embeds a name inline; it refers to pool entries by index. Deduplicating symbols this way keeps class files compact and makes them easy to link at load time.</p>
+    <p>Run <span class='key'>javap -v</span> (verbose) to dump the header and the whole pool:</p>
+<pre class="code" data-src="$ javap -v Hello.class
+  minor version: 0
+  major version: 65            // 65 = Java 21 (52 = Java 8, +1 per release)
+  flags: (0x0021) ACC_PUBLIC, ACC_SUPER
+
+Constant pool:
+   #1 = Methodref   #2.#3    // java/lang/Object.&quot;&lt;init&gt;&quot;:()V
+   #7 = String      #8       // &quot;OK&quot;
+   #8 = Utf8        OK
+  #13 = Class       #14      // java/lang/System
+  ..."></pre>
+    <h3>The execution model is a stack, not registers</h3>
+    <p>A physical CPU names registers (<span class='key'>rax</span>, <span class='key'>r1</span>&hellip;) and encodes them into each instruction. The JVM instead gives every method frame an <strong>operand stack</strong> plus a numbered array of <strong>local variables</strong>. Instructions push operands, and arithmetic opcodes pop their inputs and push the result &mdash; so they need no register operands at all, which is exactly why the same bytecode runs on any CPU.</p>
+    <p>Watch the stack depth as <span class='key'>(a + b) * 2</span> executes. Each column tracks what sits on the operand stack:</p>
+<pre class="code" data-src="// int a is local #1, int b is local #2
+iload_1     // stack: [a]
+iload_2     // stack: [a, b]
+iadd        // stack: [a+b]            &lt;- pops 2, pushes 1
+iconst_2    // stack: [a+b, 2]
+imul        // stack: [(a+b)*2]        &lt;- pops 2, pushes 1
+ireturn     // pops the result and returns it"></pre>
+    <h3>Reading real bytecode with <span class='key'>javap -c</span></h3>
+    <p>The <span class='key'>-c</span> flag disassembles each method body. This is <em>real</em> output, not a sketch &mdash; note the numbers on the left are <strong>byte offsets</strong> into the code (opcodes are variable-length), and the <span class='key'>#N</span> references point back into the constant pool.</p>
+<pre class="code" data-src="// Source
+static int add(int a, int b) {
+    return a + b;
+}"></pre>
+<pre class="code" data-src="$ javap -c Calc.class
+
+  static int add(int, int);
+    Code:
+       0: iload_0        // push arg a (locals start at 0 for a static method)
+       1: iload_1        // push arg b
+       2: iadd           // pop both, push a+b
+       3: ireturn        // return the int on top of the stack"></pre>
+    <h3>How source constructs map to opcodes</h3>
+    <p>There is a fairly direct mapping from what you type to the opcodes emitted. Arithmetic becomes typed opcodes (<span class='key'>iadd</span>, <span class='key'>ladd</span>, <span class='key'>dadd</span> &mdash; the leading letter is the type). Method calls pick one of four <span class='key'>invoke</span> opcodes depending on <em>how</em> the target is resolved. Object creation is a two-step <span class='key'>new</span> then <span class='key'>invokespecial</span> for the constructor.</p>
+<pre class="code" data-src="Source construct              Opcode(s)
+------------------------------------------------------------
+int c = a + b;                iadd
+double d = x * y;             dmul          // typed: d = double
+obj.instanceMethod()          invokevirtual  // resolved on the runtime type
+Math.max(1, 2)               invokestatic   // static: no receiver
+list.iterator()              invokeinterface // through an interface
+new Point(1, 2)              new; dup; invokespecial  // alloc + &lt;init&gt;
+() -&gt; x + 1                  invokedynamic  // lambda: linked lazily at first use
+&quot;a&quot; + b                      invokedynamic  // string concat (makeConcatWithConstants)"></pre>
+    <p><span class='key'>invokedynamic</span> is the interesting one: it defers deciding <em>what</em> to call until the first execution, handing control to a <strong>bootstrap method</strong>. Java uses it to implement lambdas (via <span class='key'>LambdaMetafactory</span>) and modern string concatenation without baking the strategy into the class file.</p>
+    <h3>Why the JVM verifies bytecode</h3>
+    <p>Because <span class='key'>.class</span> files can come from anywhere &mdash; a network, a code generator, a hand-edited hex dump &mdash; the JVM cannot trust that they were produced by an honest javac. Before a class runs, the <strong>bytecode verifier</strong> statically proves the code is safe: the operand stack never underflows or overflows, every local is written before it is read, types line up (no treating an <span class='key'>int</span> as a reference), and every branch lands on a valid instruction. This is what lets the interpreter and JIT skip runtime bounds/type checks that a naive stack machine would need.</p>
+<pre class="code" data-src="// A hand-corrupted class where iadd runs with only ONE value on the stack:
+$ java Broken
+Exception in thread &quot;main&quot; java.lang.VerifyError:
+  Operand stack underflow
+    Exception Details:
+      Location: Broken.main([Ljava/lang/String;)V @2: iadd
+      Reason: Attempt to pop empty operand stack."></pre>
+    <h3>Why bytecode exists at all</h3>
+    <p>Two payoffs justify the extra layer. First, <strong>portability</strong>: &ldquo;compile once, run anywhere&rdquo; works because the <span class='key'>.class</span> targets the abstract JVM, and each platform ships its own JVM that turns bytecode into native code at runtime (the JIT). Second, bytecode is a <strong>shared target</strong>: Kotlin, Scala, Groovy, and Clojure all compile to the very same <span class='key'>.class</span> format, so they interoperate and reuse the entire JVM ecosystem &mdash; the GC, the JIT, every Java library &mdash; for free.</p>
+<pre class="code" data-src="# All of these emit standard JVM bytecode into .class files:
+$ javac  App.java      # Java
+$ kotlinc App.kt       # Kotlin
+$ scalac  App.scala    # Scala
+# ...and one JVM runs all of them, sharing the same JIT + garbage collector."></pre>
     
   </div>
 </section>
@@ -234,6 +320,9 @@ System.out.println("Whole expression 2+3 then *4 = " + result);</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Predict the order</h3><p class="prompt">For <span class='key'>5 - 2 - 1</span>, write the sequence of pushes and <span class='key'>isub</span>s. Does it evaluate left-to-right or right-to-left?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Left-to-right: push 5, push 2, <span class='key'>isub</span> → 3; push 1, <span class='key'>isub</span> → 2. Subtraction is left-associative, so it is (5-2)-1, not 5-(2-1).</div></details></div>
       <div class="exercise"><h3>2 &middot; Why a constant pool?</h3><p class="prompt">A class uses the string <span class='key'>"OK"</span> in five places. How many times is it stored in the <span class='key'>.class</span> file?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Once. The constant pool deduplicates literals and symbolic names; the five usages all reference the same pool index, keeping the file compact.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Which invoke opcode?</h3><p class="prompt">For each call, name the invoke opcode javac emits: (a) <span class='key'>Math.abs(x)</span>, (b) <span class='key'>account.deposit(10)</span> on a class, (c) <span class='key'>list.add(x)</span> where <span class='key'>list</span> is declared <span class='key'>List</span>.</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">(a) <span class='key'>invokestatic</span> &mdash; <span class='key'>abs</span> is static, no receiver. (b) <span class='key'>invokevirtual</span> &mdash; a normal instance method resolved on the runtime type. (c) <span class='key'>invokeinterface</span> &mdash; the declared type <span class='key'>List</span> is an interface, so dispatch goes through the interface table.</div></details></div>
+      <div class="exercise"><h3>4 &middot; What flag shows the bytecode?</h3><p class="prompt">You have <span class='key'>Calc.class</span> and want to see the actual opcodes for its <span class='key'>add</span> method, plus the constant pool. Which two <span class='key'>javap</span> invocations do you run?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>javap -c Calc</span> disassembles the method bodies into opcodes; <span class='key'>javap -v Calc</span> (verbose) additionally dumps the header, flags, and the full constant pool. Plain <span class='key'>javap Calc</span> shows only the public signatures.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Trust nothing</h3><p class="prompt">A class file is generated at runtime by a library (not by javac) and its bytecode leaves the operand stack unbalanced. When and how does the JVM catch this, and what error do you get?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">At <em>class load / link time</em>, before the method ever runs, the <b>bytecode verifier</b> statically checks stack balance and types. An unbalanced stack throws <span class='key'>java.lang.VerifyError</span>. This is why the JVM can safely run <span class='key'>.class</span> files from untrusted sources &mdash; it never assumes javac produced them.</div></details></div>
   </div>
 </section>
 
@@ -383,5 +472,147 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('appinstalled', () => { if (btn) btn.hidden = true; });
 })();
 </script>
+<!-- ── Global module menu (auto-injected) ───────────────────────────── -->
+<style id="mod-menu-styles">
+.mm-btn{cursor:pointer;background:none;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px}
+.mm-btn .mm-ico{display:inline-flex;flex-direction:column;gap:3px}
+.mm-btn .mm-ico span{display:block;width:15px;height:2px;background:currentColor;border-radius:2px}
+.mm-overlay{position:fixed;inset:0;z-index:200;background:rgba(8,8,16,0.6);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity var(--transition),visibility var(--transition)}
+.mm-overlay.open{opacity:1;visibility:visible}
+.mm-drawer{position:fixed;top:0;right:0;bottom:0;z-index:201;width:min(400px,88vw);display:flex;flex-direction:column;background:var(--bg-surface);border-left:1px solid var(--bg-elevated);box-shadow:-14px 0 40px rgba(0,0,0,.5);transform:translateX(100%);transition:transform var(--transition)}
+.mm-overlay.open .mm-drawer{transform:translateX(0)}
+.mm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 12px}
+.mm-head h2{font-family:var(--font-display);font-weight:600;font-size:1.05rem;color:var(--text-primary)}
+.mm-close{cursor:pointer;background:none;border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-secondary);font-size:1.1rem;line-height:1;padding:5px 10px;transition:var(--transition)}
+.mm-close:hover{color:var(--accent-coral,#ef476f);border-color:var(--accent-coral,#ef476f)}
+.mm-search-wrap{padding:0 20px 12px}
+.mm-search{width:100%;background:var(--bg-primary);border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-primary);font-family:var(--font-body);font-size:.9rem;padding:9px 12px}
+.mm-search::placeholder{color:var(--text-muted)}
+.mm-search:focus{outline:none;border-color:var(--accent-cyan)}
+.mm-list{flex:1;overflow-y:auto;padding:0 12px 20px}
+.mm-track{font-family:var(--font-code);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:16px 8px 6px}
+.mm-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius);text-decoration:none;color:var(--text-secondary);transition:background var(--transition),color var(--transition)}
+.mm-item .mm-num{font-family:var(--font-code);font-weight:700;font-size:.72rem;color:var(--accent-cyan);background:var(--bg-elevated);padding:3px 7px;border-radius:6px;flex-shrink:0}
+.mm-item .mm-t{font-size:.9rem;line-height:1.3}
+.mm-item:hover{background:var(--bg-elevated);color:var(--text-primary)}
+.mm-item.current{background:var(--bg-elevated)}
+.mm-item.current .mm-t{color:var(--accent-cyan);font-weight:600}
+.mm-empty{color:var(--text-muted);font-size:.9rem;padding:20px 10px}
+@media(prefers-reduced-motion:reduce){.mm-overlay,.mm-drawer{transition-duration:0ms}}
+</style>
+<script>
+(function(){
+  if(window.__modMenu)return;window.__modMenu=1;
+  var M=[
+    ["01","The JVM: Your Code's Real Computer","module-01-jvm-machine.html","Track 1 — The Machine"],
+    ["02","Stack, Heap & the Garbage Collector","module-02-memory-model.html","Track 1 — The Machine"],
+    ["03","From Source to Bytecode","module-03-bytecode.html","Track 1 — The Machine"],
+    ["04","Static Types, Primitives & Boxing","module-04-types-and-vars.html","Track 2 — The Language"],
+    ["05","Objects, Classes & Constructors","module-05-objects-classes.html","Track 2 — The Language"],
+    ["06","Inheritance & Polymorphism","module-06-inheritance.html","Track 2 — The Language"],
+    ["07","Interfaces & Abstract Classes","module-07-interfaces.html","Track 2 — The Language"],
+    ["08","Encapsulation & Immutability","module-08-encapsulation.html","Track 2 — The Language"],
+    ["09","Polymorphism: Overloading vs Overriding","module-09-polymorphism.html","Track 2 — The Language"],
+    ["10","Composition over Inheritance","module-10-composition.html","Track 2 — The Language"],
+    ["11","Static Members & Class Design","module-11-static-members.html","Track 2 — The Language"],
+    ["12","SOLID Principles","module-12-solid-principles.html","Track 2 — The Language"],
+    ["13","Enums & Constant Types","module-13-enums.html","Track 2 — The Language"],
+    ["14","Packages & Access Control","module-14-packages-access.html","Track 2 — The Language"],
+    ["15","Strings & Text","module-15-strings.html","Track 2 — The Language"],
+    ["16","The equals & hashCode Contract","module-16-equals-hashcode.html","Track 2 — The Language"],
+    ["17","Generics & Type Erasure","module-17-generics.html","Track 2 — The Language"],
+    ["18","The Collections Framework","module-18-collections.html","Track 2 — The Language"],
+    ["19","Checked vs Unchecked Exceptions","module-19-exceptions.html","Track 2 — The Language"],
+    ["20","Nested, Inner & Anonymous Classes","module-20-nested-classes.html","Track 2 — The Language"],
+    ["21","Lambdas & the Streams API","module-21-lambdas-streams.html","Track 3 — Modern Java"],
+    ["22","Optional & the Billion-Dollar Bug","module-22-optional-null.html","Track 3 — Modern Java"],
+    ["23","Records, Sealed Types & Pattern Matching","module-23-records-sealed.html","Track 3 — Modern Java"],
+    ["24","Dates & Times (java.time)","module-24-datetime.html","Track 3 — Modern Java"],
+    ["25","Annotations & Reflection","module-25-annotations-reflection.html","Track 3 — Modern Java"],
+    ["26","Threads, Executors & Virtual Threads","module-26-concurrency.html","Track 3 — Modern Java"],
+    ["27","Maven, Gradle & the Classpath","module-27-build-tools.html","Track 4 — The Ecosystem"],
+    ["28","JUnit & Modern Testing","module-28-testing.html","Track 4 — The Ecosystem"],
+    ["29","Dependency Injection & Spring","module-29-spring-di.html","Track 5 — Real-World Java"],
+    ["30","Databases: JDBC & JPA","module-30-persistence-jdbc.html","Track 5 — Real-World Java"],
+    ["31","JSON with Jackson","module-31-json-jackson.html","Track 5 — Real-World Java"],
+    ["32","The HTTP Client (java.net.http)","module-32-http-client.html","Track 5 — Real-World Java"],
+    ["33","Logging Done Right","module-33-logging.html","Track 5 — Real-World Java"],
+    ["34","Singleton","module-34-singleton.html","Track 6 — Design Patterns"],
+    ["35","Factory Method","module-35-factory-method.html","Track 6 — Design Patterns"],
+    ["36","Builder","module-36-builder.html","Track 6 — Design Patterns"],
+    ["37","Adapter","module-37-adapter.html","Track 6 — Design Patterns"],
+    ["38","Decorator","module-38-decorator.html","Track 6 — Design Patterns"],
+    ["39","Facade","module-39-facade.html","Track 6 — Design Patterns"],
+    ["40","Proxy","module-40-proxy.html","Track 6 — Design Patterns"],
+    ["41","Strategy","module-41-strategy.html","Track 6 — Design Patterns"],
+    ["42","Observer","module-42-observer.html","Track 6 — Design Patterns"],
+    ["43","Command","module-43-command.html","Track 6 — Design Patterns"],
+    ["44","Template Method","module-44-template-method.html","Track 6 — Design Patterns"],
+    ["45","State","module-45-state.html","Track 6 — Design Patterns"],
+    ["46","Abstract Factory","module-46-abstract-factory.html","Track 7 — More Design Patterns"],
+    ["47","Prototype","module-47-prototype.html","Track 7 — More Design Patterns"],
+    ["48","Bridge","module-48-bridge.html","Track 7 — More Design Patterns"],
+    ["49","Composite","module-49-composite.html","Track 7 — More Design Patterns"],
+    ["50","Flyweight","module-50-flyweight.html","Track 7 — More Design Patterns"],
+    ["51","Chain of Responsibility","module-51-chain-of-responsibility.html","Track 7 — More Design Patterns"],
+    ["52","Iterator","module-52-iterator.html","Track 7 — More Design Patterns"],
+    ["53","Mediator","module-53-mediator.html","Track 7 — More Design Patterns"],
+    ["54","Memento","module-54-memento.html","Track 7 — More Design Patterns"],
+    ["55","Visitor","module-55-visitor.html","Track 7 — More Design Patterns"],
+    ["56","Interpreter","module-56-interpreter.html","Track 7 — More Design Patterns"]
+  ];
+  var here=location.pathname.split("/").pop();
+
+  // Build the "All Modules" trigger button and drop it into the nav's links group.
+  var links=document.querySelector(".module-nav .links");
+  var btn=document.createElement("button");
+  btn.type="button";btn.className="mm-btn module-nav-mmbtn";
+  btn.setAttribute("aria-haspopup","dialog");btn.setAttribute("aria-expanded","false");
+  btn.innerHTML='<span class="mm-ico"><span></span><span></span><span></span></span>All Modules';
+  if(links){links.insertBefore(btn,links.firstChild);
+    // match the nav link styling
+    var probe=links.querySelector("a");
+    if(probe){var cs=getComputedStyle(probe);btn.style.color=cs.color;btn.style.border=cs.border;btn.style.borderRadius=cs.borderRadius;btn.style.padding=cs.padding;btn.style.fontSize=cs.fontSize;}
+  } else {document.body.appendChild(btn);btn.style.position="fixed";btn.style.top="12px";btn.style.right="12px";btn.style.zIndex="202";btn.style.color="var(--text-secondary)";btn.style.border="1px solid var(--bg-elevated)";btn.style.borderRadius="var(--radius)";btn.style.padding="6px 12px";}
+
+  // Build the drawer.
+  var ov=document.createElement("div");ov.className="mm-overlay";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");ov.setAttribute("aria-label","Course modules");
+  var rows="",lastTrack="";
+  for(var i=0;i<M.length;i++){var m=M[i];
+    if(m[3]!==lastTrack){rows+='<div class="mm-track">'+m[3]+'</div>';lastTrack=m[3];}
+    var cur=m[2]===here?" current":"";
+    rows+='<a class="mm-item'+cur+'" href="'+m[2]+'" data-s="'+(m[0]+" "+m[1]).toLowerCase()+'"'+(cur?' aria-current="page"':'')+'><span class="mm-num">'+m[0]+'</span><span class="mm-t">'+m[1]+'</span></a>';
+  }
+  ov.innerHTML='<div class="mm-drawer"><div class="mm-head"><h2>All Modules</h2><button type="button" class="mm-close" aria-label="Close">&times;</button></div><div class="mm-search-wrap"><input type="search" class="mm-search" placeholder="Filter modules…" aria-label="Filter modules"></div><div class="mm-list">'+rows+'<div class="mm-empty" hidden>No modules match.</div></div></div>';
+  document.body.appendChild(ov);
+
+  var drawer=ov.querySelector(".mm-drawer");
+  var search=ov.querySelector(".mm-search");
+  var items=[].slice.call(ov.querySelectorAll(".mm-item"));
+  var tracks=[].slice.call(ov.querySelectorAll(".mm-track"));
+  var empty=ov.querySelector(".mm-empty");
+  var lastFocus=null;
+
+  function open(){lastFocus=document.activeElement;ov.classList.add("open");btn.setAttribute("aria-expanded","true");document.body.style.overflow="hidden";setTimeout(function(){search.focus();},50);
+    var c=ov.querySelector(".mm-item.current");if(c)c.scrollIntoView({block:"center"});}
+  function close(){ov.classList.remove("open");btn.setAttribute("aria-expanded","false");document.body.style.overflow="";if(lastFocus)lastFocus.focus();}
+  function filter(){var q=search.value.trim().toLowerCase();var any=false;
+    items.forEach(function(it){var show=!q||it.getAttribute("data-s").indexOf(q)>-1;it.style.display=show?"":"none";if(show)any=true;});
+    tracks.forEach(function(tr){var n=tr.nextElementSibling,vis=false;while(n&&n.classList.contains("mm-item")){if(n.style.display!=="none")vis=true;n=n.nextElementSibling;}tr.style.display=vis?"":"none";});
+    empty.hidden=any;}
+
+  btn.addEventListener("click",open);
+  ov.querySelector(".mm-close").addEventListener("click",close);
+  ov.addEventListener("click",function(e){if(e.target===ov)close();});
+  search.addEventListener("input",filter);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ov.classList.contains("open"))close();});
+  // simple focus trap
+  ov.addEventListener("keydown",function(e){if(e.key!=="Tab"||!ov.classList.contains("open"))return;
+    var f=ov.querySelectorAll("a,button,input");if(!f.length)return;var first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+})();
+</script>
+
 </body>
 </html>

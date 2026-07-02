@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Stack values, heap objects, and a reference between them</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127869;&#65039; Real-world analogy</span>
+      <p><strong>The stack is a spring-loaded stack of cafeteria trays; the heap is the warehouse behind the kitchen; the GC is the night-shift janitor.</strong> Every time a diner starts a meal (a <b>method call</b>), a fresh <b>tray</b> pops up on top of the stack to hold their small stuff &mdash; a fork, a number, a claim ticket. You can only ever touch the <em>top</em> tray, and when the meal ends the tray pops off in the exact reverse order it was added &mdash; that is the <b>call stack</b> of stack frames. The actual meals are far too big for a tray, so they are cooked and parked in the <b>warehouse</b> (the <b>heap</b>); the tray only holds a <b>claim ticket</b> pointing at one &mdash; that ticket is a <b>reference</b>. Hand your ticket to a friend and you have copied the <em>ticket</em>, not the meal: you both now point at the same warehouse dish. Nobody bins the warehouse dishes by hand. The <b>janitor</b> (the <b>garbage collector</b>) periodically walks out from the trays still in use, follows every claim ticket he can reach, and throws out any dish that <em>no</em> remaining ticket points to &mdash; even if it looks perfectly good. Stack too tall (infinite recursion) and the tray dispenser jams: <span class='key'>StackOverflowError</span>. Warehouse full and the janitor can’t free enough: <span class='key'>OutOfMemoryError</span>.</p>
+    </div>
     <p>Every method call gets a <strong>stack frame</strong> — a small, short-lived scratchpad holding its local variables. Primitives (<span class='key'>int</span>, <span class='key'>boolean</span>, …) live <em>directly</em> in that frame. Objects do not: <span class='key'>new</span> allocates them on the <strong>heap</strong>, and the stack variable holds only a <strong>reference</strong> (an arrow) to them.</p><p>That single distinction explains Java's assignment rules. Copy an <span class='key'>int</span> and you copy the value. Copy an object variable and you copy the <em>arrow</em> — both now point at the same heap object.</p><pre class="code" data-src="int a = 10;
 int b = a;      // copies the VALUE 10
 
@@ -163,7 +171,86 @@ int[] xs = {1, 2, 3};
 int[] ys = xs;  // copies the REFERENCE — same array!
 ys[0] = 99;     // xs[0] is now 99 too"></pre><p>Nobody frees the heap by hand. When no live reference can reach an object anymore, the <strong>garbage collector</strong> proves it unreachable and reclaims the space.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: main() then new int[] then reference then GC mark then GC sweep"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">main()</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">stack frame</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">new int[]</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">heap alloc</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">reference</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">stack → heap</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">GC mark</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">reachable?</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">GC sweep</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">reclaim</text></g></svg></div>
-    
+    <h3>The call stack &amp; stack frames</h3>
+    <p>Each thread owns exactly one <strong>call stack</strong>. Every method invocation pushes a new <strong>stack frame</strong> holding that call’s parameters, local variables, and a slot for the return address; when the method returns, its frame is popped and its locals vanish instantly &mdash; no GC involved. Because frames stack in last-in-first-out order, the currently running method is always the frame on top.</p>
+    <p>The stack is small and fixed (often about 512&nbsp;KB&ndash;1&nbsp;MB per thread, set with <span class='key'>-Xss</span>). Recurse without a base case and you keep pushing frames until the stack is exhausted &mdash; the JVM throws <span class='key'>StackOverflowError</span>, not <span class='key'>OutOfMemoryError</span>. Note that Java does <em>not</em> optimize tail calls, so even a &ldquo;tail-recursive&rdquo; method grows the stack.</p>
+<pre class="code" data-src="int factorial(int n) {
+    // Each call pushes a frame holding n and the return address.
+    if (n &lt;= 1) return 1;          // base case pops frames back down
+    return n * factorial(n - 1);   // recursive call pushes another frame
+}
+
+int boom(int n) {
+    return boom(n + 1);            // no base case -&gt; StackOverflowError
+}
+// The stack is per-thread; a deep-but-finite recursion is fine,
+// an unbounded one exhausts the ~1 MB stack in milliseconds."></pre>
+    <h3>What a variable actually holds</h3>
+    <p>A variable of a primitive type <em>is</em> its value: an <span class='key'>int</span> slot literally contains the bits <span class='key'>10</span>. A variable of any reference type &mdash; every class, array, and interface &mdash; holds a <strong>reference</strong>, never the object itself. The object always lives on the heap; the variable is just an arrow to it (or <span class='key'>null</span>, an arrow to nothing).</p>
+    <p>This is why <span class='key'>==</span> on objects compares <em>identity</em> (same arrow, same heap address), while <span class='key'>.equals()</span> compares <em>contents</em>. It is also why passing an object to a method lets the method mutate it: Java is strictly pass-by-value, but the value passed <em>is the reference</em>, so the copy still points at the same heap object.</p>
+<pre class="code" data-src="String a = new String(&quot;hi&quot;);
+String b = new String(&quot;hi&quot;);
+System.out.println(a == b);        // false: two different heap objects
+System.out.println(a.equals(b));   // true:  same contents
+
+void rename(int[] xs) {            // xs is a COPY of the reference...
+    xs[0] = 42;                    // ...but it points at the SAME array
+}
+int[] data = {1, 2, 3};
+rename(data);
+System.out.println(data[0]);       // 42 -- the callee mutated our object"></pre>
+    <h3>Reachability &amp; GC roots</h3>
+    <p>The garbage collector never tries to detect &ldquo;objects you’re done with.&rdquo; It computes <strong>reachability</strong>. It starts from a fixed set of <strong>GC roots</strong> &mdash; local variables on every thread’s stack, active method parameters, static fields, and JNI references &mdash; and traces every reference it can follow. Any object reached is <strong>live</strong>; everything else is provably <strong>garbage</strong> and may be reclaimed.</p>
+    <p>The consequence that trips people up: an object is collectible the moment it becomes <em>unreachable</em>, not when it &ldquo;goes out of scope&rdquo; textually. Two objects that reference each other but that no root can reach are <em>both</em> garbage &mdash; tracing collectors handle cycles for free, unlike pure reference counting.</p>
+<pre class="code" data-src="Object x = new Object();   // reachable: a local (a GC root) points to it
+x = null;                  // that object is now unreachable -&gt; eligible for GC
+
+// Cycles are NOT a problem for a tracing GC:
+class Node { Node next; }
+Node a = new Node();
+Node b = new Node();
+a.next = b;
+b.next = a;                // a&lt;-&gt;b reference each other
+a = null;
+b = null;                  // no root reaches either -&gt; both are collectible"></pre>
+    <h3>Generational GC: young vs old</h3>
+    <p>The JVM exploits a strong empirical rule &mdash; the <strong>weak generational hypothesis</strong>: most objects die young. So the heap is split into a <strong>young generation</strong> (a small Eden space plus two survivor spaces) and an <strong>old generation</strong>. New objects are allocated in Eden. A <strong>minor GC</strong> collects only the young gen; it’s fast because it copies out the few survivors and wipes the rest wholesale.</p>
+    <p>Objects that survive several minor GCs are <strong>promoted</strong> (tenured) into the old generation. Cleaning the old gen requires a <strong>major</strong> (or <strong>full</strong>) GC, which is rarer but more expensive. You don’t call any of this &mdash; you observe it. The practical takeaway: churning short-lived objects is cheap in Java precisely because they never leave the young gen.</p>
+<pre class="code" data-src="// Short-lived garbage: allocated and abandoned inside the loop.
+// Each temporary dies in Eden and is reclaimed by a fast minor GC.
+long sum = 0;
+for (int i = 0; i &lt; 1_000_000; i++) {
+    String tmp = &quot;row-&quot; + i;   // fresh object per iteration
+    sum += tmp.length();       // tmp is unreachable after this line
+}
+// A cache field, by contrast, keeps objects reachable for a long time,
+// so they get promoted to the old generation and only a major GC frees them."></pre>
+    <h3>Choosing a collector: G1, ZGC, Shenandoah</h3>
+    <p>The JVM ships several garbage collectors and you pick one with a flag &mdash; a tuning knob most other managed runtimes don’t expose. <strong>G1</strong> (Garbage-First) is the default on modern JDKs: it divides the heap into many regions and aims to hit a pause-time target, a solid all-round throughput/latency balance. <strong>ZGC</strong> and <strong>Shenandoah</strong> are low-latency, mostly-concurrent collectors that keep &ldquo;stop-the-world&rdquo; pauses to a small, roughly constant duration even on very large heaps &mdash; ideal for latency-sensitive services.</p>
+    <p>There’s also the throughput-oriented <strong>Parallel</strong> collector (great for batch jobs that don’t care about pauses) and the <strong>Serial</strong> collector for tiny heaps. The choice is a trade-off between raw throughput and pause length; it does not change your code, only the runtime’s pause profile.</p>
+<pre class="code" data-src="# Selected at launch, never in source code:
+java -XX:+UseG1GC        MyApp   # default; balanced pause vs throughput
+java -XX:+UseZGC         MyApp   # very low, near-constant pauses on huge heaps
+java -XX:+UseShenandoahGC MyApp  # low pause, concurrent compaction
+java -XX:+UseParallelGC  MyApp   # max throughput, longer pauses (batch)
+
+# Ask the JVM which collector it chose and watch it work:
+java -Xlog:gc MyApp"></pre>
+    <h3>You can still leak memory (and sizing the heap)</h3>
+    <p>Automatic collection removes <em>unreachable</em> objects &mdash; it cannot help with objects you keep <em>reachable</em> by accident. A <strong>Java memory leak</strong> is a lingering reference: a growing <span class='key'>static</span> collection, a cache with no eviction, or a listener you registered but never removed. The GC dutifully keeps every one of them alive because a root still reaches them, and the heap fills until you hit <span class='key'>OutOfMemoryError: Java heap space</span>.</p>
+    <p>You bound the heap with two flags: <span class='key'>-Xms</span> sets the initial heap size and <span class='key'>-Xmx</span> sets the maximum. Setting them equal avoids resizing pauses in servers. The heap max is a ceiling, not a reservation of &ldquo;how much you’ll use&rdquo; &mdash; leak faster than the GC can free, and no ceiling saves you.</p>
+<pre class="code" data-src="// A classic leak: a static cache that only ever grows.
+class Registry {
+    static final Map&lt;String, byte[]&gt; CACHE = new HashMap&lt;&gt;();
+    static void add(String key) {
+        CACHE.put(key, new byte[1_000_000]);  // never removed...
+    }                                         // ...so never collectible
+}
+// CACHE is reachable from a static field (a GC root) forever -&gt;
+// every 1 MB array stays live -&gt; eventually OutOfMemoryError.
+
+// Bound the heap at launch:  java -Xms512m -Xmx2g MyApp
+//   -Xms = starting heap size,  -Xmx = hard maximum heap size."></pre>
   </div>
 </section>
 
@@ -230,6 +317,9 @@ System.out.println("1,000,000 ints ≈ " + (bytesPerInt * count / 1024) + " KB o
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Will it print 99?</h3><p class="prompt">Given <span class='key'>int[] xs = {1,2,3}; int[] ys = xs; ys[0] = 99;</span> — what does <span class='key'>xs[0]</span> print, and why?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>99</b>. <span class='key'>ys = xs</span> copies the reference, not the array, so both names point at the same heap object. Mutating through one is visible through the other.</div></details></div>
       <div class="exercise"><h3>2 &middot; When does it become garbage?</h3><p class="prompt">A method allocates a big <span class='key'>byte[]</span> into a local variable and returns. When is that array eligible for collection?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">As soon as the method returns, its stack frame (and the only reference) is gone, so the array is unreachable and eligible immediately. The GC reclaims it on its next run, not necessarily right away.</div></details></div>
+      <div class="exercise"><h3>3 &middot; StackOverflow or OutOfMemory?</h3><p class="prompt">A recursive method calls itself with no base case. Which error does the JVM throw &mdash; <span class='key'>StackOverflowError</span> or <span class='key'>OutOfMemoryError</span> &mdash; and why that one?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><b>StackOverflowError</b>. Each call pushes a new <b>stack frame</b>, and the per-thread call stack is small and fixed (~1&nbsp;MB, tunable with <span class='key'>-Xss</span>). It fills long before the much larger heap does. Java has no tail-call optimization, so even tail recursion grows the stack.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Does a GC language leak?</h3><p class="prompt">You keep <span class='key'>put</span>ting entries into a <span class='key'>static final Map</span> cache and never remove any. The heap grows until <span class='key'>OutOfMemoryError</span>. Why didn’t the garbage collector prevent it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The GC only removes <b>unreachable</b> objects. The static map is a <b>GC root</b>, so every entry stays reachable &mdash; and therefore live &mdash; forever. That’s a genuine memory leak in a GC language: a lingering reference, not a missing <span class='key'>free()</span>. Fix it with eviction, a bounded cache, or weak references.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Two objects, a cycle, no roots</h3><p class="prompt">Objects <span class='key'>a</span> and <span class='key'>b</span> hold references to each other, then every local pointing at them is set to <span class='key'>null</span>. Are they collectible?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><b>Yes.</b> The JVM uses a <b>tracing</b> collector: it starts from the GC roots and marks whatever it can reach. Since no root reaches the <span class='key'>a</span>&harr;<span class='key'>b</span> cycle, both are unreachable and eligible &mdash; unlike naive reference counting, which would keep the cycle alive.</div></details></div>
   </div>
 </section>
 
@@ -379,5 +469,147 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('appinstalled', () => { if (btn) btn.hidden = true; });
 })();
 </script>
+<!-- ── Global module menu (auto-injected) ───────────────────────────── -->
+<style id="mod-menu-styles">
+.mm-btn{cursor:pointer;background:none;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px}
+.mm-btn .mm-ico{display:inline-flex;flex-direction:column;gap:3px}
+.mm-btn .mm-ico span{display:block;width:15px;height:2px;background:currentColor;border-radius:2px}
+.mm-overlay{position:fixed;inset:0;z-index:200;background:rgba(8,8,16,0.6);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity var(--transition),visibility var(--transition)}
+.mm-overlay.open{opacity:1;visibility:visible}
+.mm-drawer{position:fixed;top:0;right:0;bottom:0;z-index:201;width:min(400px,88vw);display:flex;flex-direction:column;background:var(--bg-surface);border-left:1px solid var(--bg-elevated);box-shadow:-14px 0 40px rgba(0,0,0,.5);transform:translateX(100%);transition:transform var(--transition)}
+.mm-overlay.open .mm-drawer{transform:translateX(0)}
+.mm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 12px}
+.mm-head h2{font-family:var(--font-display);font-weight:600;font-size:1.05rem;color:var(--text-primary)}
+.mm-close{cursor:pointer;background:none;border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-secondary);font-size:1.1rem;line-height:1;padding:5px 10px;transition:var(--transition)}
+.mm-close:hover{color:var(--accent-coral,#ef476f);border-color:var(--accent-coral,#ef476f)}
+.mm-search-wrap{padding:0 20px 12px}
+.mm-search{width:100%;background:var(--bg-primary);border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-primary);font-family:var(--font-body);font-size:.9rem;padding:9px 12px}
+.mm-search::placeholder{color:var(--text-muted)}
+.mm-search:focus{outline:none;border-color:var(--accent-cyan)}
+.mm-list{flex:1;overflow-y:auto;padding:0 12px 20px}
+.mm-track{font-family:var(--font-code);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:16px 8px 6px}
+.mm-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius);text-decoration:none;color:var(--text-secondary);transition:background var(--transition),color var(--transition)}
+.mm-item .mm-num{font-family:var(--font-code);font-weight:700;font-size:.72rem;color:var(--accent-cyan);background:var(--bg-elevated);padding:3px 7px;border-radius:6px;flex-shrink:0}
+.mm-item .mm-t{font-size:.9rem;line-height:1.3}
+.mm-item:hover{background:var(--bg-elevated);color:var(--text-primary)}
+.mm-item.current{background:var(--bg-elevated)}
+.mm-item.current .mm-t{color:var(--accent-cyan);font-weight:600}
+.mm-empty{color:var(--text-muted);font-size:.9rem;padding:20px 10px}
+@media(prefers-reduced-motion:reduce){.mm-overlay,.mm-drawer{transition-duration:0ms}}
+</style>
+<script>
+(function(){
+  if(window.__modMenu)return;window.__modMenu=1;
+  var M=[
+    ["01","The JVM: Your Code's Real Computer","module-01-jvm-machine.html","Track 1 — The Machine"],
+    ["02","Stack, Heap & the Garbage Collector","module-02-memory-model.html","Track 1 — The Machine"],
+    ["03","From Source to Bytecode","module-03-bytecode.html","Track 1 — The Machine"],
+    ["04","Static Types, Primitives & Boxing","module-04-types-and-vars.html","Track 2 — The Language"],
+    ["05","Objects, Classes & Constructors","module-05-objects-classes.html","Track 2 — The Language"],
+    ["06","Inheritance & Polymorphism","module-06-inheritance.html","Track 2 — The Language"],
+    ["07","Interfaces & Abstract Classes","module-07-interfaces.html","Track 2 — The Language"],
+    ["08","Encapsulation & Immutability","module-08-encapsulation.html","Track 2 — The Language"],
+    ["09","Polymorphism: Overloading vs Overriding","module-09-polymorphism.html","Track 2 — The Language"],
+    ["10","Composition over Inheritance","module-10-composition.html","Track 2 — The Language"],
+    ["11","Static Members & Class Design","module-11-static-members.html","Track 2 — The Language"],
+    ["12","SOLID Principles","module-12-solid-principles.html","Track 2 — The Language"],
+    ["13","Enums & Constant Types","module-13-enums.html","Track 2 — The Language"],
+    ["14","Packages & Access Control","module-14-packages-access.html","Track 2 — The Language"],
+    ["15","Strings & Text","module-15-strings.html","Track 2 — The Language"],
+    ["16","The equals & hashCode Contract","module-16-equals-hashcode.html","Track 2 — The Language"],
+    ["17","Generics & Type Erasure","module-17-generics.html","Track 2 — The Language"],
+    ["18","The Collections Framework","module-18-collections.html","Track 2 — The Language"],
+    ["19","Checked vs Unchecked Exceptions","module-19-exceptions.html","Track 2 — The Language"],
+    ["20","Nested, Inner & Anonymous Classes","module-20-nested-classes.html","Track 2 — The Language"],
+    ["21","Lambdas & the Streams API","module-21-lambdas-streams.html","Track 3 — Modern Java"],
+    ["22","Optional & the Billion-Dollar Bug","module-22-optional-null.html","Track 3 — Modern Java"],
+    ["23","Records, Sealed Types & Pattern Matching","module-23-records-sealed.html","Track 3 — Modern Java"],
+    ["24","Dates & Times (java.time)","module-24-datetime.html","Track 3 — Modern Java"],
+    ["25","Annotations & Reflection","module-25-annotations-reflection.html","Track 3 — Modern Java"],
+    ["26","Threads, Executors & Virtual Threads","module-26-concurrency.html","Track 3 — Modern Java"],
+    ["27","Maven, Gradle & the Classpath","module-27-build-tools.html","Track 4 — The Ecosystem"],
+    ["28","JUnit & Modern Testing","module-28-testing.html","Track 4 — The Ecosystem"],
+    ["29","Dependency Injection & Spring","module-29-spring-di.html","Track 5 — Real-World Java"],
+    ["30","Databases: JDBC & JPA","module-30-persistence-jdbc.html","Track 5 — Real-World Java"],
+    ["31","JSON with Jackson","module-31-json-jackson.html","Track 5 — Real-World Java"],
+    ["32","The HTTP Client (java.net.http)","module-32-http-client.html","Track 5 — Real-World Java"],
+    ["33","Logging Done Right","module-33-logging.html","Track 5 — Real-World Java"],
+    ["34","Singleton","module-34-singleton.html","Track 6 — Design Patterns"],
+    ["35","Factory Method","module-35-factory-method.html","Track 6 — Design Patterns"],
+    ["36","Builder","module-36-builder.html","Track 6 — Design Patterns"],
+    ["37","Adapter","module-37-adapter.html","Track 6 — Design Patterns"],
+    ["38","Decorator","module-38-decorator.html","Track 6 — Design Patterns"],
+    ["39","Facade","module-39-facade.html","Track 6 — Design Patterns"],
+    ["40","Proxy","module-40-proxy.html","Track 6 — Design Patterns"],
+    ["41","Strategy","module-41-strategy.html","Track 6 — Design Patterns"],
+    ["42","Observer","module-42-observer.html","Track 6 — Design Patterns"],
+    ["43","Command","module-43-command.html","Track 6 — Design Patterns"],
+    ["44","Template Method","module-44-template-method.html","Track 6 — Design Patterns"],
+    ["45","State","module-45-state.html","Track 6 — Design Patterns"],
+    ["46","Abstract Factory","module-46-abstract-factory.html","Track 7 — More Design Patterns"],
+    ["47","Prototype","module-47-prototype.html","Track 7 — More Design Patterns"],
+    ["48","Bridge","module-48-bridge.html","Track 7 — More Design Patterns"],
+    ["49","Composite","module-49-composite.html","Track 7 — More Design Patterns"],
+    ["50","Flyweight","module-50-flyweight.html","Track 7 — More Design Patterns"],
+    ["51","Chain of Responsibility","module-51-chain-of-responsibility.html","Track 7 — More Design Patterns"],
+    ["52","Iterator","module-52-iterator.html","Track 7 — More Design Patterns"],
+    ["53","Mediator","module-53-mediator.html","Track 7 — More Design Patterns"],
+    ["54","Memento","module-54-memento.html","Track 7 — More Design Patterns"],
+    ["55","Visitor","module-55-visitor.html","Track 7 — More Design Patterns"],
+    ["56","Interpreter","module-56-interpreter.html","Track 7 — More Design Patterns"]
+  ];
+  var here=location.pathname.split("/").pop();
+
+  // Build the "All Modules" trigger button and drop it into the nav's links group.
+  var links=document.querySelector(".module-nav .links");
+  var btn=document.createElement("button");
+  btn.type="button";btn.className="mm-btn module-nav-mmbtn";
+  btn.setAttribute("aria-haspopup","dialog");btn.setAttribute("aria-expanded","false");
+  btn.innerHTML='<span class="mm-ico"><span></span><span></span><span></span></span>All Modules';
+  if(links){links.insertBefore(btn,links.firstChild);
+    // match the nav link styling
+    var probe=links.querySelector("a");
+    if(probe){var cs=getComputedStyle(probe);btn.style.color=cs.color;btn.style.border=cs.border;btn.style.borderRadius=cs.borderRadius;btn.style.padding=cs.padding;btn.style.fontSize=cs.fontSize;}
+  } else {document.body.appendChild(btn);btn.style.position="fixed";btn.style.top="12px";btn.style.right="12px";btn.style.zIndex="202";btn.style.color="var(--text-secondary)";btn.style.border="1px solid var(--bg-elevated)";btn.style.borderRadius="var(--radius)";btn.style.padding="6px 12px";}
+
+  // Build the drawer.
+  var ov=document.createElement("div");ov.className="mm-overlay";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");ov.setAttribute("aria-label","Course modules");
+  var rows="",lastTrack="";
+  for(var i=0;i<M.length;i++){var m=M[i];
+    if(m[3]!==lastTrack){rows+='<div class="mm-track">'+m[3]+'</div>';lastTrack=m[3];}
+    var cur=m[2]===here?" current":"";
+    rows+='<a class="mm-item'+cur+'" href="'+m[2]+'" data-s="'+(m[0]+" "+m[1]).toLowerCase()+'"'+(cur?' aria-current="page"':'')+'><span class="mm-num">'+m[0]+'</span><span class="mm-t">'+m[1]+'</span></a>';
+  }
+  ov.innerHTML='<div class="mm-drawer"><div class="mm-head"><h2>All Modules</h2><button type="button" class="mm-close" aria-label="Close">&times;</button></div><div class="mm-search-wrap"><input type="search" class="mm-search" placeholder="Filter modules…" aria-label="Filter modules"></div><div class="mm-list">'+rows+'<div class="mm-empty" hidden>No modules match.</div></div></div>';
+  document.body.appendChild(ov);
+
+  var drawer=ov.querySelector(".mm-drawer");
+  var search=ov.querySelector(".mm-search");
+  var items=[].slice.call(ov.querySelectorAll(".mm-item"));
+  var tracks=[].slice.call(ov.querySelectorAll(".mm-track"));
+  var empty=ov.querySelector(".mm-empty");
+  var lastFocus=null;
+
+  function open(){lastFocus=document.activeElement;ov.classList.add("open");btn.setAttribute("aria-expanded","true");document.body.style.overflow="hidden";setTimeout(function(){search.focus();},50);
+    var c=ov.querySelector(".mm-item.current");if(c)c.scrollIntoView({block:"center"});}
+  function close(){ov.classList.remove("open");btn.setAttribute("aria-expanded","false");document.body.style.overflow="";if(lastFocus)lastFocus.focus();}
+  function filter(){var q=search.value.trim().toLowerCase();var any=false;
+    items.forEach(function(it){var show=!q||it.getAttribute("data-s").indexOf(q)>-1;it.style.display=show?"":"none";if(show)any=true;});
+    tracks.forEach(function(tr){var n=tr.nextElementSibling,vis=false;while(n&&n.classList.contains("mm-item")){if(n.style.display!=="none")vis=true;n=n.nextElementSibling;}tr.style.display=vis?"":"none";});
+    empty.hidden=any;}
+
+  btn.addEventListener("click",open);
+  ov.querySelector(".mm-close").addEventListener("click",close);
+  ov.addEventListener("click",function(e){if(e.target===ov)close();});
+  search.addEventListener("input",filter);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ov.classList.contains("open"))close();});
+  // simple focus trap
+  ov.addEventListener("keydown",function(e){if(e.key!=="Tab"||!ov.classList.contains("open"))return;
+    var f=ov.querySelectorAll("a,button,input");if(!f.length)return;var first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+})();
+</script>
+
 </body>
 </html>

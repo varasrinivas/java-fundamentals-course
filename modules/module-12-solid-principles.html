@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>S · O · L · I · D</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127959; Real-world analogy</span>
+      <p><strong>SOLID is the building code for software.</strong> A city’s building code is a set of construction rules that keep a structure safe and livable as it grows and gets renovated. Each SOLID letter is one such rule. <b>Single Responsibility</b> is &ldquo;one room, one purpose&rdquo; — the kitchen isn’t also the electrical panel. <b>Open/Closed</b> is &ldquo;add an extension without knocking down load-bearing walls.&rdquo; <b>Liskov Substitution</b> is &ldquo;any certified fixture can be swapped for another of the same rating&rdquo; — a replacement outlet must behave like an outlet. <b>Interface Segregation</b> is &ldquo;don’t force every tenant to pay for a pool and a gym they never use.&rdquo; <b>Dependency Inversion</b> is &ldquo;plug appliances into standardized sockets, not directly into the wiring in the wall.&rdquo; Follow the code and the building keeps standing through decades of change; ignore it and every renovation risks the whole structure.</p>
+    </div>
     <p><strong>S — Single Responsibility:</strong> a class should have one reason to change. A class that parses <em>and</em> validates <em>and</em> saves is three classes wearing a trench coat.</p><p><strong>O — Open/Closed:</strong> open for extension, closed for modification. Add behavior by adding a new type (a new <span class='key'>Shape</span> implementation), not by editing a giant <span class='key'>switch</span>.</p><p><strong>L — Liskov Substitution:</strong> a subtype must be usable anywhere its supertype is, without surprises. If <span class='key'>Square extends Rectangle</span> breaks code that sets width and height independently, you’ve violated it.</p><p><strong>I — Interface Segregation:</strong> prefer many small interfaces over one fat one. Don’t force a class to implement methods it doesn’t need.</p><p><strong>D — Dependency Inversion:</strong> depend on abstractions, not concretions. High-level code should rely on an interface and have the implementation injected (see the DI module).</p><pre class="code" data-src="// OCP + DIP: new behavior via a new type, injected as an interface
 interface Discount { int apply(int cents); }
 class BlackFriday implements Discount { public int apply(int c){ return c/2; } }
@@ -165,7 +173,103 @@ class Checkout {
     Checkout(Discount discount) { this.discount = discount; }   // injected
 }"></pre>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: S then O then L then I then D"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">S</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">one responsibility</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">O</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">open/closed</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">L</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">substitutable</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">I</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">small interfaces</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">D</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">depend on abstractions</text></g></svg></div>
-    
+
+    <h3>S — Single Responsibility</h3>
+    <p>A class should have <strong>one reason to change</strong> — that is, answer to a single actor or concern. When formatting, persistence, and messaging all live in one class, a change to any of the three risks the other two, and the class becomes a merge-conflict magnet. The fix is to give each concern its own class and let a coordinator wire them together.</p>
+    <p>&ldquo;One reason to change&rdquo; is subtler than &ldquo;one method&rdquo;: it’s about <em>who</em> asks for the change. The renderer changes when marketing wants new HTML; the repository changes when the DBA alters schema. Different masters &rarr; different classes.</p>
+    <pre class="code" data-src="// VIOLATION: three reasons to change wearing one trench coat.
+class Invoice {
+    String toHtml()      { /* formatting logic */ return &quot;...&quot;; }
+    void   saveToDb()    { /* JDBC / persistence logic */ }
+    void   emailTo(String addr) { /* SMTP logic */ }
+}
+
+// FIX: one responsibility per class; each has a single reason to change.
+class Invoice { /* just the data + business rules */ }
+class InvoiceRenderer  { String toHtml(Invoice i) { return &quot;...&quot;; } }
+class InvoiceRepository { void save(Invoice i) { /* JDBC */ } }
+class InvoiceMailer    { void email(Invoice i, String addr) { /* SMTP */ } }"></pre>
+    <h3>O — Open/Closed</h3>
+    <p>Software entities should be <strong>open for extension but closed for modification</strong>. You should be able to add new behavior by adding new code (a new type or strategy), not by editing existing, already-tested code. A growing <span class='key'>if/instanceof</span> chain or <span class='key'>switch</span> that you edit for every new case is the classic smell.</p>
+    <p>In Java the lever is polymorphism: define an interface, and let each new case be a new implementation. Existing methods never change, so existing tests stay green and can’t regress.</p>
+    <pre class="code" data-src="// VIOLATION: every new shape forces an edit to this tested method.
+double area(Shape s) {
+    if (s instanceof Circle c)    return Math.PI * c.r * c.r;
+    if (s instanceof Square sq)   return sq.side * sq.side;
+    // add Triangle -&gt; edit here again... closed for nothing.
+    throw new IllegalArgumentException(&quot;unknown shape&quot;);
+}
+
+// FIX: open for extension via a new type, closed to modification.
+interface Shape { double area(); }
+record Circle(double r)   implements Shape { public double area(){ return Math.PI*r*r; } }
+record Square(double side) implements Shape { public double area(){ return side*side; } }
+// New shape = new class. No existing code is touched.
+record Triangle(double b, double h) implements Shape { public double area(){ return 0.5*b*h; } }"></pre>
+    <h3>L — Liskov Substitution</h3>
+    <p>Subtypes must be <strong>usable through the base type without surprises</strong>: anywhere the code expects a <span class='key'>Rectangle</span>, handing it a subtype must not break the caller’s assumptions. The classic trap is <span class='key'>Square extends Rectangle</span> — mathematically a square is a rectangle, but overriding the setters to keep sides equal violates the base class’s contract that width and height move independently.</p>
+    <p>Another form is the <span class='key'>Bird</span>/<span class='key'>Penguin</span> trap: if <span class='key'>Bird</span> promises <span class='key'>fly()</span> and <span class='key'>Penguin</span> throws from it, penguins aren’t substitutable birds. LSP is really about honoring contracts — preconditions no stronger, postconditions no weaker than the base type’s.</p>
+    <pre class="code" data-src="// VIOLATION: Square IS-A Rectangle mathematically, but not behaviorally.
+class Rectangle {
+    protected int w, h;
+    void setWidth(int w)  { this.w = w; }
+    void setHeight(int h) { this.h = h; }
+    int area() { return w * h; }
+}
+class Square extends Rectangle {
+    void setWidth(int w)  { this.w = w; this.h = w; }   // surprise: also sets height
+    void setHeight(int h) { this.h = h; this.w = h; }   // breaks the base contract
+}
+// Any code written against Rectangle now misbehaves for a Square:
+void resizeAndCheck(Rectangle r) {
+    r.setWidth(5); r.setHeight(4);
+    assert r.area() == 20;   // FAILS for Square: area is 16, not 20
+}
+
+// FIX: don't subtype when the contract can't hold. Model them separately
+// (e.g. an immutable Shape with area()), so no subtype surprises a caller."></pre>
+    <h3>I — Interface Segregation</h3>
+    <p>Many small, role-focused interfaces beat one fat interface. No client should be <strong>forced to depend on methods it doesn’t use</strong>. The tell-tale sign of a violation is an implementation that has to write <span class='key'>throw new UnsupportedOperationException()</span> for a method that makes no sense for it.</p>
+    <p>Java’s standard library learned this lesson: interfaces like <span class='key'>Runnable</span>, <span class='key'>Comparable</span>, and <span class='key'>AutoCloseable</span> each declare a single method, so a class implements exactly the roles it actually plays.</p>
+    <pre class="code" data-src="// VIOLATION: one fat interface forces meaningless method implementations.
+interface Worker {
+    void work();
+    void eat();
+}
+class Robot implements Worker {
+    public void work() { /* ... */ }
+    public void eat()  { throw new UnsupportedOperationException(&quot;robots don't eat&quot;); }
+}
+
+// FIX: split into small, role-focused interfaces; implement only what fits.
+interface Workable { void work(); }
+interface Feedable { void eat(); }
+class Human implements Workable, Feedable {
+    public void work() { /* ... */ }
+    public void eat()  { /* ... */ }
+}
+class Robot implements Workable {   // no forced eat(), no UnsupportedOperationException
+    public void work() { /* ... */ }
+}"></pre>
+    <h3>D — Dependency Inversion</h3>
+    <p>High-level code should <strong>depend on abstractions, not on low-level details</strong>. Both should depend on interfaces. Concretely: don’t <span class='key'>new</span> up a database class inside your business logic — accept an interface and let the caller inject the implementation. This inverts the usual compile-time arrow so the policy no longer imports the plumbing.</p>
+    <p>Injecting the dependency (constructor injection is the Java idiom) makes the high-level class testable with a fake and reconfigurable in production — exactly what frameworks like Spring automate. DIP is the principle; dependency injection is the technique that delivers it.</p>
+    <pre class="code" data-src="// VIOLATION: high-level policy hard-wired to a low-level detail.
+class OrderService {
+    private final MySqlOrderDb db = new MySqlOrderDb();  // imports the concrete class
+    void place(Order o) { db.insert(o); }                // can't swap DB or test in isolation
+}
+
+// FIX: depend on an abstraction; inject the implementation.
+interface OrderStore { void save(Order o); }
+class MySqlOrderStore implements OrderStore { public void save(Order o){ /* JDBC */ } }
+
+class OrderService {
+    private final OrderStore store;                 // depends on the interface
+    OrderService(OrderStore store) { this.store = store; }   // injected by the caller
+    void place(Order o) { store.save(o); }
+}
+// Now a test can inject an in-memory OrderStore; production injects the MySQL one."></pre>
   </div>
 </section>
 
@@ -230,6 +334,9 @@ System.out.println("bloated class follows SRP? " + (bloated &lt;= 1));</textarea
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Name the violation</h3><p class="prompt">A <span class='key'>Report</span> class formats HTML, queries the database, and emails the result. Which SOLID letter does it break, and how do you fix it?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>S</b> (Single Responsibility) — it has three reasons to change. Split it into a formatter, a repository, and a mailer, each with one job, and coordinate them (often via injected dependencies, which also serves <b>D</b>).</div></details></div>
       <div class="exercise"><h3>2 &middot; Open/Closed in practice</h3><p class="prompt">Adding each new payment type means editing a growing <span class='key'>switch(type)</span>. Which principle is strained, and what’s the OO fix?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>O</b> (Open/Closed). Replace the switch with a <span class='key'>PaymentMethod</span> interface and one implementation per type; adding a payment means adding a class, not modifying existing, tested code (polymorphism doing the dispatch).</div></details></div>
+      <div class="exercise"><h3>3 &middot; The Square/Rectangle trap</h3><p class="prompt">Why is <span class='key'>class Square extends Rectangle</span> — with overridden setters that keep all sides equal — a Liskov violation, even though a square really is a kind of rectangle?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>L</b> (Liskov Substitution). <span class='key'>Rectangle</span>’s contract lets a caller set width and height <em>independently</em>; <span class='key'>Square</span> secretly changes both, so code like <span class='key'>setWidth(5); setHeight(4); assert area()==20</span> fails for a Square. The subtype strengthens an implicit precondition and surprises callers. Fix: don’t inherit — model them as separate (often immutable) shapes.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Spot the fat interface</h3><p class="prompt">A <span class='key'>Machine</span> interface declares <span class='key'>print()</span>, <span class='key'>scan()</span>, and <span class='key'>fax()</span>. Your <span class='key'>SimplePrinter</span> can only print, so its <span class='key'>scan()</span> and <span class='key'>fax()</span> throw <span class='key'>UnsupportedOperationException</span>. Which principle is violated and how do you fix it?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>I</b> (Interface Segregation). The forced <span class='key'>UnsupportedOperationException</span> is the giveaway. Split <span class='key'>Machine</span> into small role interfaces — <span class='key'>Printer</span>, <span class='key'>Scanner</span>, <span class='key'>Fax</span> — and let <span class='key'>SimplePrinter</span> implement only <span class='key'>Printer</span>. A multifunction device implements all three.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Invert the dependency</h3><p class="prompt">A <span class='key'>NotificationService</span> does <span class='key'>new SmtpEmailSender()</span> inside its constructor. It works, but it’s hard to unit-test and you can’t switch to SMS. Which principle is broken, and what’s the idiomatic Java fix?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body"><b>D</b> (Dependency Inversion). The high-level service imports a low-level concrete class. Define a <span class='key'>MessageSender</span> interface, have <span class='key'>NotificationService</span> accept it via <em>constructor injection</em>, and let the caller (or a DI container like Spring) supply <span class='key'>SmtpEmailSender</span> in production and a fake in tests.</div></details></div>
   </div>
 </section>
 
@@ -379,5 +486,147 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('appinstalled', () => { if (btn) btn.hidden = true; });
 })();
 </script>
+<!-- ── Global module menu (auto-injected) ───────────────────────────── -->
+<style id="mod-menu-styles">
+.mm-btn{cursor:pointer;background:none;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px}
+.mm-btn .mm-ico{display:inline-flex;flex-direction:column;gap:3px}
+.mm-btn .mm-ico span{display:block;width:15px;height:2px;background:currentColor;border-radius:2px}
+.mm-overlay{position:fixed;inset:0;z-index:200;background:rgba(8,8,16,0.6);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity var(--transition),visibility var(--transition)}
+.mm-overlay.open{opacity:1;visibility:visible}
+.mm-drawer{position:fixed;top:0;right:0;bottom:0;z-index:201;width:min(400px,88vw);display:flex;flex-direction:column;background:var(--bg-surface);border-left:1px solid var(--bg-elevated);box-shadow:-14px 0 40px rgba(0,0,0,.5);transform:translateX(100%);transition:transform var(--transition)}
+.mm-overlay.open .mm-drawer{transform:translateX(0)}
+.mm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 12px}
+.mm-head h2{font-family:var(--font-display);font-weight:600;font-size:1.05rem;color:var(--text-primary)}
+.mm-close{cursor:pointer;background:none;border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-secondary);font-size:1.1rem;line-height:1;padding:5px 10px;transition:var(--transition)}
+.mm-close:hover{color:var(--accent-coral,#ef476f);border-color:var(--accent-coral,#ef476f)}
+.mm-search-wrap{padding:0 20px 12px}
+.mm-search{width:100%;background:var(--bg-primary);border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-primary);font-family:var(--font-body);font-size:.9rem;padding:9px 12px}
+.mm-search::placeholder{color:var(--text-muted)}
+.mm-search:focus{outline:none;border-color:var(--accent-cyan)}
+.mm-list{flex:1;overflow-y:auto;padding:0 12px 20px}
+.mm-track{font-family:var(--font-code);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:16px 8px 6px}
+.mm-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius);text-decoration:none;color:var(--text-secondary);transition:background var(--transition),color var(--transition)}
+.mm-item .mm-num{font-family:var(--font-code);font-weight:700;font-size:.72rem;color:var(--accent-cyan);background:var(--bg-elevated);padding:3px 7px;border-radius:6px;flex-shrink:0}
+.mm-item .mm-t{font-size:.9rem;line-height:1.3}
+.mm-item:hover{background:var(--bg-elevated);color:var(--text-primary)}
+.mm-item.current{background:var(--bg-elevated)}
+.mm-item.current .mm-t{color:var(--accent-cyan);font-weight:600}
+.mm-empty{color:var(--text-muted);font-size:.9rem;padding:20px 10px}
+@media(prefers-reduced-motion:reduce){.mm-overlay,.mm-drawer{transition-duration:0ms}}
+</style>
+<script>
+(function(){
+  if(window.__modMenu)return;window.__modMenu=1;
+  var M=[
+    ["01","The JVM: Your Code's Real Computer","module-01-jvm-machine.html","Track 1 — The Machine"],
+    ["02","Stack, Heap & the Garbage Collector","module-02-memory-model.html","Track 1 — The Machine"],
+    ["03","From Source to Bytecode","module-03-bytecode.html","Track 1 — The Machine"],
+    ["04","Static Types, Primitives & Boxing","module-04-types-and-vars.html","Track 2 — The Language"],
+    ["05","Objects, Classes & Constructors","module-05-objects-classes.html","Track 2 — The Language"],
+    ["06","Inheritance & Polymorphism","module-06-inheritance.html","Track 2 — The Language"],
+    ["07","Interfaces & Abstract Classes","module-07-interfaces.html","Track 2 — The Language"],
+    ["08","Encapsulation & Immutability","module-08-encapsulation.html","Track 2 — The Language"],
+    ["09","Polymorphism: Overloading vs Overriding","module-09-polymorphism.html","Track 2 — The Language"],
+    ["10","Composition over Inheritance","module-10-composition.html","Track 2 — The Language"],
+    ["11","Static Members & Class Design","module-11-static-members.html","Track 2 — The Language"],
+    ["12","SOLID Principles","module-12-solid-principles.html","Track 2 — The Language"],
+    ["13","Enums & Constant Types","module-13-enums.html","Track 2 — The Language"],
+    ["14","Packages & Access Control","module-14-packages-access.html","Track 2 — The Language"],
+    ["15","Strings & Text","module-15-strings.html","Track 2 — The Language"],
+    ["16","The equals & hashCode Contract","module-16-equals-hashcode.html","Track 2 — The Language"],
+    ["17","Generics & Type Erasure","module-17-generics.html","Track 2 — The Language"],
+    ["18","The Collections Framework","module-18-collections.html","Track 2 — The Language"],
+    ["19","Checked vs Unchecked Exceptions","module-19-exceptions.html","Track 2 — The Language"],
+    ["20","Nested, Inner & Anonymous Classes","module-20-nested-classes.html","Track 2 — The Language"],
+    ["21","Lambdas & the Streams API","module-21-lambdas-streams.html","Track 3 — Modern Java"],
+    ["22","Optional & the Billion-Dollar Bug","module-22-optional-null.html","Track 3 — Modern Java"],
+    ["23","Records, Sealed Types & Pattern Matching","module-23-records-sealed.html","Track 3 — Modern Java"],
+    ["24","Dates & Times (java.time)","module-24-datetime.html","Track 3 — Modern Java"],
+    ["25","Annotations & Reflection","module-25-annotations-reflection.html","Track 3 — Modern Java"],
+    ["26","Threads, Executors & Virtual Threads","module-26-concurrency.html","Track 3 — Modern Java"],
+    ["27","Maven, Gradle & the Classpath","module-27-build-tools.html","Track 4 — The Ecosystem"],
+    ["28","JUnit & Modern Testing","module-28-testing.html","Track 4 — The Ecosystem"],
+    ["29","Dependency Injection & Spring","module-29-spring-di.html","Track 5 — Real-World Java"],
+    ["30","Databases: JDBC & JPA","module-30-persistence-jdbc.html","Track 5 — Real-World Java"],
+    ["31","JSON with Jackson","module-31-json-jackson.html","Track 5 — Real-World Java"],
+    ["32","The HTTP Client (java.net.http)","module-32-http-client.html","Track 5 — Real-World Java"],
+    ["33","Logging Done Right","module-33-logging.html","Track 5 — Real-World Java"],
+    ["34","Singleton","module-34-singleton.html","Track 6 — Design Patterns"],
+    ["35","Factory Method","module-35-factory-method.html","Track 6 — Design Patterns"],
+    ["36","Builder","module-36-builder.html","Track 6 — Design Patterns"],
+    ["37","Adapter","module-37-adapter.html","Track 6 — Design Patterns"],
+    ["38","Decorator","module-38-decorator.html","Track 6 — Design Patterns"],
+    ["39","Facade","module-39-facade.html","Track 6 — Design Patterns"],
+    ["40","Proxy","module-40-proxy.html","Track 6 — Design Patterns"],
+    ["41","Strategy","module-41-strategy.html","Track 6 — Design Patterns"],
+    ["42","Observer","module-42-observer.html","Track 6 — Design Patterns"],
+    ["43","Command","module-43-command.html","Track 6 — Design Patterns"],
+    ["44","Template Method","module-44-template-method.html","Track 6 — Design Patterns"],
+    ["45","State","module-45-state.html","Track 6 — Design Patterns"],
+    ["46","Abstract Factory","module-46-abstract-factory.html","Track 7 — More Design Patterns"],
+    ["47","Prototype","module-47-prototype.html","Track 7 — More Design Patterns"],
+    ["48","Bridge","module-48-bridge.html","Track 7 — More Design Patterns"],
+    ["49","Composite","module-49-composite.html","Track 7 — More Design Patterns"],
+    ["50","Flyweight","module-50-flyweight.html","Track 7 — More Design Patterns"],
+    ["51","Chain of Responsibility","module-51-chain-of-responsibility.html","Track 7 — More Design Patterns"],
+    ["52","Iterator","module-52-iterator.html","Track 7 — More Design Patterns"],
+    ["53","Mediator","module-53-mediator.html","Track 7 — More Design Patterns"],
+    ["54","Memento","module-54-memento.html","Track 7 — More Design Patterns"],
+    ["55","Visitor","module-55-visitor.html","Track 7 — More Design Patterns"],
+    ["56","Interpreter","module-56-interpreter.html","Track 7 — More Design Patterns"]
+  ];
+  var here=location.pathname.split("/").pop();
+
+  // Build the "All Modules" trigger button and drop it into the nav's links group.
+  var links=document.querySelector(".module-nav .links");
+  var btn=document.createElement("button");
+  btn.type="button";btn.className="mm-btn module-nav-mmbtn";
+  btn.setAttribute("aria-haspopup","dialog");btn.setAttribute("aria-expanded","false");
+  btn.innerHTML='<span class="mm-ico"><span></span><span></span><span></span></span>All Modules';
+  if(links){links.insertBefore(btn,links.firstChild);
+    // match the nav link styling
+    var probe=links.querySelector("a");
+    if(probe){var cs=getComputedStyle(probe);btn.style.color=cs.color;btn.style.border=cs.border;btn.style.borderRadius=cs.borderRadius;btn.style.padding=cs.padding;btn.style.fontSize=cs.fontSize;}
+  } else {document.body.appendChild(btn);btn.style.position="fixed";btn.style.top="12px";btn.style.right="12px";btn.style.zIndex="202";btn.style.color="var(--text-secondary)";btn.style.border="1px solid var(--bg-elevated)";btn.style.borderRadius="var(--radius)";btn.style.padding="6px 12px";}
+
+  // Build the drawer.
+  var ov=document.createElement("div");ov.className="mm-overlay";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");ov.setAttribute("aria-label","Course modules");
+  var rows="",lastTrack="";
+  for(var i=0;i<M.length;i++){var m=M[i];
+    if(m[3]!==lastTrack){rows+='<div class="mm-track">'+m[3]+'</div>';lastTrack=m[3];}
+    var cur=m[2]===here?" current":"";
+    rows+='<a class="mm-item'+cur+'" href="'+m[2]+'" data-s="'+(m[0]+" "+m[1]).toLowerCase()+'"'+(cur?' aria-current="page"':'')+'><span class="mm-num">'+m[0]+'</span><span class="mm-t">'+m[1]+'</span></a>';
+  }
+  ov.innerHTML='<div class="mm-drawer"><div class="mm-head"><h2>All Modules</h2><button type="button" class="mm-close" aria-label="Close">&times;</button></div><div class="mm-search-wrap"><input type="search" class="mm-search" placeholder="Filter modules…" aria-label="Filter modules"></div><div class="mm-list">'+rows+'<div class="mm-empty" hidden>No modules match.</div></div></div>';
+  document.body.appendChild(ov);
+
+  var drawer=ov.querySelector(".mm-drawer");
+  var search=ov.querySelector(".mm-search");
+  var items=[].slice.call(ov.querySelectorAll(".mm-item"));
+  var tracks=[].slice.call(ov.querySelectorAll(".mm-track"));
+  var empty=ov.querySelector(".mm-empty");
+  var lastFocus=null;
+
+  function open(){lastFocus=document.activeElement;ov.classList.add("open");btn.setAttribute("aria-expanded","true");document.body.style.overflow="hidden";setTimeout(function(){search.focus();},50);
+    var c=ov.querySelector(".mm-item.current");if(c)c.scrollIntoView({block:"center"});}
+  function close(){ov.classList.remove("open");btn.setAttribute("aria-expanded","false");document.body.style.overflow="";if(lastFocus)lastFocus.focus();}
+  function filter(){var q=search.value.trim().toLowerCase();var any=false;
+    items.forEach(function(it){var show=!q||it.getAttribute("data-s").indexOf(q)>-1;it.style.display=show?"":"none";if(show)any=true;});
+    tracks.forEach(function(tr){var n=tr.nextElementSibling,vis=false;while(n&&n.classList.contains("mm-item")){if(n.style.display!=="none")vis=true;n=n.nextElementSibling;}tr.style.display=vis?"":"none";});
+    empty.hidden=any;}
+
+  btn.addEventListener("click",open);
+  ov.querySelector(".mm-close").addEventListener("click",close);
+  ov.addEventListener("click",function(e){if(e.target===ov)close();});
+  search.addEventListener("input",filter);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ov.classList.contains("open"))close();});
+  // simple focus trap
+  ov.addEventListener("keydown",function(e){if(e.key!=="Tab"||!ov.classList.contains("open"))return;
+    var f=ov.querySelectorAll("a,button,input");if(!f.length)return;var first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+})();
+</script>
+
 </body>
 </html>

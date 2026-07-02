@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>extends, super, @Override, and dynamic dispatch</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#129516; Real-world analogy</span>
+      <p><strong>Inheritance is biological taxonomy.</strong> A <b>Dog</b> IS-A <b>Mammal</b> IS-A <b>Animal</b> &mdash; it inherits the traits of its ancestors (a heartbeat, a spine) for free, yet specializes some of them: every animal &ldquo;makes a sound,&rdquo; but a dog <em>overrides</em> that with a bark. When a zookeeper points at a caged creature and asks &ldquo;<em>what kind of animal are you?</em>&rdquo; the answer is decided by the actual creature standing there, not by the label on the cage. That runtime question &mdash; ask the real object, get its specific behavior &mdash; is <b>dynamic dispatch</b>. A single-species rule applies too: in Java a class has exactly <b>one</b> direct parent, just as an organism belongs to one species, not two at once.</p>
+    </div>
     <p>A subclass <span class='key'>extends</span> a superclass, inheriting its fields and methods. It can add new ones and <strong>override</strong> existing ones. A subclass constructor must call a superclass constructor first — explicitly with <span class='key'>super(...)</span>, or implicitly via the no-arg one.</p><pre class="code" data-src="class Animal {
     String name;
     Animal(String name) { this.name = name; }
@@ -169,7 +177,78 @@ class Dog extends Animal {
 Animal a = new Dog(&quot;Rex&quot;);   // upcast: a Dog seen as an Animal
 String s = a.speak();         // dynamic dispatch -&gt; &quot;Woof&quot;"></pre><p>The variable's type is <span class='key'>Animal</span>, but the JVM runs <span class='key'>Dog.speak()</span> because that's the real object — this is <strong>polymorphism</strong> via <strong>dynamic dispatch</strong>. Use <span class='key'>@Override</span> so the compiler catches typos; prefer composition over deep hierarchies, and reach for <span class='key'>final</span> to forbid further subclassing.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: class Dog then super(name) then @Override then Animal a = Dog then a.speak()"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">class Dog</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">extends Animal</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">super(name)</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">parent init</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">@Override</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">speak()</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">Animal a = Dog</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">upcast</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">a.speak()</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">dynamic dispatch</text></g></svg></div>
-    
+    <h3>Single inheritance: one parent only</h3>
+    <p>Java allows a class to <span class='key'>extends</span> <strong>exactly one</strong> superclass &mdash; there is no <span class='key'>extends A, B</span>. This sidesteps the &ldquo;diamond problem&rdquo; of multiple base classes. To mix in behavior from several sources you <span class='key'>implements</span> multiple interfaces instead; a class can implement any number of those. Every class you write ultimately sits in a single straight line of ancestors rising to <span class='key'>Object</span>.</p>
+    <pre class="code" data-src="class Animal {}
+class Pet {}
+
+// class Dog extends Animal, Pet {}   // ERROR: no multiple class inheritance
+class Dog extends Animal implements Comparable&lt;Dog&gt; {   // one class + many interfaces
+    public int compareTo(Dog other) { return 0; }
+}"></pre>
+    <h3>Methods are virtual by default</h3>
+    <p>This is the rule that surprises people coming from C++ and C#: in Java <strong>every non-<span class='key'>final</span>, non-<span class='key'>static</span>, non-<span class='key'>private</span> method is virtual</strong>. There is no <span class='key'>virtual</span> keyword because you never need one &mdash; overriding is the default. The <span class='key'>@Override</span> annotation changes nothing at runtime; it just asks the compiler to fail the build if the method doesn&rsquo;t actually override anything (a typo&rsquo;d name, wrong parameter types), catching a whole class of silent bugs.</p>
+    <pre class="code" data-src="class Animal {
+    String speak() { return &quot;...&quot;; }          // virtual automatically
+}
+class Cat extends Animal {
+    @Override String speak() { return &quot;Meow&quot;; }   // compiler verifies it overrides
+    // @Override String speaks() { ... }           // ERROR: nothing to override -&gt; typo caught
+}"></pre>
+    <h3>super(...) chaining and super.method()</h3>
+    <p>A subclass constructor must run a superclass constructor <strong>first</strong>. Write it explicitly as <span class='key'>super(args)</span> on the first line; omit it and Java inserts an implicit no-arg <span class='key'>super()</span> &mdash; which fails to compile if the parent has no accessible no-arg constructor. Separately, <span class='key'>super.method()</span> invokes the parent&rsquo;s version of an overridden method, letting you <em>extend</em> behavior rather than replace it.</p>
+    <pre class="code" data-src="class Animal {
+    final String name;
+    Animal(String name) { this.name = name; }
+    String describe() { return &quot;an animal named &quot; + name; }
+}
+class Dog extends Animal {
+    Dog(String name) { super(name); }               // must chain to Animal(String)
+    @Override String describe() {
+        return super.describe() + &quot; that barks&quot;;    // reuse + extend the parent
+    }
+}"></pre>
+    <h3>final and abstract: forbid vs force overriding</h3>
+    <p>The two keywords pull in opposite directions. <span class='key'>final</span> <strong>locks a method or class down</strong>: a <span class='key'>final</span> method can&rsquo;t be overridden, and a <span class='key'>final</span> class (like <span class='key'>String</span>) can&rsquo;t be subclassed at all. <span class='key'>abstract</span> does the reverse: an <span class='key'>abstract</span> method has no body and <strong>demands</strong> that a concrete subclass supply one, and its class can&rsquo;t be instantiated directly. An abstract class can still hold state and fully-implemented methods, which is what separates it from an interface.</p>
+    <pre class="code" data-src="abstract class Shape {
+    abstract double area();                      // no body: subclasses MUST implement
+    final String kind() { return &quot;shape&quot;; }      // final: subclasses may NOT override
+}
+class Circle extends Shape {
+    final double r;
+    Circle(double r) { this.r = r; }
+    @Override double area() { return Math.PI * r * r; }
+}
+// Shape s = new Shape();     // ERROR: abstract class can't be instantiated"></pre>
+    <h3>Object, casting, and pattern-matching instanceof</h3>
+    <p>Every class without an explicit parent extends <span class='key'>Object</span>, so an <span class='key'>Object</span> reference can hold anything. <strong>Upcasting</strong> (to a supertype) is always safe and implicit. <strong>Downcasting</strong> (to a subtype) is checked at runtime and throws <span class='key'>ClassCastException</span> if wrong, so guard it with <span class='key'>instanceof</span>. Modern Java folds the test and the cast together with <em>pattern-matching</em> <span class='key'>instanceof</span> (Java 16+), binding a new variable only when the type matches.</p>
+    <pre class="code" data-src="Object o = new Dog(&quot;Rex&quot;);     // upcast to Object: implicit, always safe
+
+// Classic: test, then cast.
+if (o instanceof Dog) {
+    Dog d = (Dog) o;
+    d.speak();
+}
+
+// Pattern matching (Java 16+): test and bind in one step.
+if (o instanceof Dog d) {       // 'd' in scope only when o really is a Dog
+    d.speak();
+}"></pre>
+    <h3>The trap: fields and statics are hidden, not overridden</h3>
+    <p>Overriding applies only to instance methods. <strong>Fields are not polymorphic</strong> &mdash; a subclass field with the same name <em>hides</em> the parent&rsquo;s, and which one you see depends on the <em>compile-time type</em> of the reference, not the object. <strong>Static methods</strong> behave the same way: redeclaring one in a subclass <em>hides</em> it (resolved by the reference&rsquo;s declared type), it does not override it. This is why you should call static methods through the class name, and never rely on a same-named field across a hierarchy.</p>
+    <pre class="code" data-src="class Animal {
+    String kind = &quot;animal&quot;;
+    static String category() { return &quot;Animal&quot;; }
+}
+class Dog extends Animal {
+    String kind = &quot;dog&quot;;                       // HIDES Animal.kind, doesn't override
+    static String category() { return &quot;Dog&quot;; } // HIDES the static, doesn't override
+}
+
+Animal a = new Dog();
+System.out.println(a.kind);        // &quot;animal&quot;  &lt;- field picked by declared type
+System.out.println(a.category());  // &quot;Animal&quot;  &lt;- static picked by declared type
+// contrast: a.speak() would run Dog's version, because methods DO override"></pre>
   </div>
 </section>
 
@@ -234,6 +313,9 @@ System.out.println("Manager earns more? " + (managerPay &gt; basePay));</textare
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Who runs?</h3><p class="prompt"><span class='key'>Animal a = new Dog(); a.speak();</span> — does Animal’s or Dog’s <span class='key'>speak()</span> run, and what decides?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Dog’s. Dynamic dispatch picks the method based on the <b>runtime object type</b> (Dog), not the declared variable type (Animal). The declared type only limits which methods you may <em>call</em>.</div></details></div>
       <div class="exercise"><h3>2 &middot; Constructor order</h3><p class="prompt">Why must a subclass constructor call <span class='key'>super(...)</span> before touching its own fields?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The parent’s state must be fully initialized before the subclass relies on it. Java enforces this: <span class='key'>super(...)</span> (explicit or implicit) is always the first statement of a constructor.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Field vs method</h3><p class="prompt">Given <span class='key'>Animal a = new Dog();</span> where both classes declare a field <span class='key'>String kind</span> and override <span class='key'>speak()</span> &mdash; does <span class='key'>a.kind</span> give Dog&rsquo;s value, and does <span class='key'>a.speak()</span> give Dog&rsquo;s result?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>a.kind</span> gives <b>Animal&rsquo;s</b> value &mdash; fields are <em>hidden</em>, resolved by the declared type (<span class='key'>Animal</span>). But <span class='key'>a.speak()</span> gives <b>Dog&rsquo;s</b> result &mdash; methods are <em>overridden</em>, resolved by the runtime object. Fields don&rsquo;t do polymorphism; methods do.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Stop the subclassing</h3><p class="prompt">You want a class that nobody can extend, and within another class a method nobody can override. Which keyword do you use, and where?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>final</span> in both places. <span class='key'>final class Foo</span> forbids subclassing entirely (that&rsquo;s how <span class='key'>String</span> is sealed). <span class='key'>final</span> on a method &mdash; <span class='key'>final void run()</span> &mdash; lets the class be extended but pins that one method so no subclass can change it.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Safe downcast</h3><p class="prompt">You hold an <span class='key'>Animal a</span> and want to call a <span class='key'>Dog</span>-only method <span class='key'>fetch()</span>. Write the safe modern one-liner test, and say what happens if you skip the check and just cast a non-Dog.</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Use pattern-matching <span class='key'>instanceof</span>: <span class='key'>if (a instanceof Dog d) d.fetch();</span> &mdash; it tests and binds <span class='key'>d</span> in one step. If you instead write <span class='key'>((Dog) a).fetch()</span> when <span class='key'>a</span> is really a <span class='key'>Cat</span>, the JVM throws a <span class='key'>ClassCastException</span> at runtime.</div></details></div>
   </div>
 </section>
 
@@ -383,5 +465,147 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('appinstalled', () => { if (btn) btn.hidden = true; });
 })();
 </script>
+<!-- ── Global module menu (auto-injected) ───────────────────────────── -->
+<style id="mod-menu-styles">
+.mm-btn{cursor:pointer;background:none;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px}
+.mm-btn .mm-ico{display:inline-flex;flex-direction:column;gap:3px}
+.mm-btn .mm-ico span{display:block;width:15px;height:2px;background:currentColor;border-radius:2px}
+.mm-overlay{position:fixed;inset:0;z-index:200;background:rgba(8,8,16,0.6);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity var(--transition),visibility var(--transition)}
+.mm-overlay.open{opacity:1;visibility:visible}
+.mm-drawer{position:fixed;top:0;right:0;bottom:0;z-index:201;width:min(400px,88vw);display:flex;flex-direction:column;background:var(--bg-surface);border-left:1px solid var(--bg-elevated);box-shadow:-14px 0 40px rgba(0,0,0,.5);transform:translateX(100%);transition:transform var(--transition)}
+.mm-overlay.open .mm-drawer{transform:translateX(0)}
+.mm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 12px}
+.mm-head h2{font-family:var(--font-display);font-weight:600;font-size:1.05rem;color:var(--text-primary)}
+.mm-close{cursor:pointer;background:none;border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-secondary);font-size:1.1rem;line-height:1;padding:5px 10px;transition:var(--transition)}
+.mm-close:hover{color:var(--accent-coral,#ef476f);border-color:var(--accent-coral,#ef476f)}
+.mm-search-wrap{padding:0 20px 12px}
+.mm-search{width:100%;background:var(--bg-primary);border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-primary);font-family:var(--font-body);font-size:.9rem;padding:9px 12px}
+.mm-search::placeholder{color:var(--text-muted)}
+.mm-search:focus{outline:none;border-color:var(--accent-cyan)}
+.mm-list{flex:1;overflow-y:auto;padding:0 12px 20px}
+.mm-track{font-family:var(--font-code);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:16px 8px 6px}
+.mm-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius);text-decoration:none;color:var(--text-secondary);transition:background var(--transition),color var(--transition)}
+.mm-item .mm-num{font-family:var(--font-code);font-weight:700;font-size:.72rem;color:var(--accent-cyan);background:var(--bg-elevated);padding:3px 7px;border-radius:6px;flex-shrink:0}
+.mm-item .mm-t{font-size:.9rem;line-height:1.3}
+.mm-item:hover{background:var(--bg-elevated);color:var(--text-primary)}
+.mm-item.current{background:var(--bg-elevated)}
+.mm-item.current .mm-t{color:var(--accent-cyan);font-weight:600}
+.mm-empty{color:var(--text-muted);font-size:.9rem;padding:20px 10px}
+@media(prefers-reduced-motion:reduce){.mm-overlay,.mm-drawer{transition-duration:0ms}}
+</style>
+<script>
+(function(){
+  if(window.__modMenu)return;window.__modMenu=1;
+  var M=[
+    ["01","The JVM: Your Code's Real Computer","module-01-jvm-machine.html","Track 1 — The Machine"],
+    ["02","Stack, Heap & the Garbage Collector","module-02-memory-model.html","Track 1 — The Machine"],
+    ["03","From Source to Bytecode","module-03-bytecode.html","Track 1 — The Machine"],
+    ["04","Static Types, Primitives & Boxing","module-04-types-and-vars.html","Track 2 — The Language"],
+    ["05","Objects, Classes & Constructors","module-05-objects-classes.html","Track 2 — The Language"],
+    ["06","Inheritance & Polymorphism","module-06-inheritance.html","Track 2 — The Language"],
+    ["07","Interfaces & Abstract Classes","module-07-interfaces.html","Track 2 — The Language"],
+    ["08","Encapsulation & Immutability","module-08-encapsulation.html","Track 2 — The Language"],
+    ["09","Polymorphism: Overloading vs Overriding","module-09-polymorphism.html","Track 2 — The Language"],
+    ["10","Composition over Inheritance","module-10-composition.html","Track 2 — The Language"],
+    ["11","Static Members & Class Design","module-11-static-members.html","Track 2 — The Language"],
+    ["12","SOLID Principles","module-12-solid-principles.html","Track 2 — The Language"],
+    ["13","Enums & Constant Types","module-13-enums.html","Track 2 — The Language"],
+    ["14","Packages & Access Control","module-14-packages-access.html","Track 2 — The Language"],
+    ["15","Strings & Text","module-15-strings.html","Track 2 — The Language"],
+    ["16","The equals & hashCode Contract","module-16-equals-hashcode.html","Track 2 — The Language"],
+    ["17","Generics & Type Erasure","module-17-generics.html","Track 2 — The Language"],
+    ["18","The Collections Framework","module-18-collections.html","Track 2 — The Language"],
+    ["19","Checked vs Unchecked Exceptions","module-19-exceptions.html","Track 2 — The Language"],
+    ["20","Nested, Inner & Anonymous Classes","module-20-nested-classes.html","Track 2 — The Language"],
+    ["21","Lambdas & the Streams API","module-21-lambdas-streams.html","Track 3 — Modern Java"],
+    ["22","Optional & the Billion-Dollar Bug","module-22-optional-null.html","Track 3 — Modern Java"],
+    ["23","Records, Sealed Types & Pattern Matching","module-23-records-sealed.html","Track 3 — Modern Java"],
+    ["24","Dates & Times (java.time)","module-24-datetime.html","Track 3 — Modern Java"],
+    ["25","Annotations & Reflection","module-25-annotations-reflection.html","Track 3 — Modern Java"],
+    ["26","Threads, Executors & Virtual Threads","module-26-concurrency.html","Track 3 — Modern Java"],
+    ["27","Maven, Gradle & the Classpath","module-27-build-tools.html","Track 4 — The Ecosystem"],
+    ["28","JUnit & Modern Testing","module-28-testing.html","Track 4 — The Ecosystem"],
+    ["29","Dependency Injection & Spring","module-29-spring-di.html","Track 5 — Real-World Java"],
+    ["30","Databases: JDBC & JPA","module-30-persistence-jdbc.html","Track 5 — Real-World Java"],
+    ["31","JSON with Jackson","module-31-json-jackson.html","Track 5 — Real-World Java"],
+    ["32","The HTTP Client (java.net.http)","module-32-http-client.html","Track 5 — Real-World Java"],
+    ["33","Logging Done Right","module-33-logging.html","Track 5 — Real-World Java"],
+    ["34","Singleton","module-34-singleton.html","Track 6 — Design Patterns"],
+    ["35","Factory Method","module-35-factory-method.html","Track 6 — Design Patterns"],
+    ["36","Builder","module-36-builder.html","Track 6 — Design Patterns"],
+    ["37","Adapter","module-37-adapter.html","Track 6 — Design Patterns"],
+    ["38","Decorator","module-38-decorator.html","Track 6 — Design Patterns"],
+    ["39","Facade","module-39-facade.html","Track 6 — Design Patterns"],
+    ["40","Proxy","module-40-proxy.html","Track 6 — Design Patterns"],
+    ["41","Strategy","module-41-strategy.html","Track 6 — Design Patterns"],
+    ["42","Observer","module-42-observer.html","Track 6 — Design Patterns"],
+    ["43","Command","module-43-command.html","Track 6 — Design Patterns"],
+    ["44","Template Method","module-44-template-method.html","Track 6 — Design Patterns"],
+    ["45","State","module-45-state.html","Track 6 — Design Patterns"],
+    ["46","Abstract Factory","module-46-abstract-factory.html","Track 7 — More Design Patterns"],
+    ["47","Prototype","module-47-prototype.html","Track 7 — More Design Patterns"],
+    ["48","Bridge","module-48-bridge.html","Track 7 — More Design Patterns"],
+    ["49","Composite","module-49-composite.html","Track 7 — More Design Patterns"],
+    ["50","Flyweight","module-50-flyweight.html","Track 7 — More Design Patterns"],
+    ["51","Chain of Responsibility","module-51-chain-of-responsibility.html","Track 7 — More Design Patterns"],
+    ["52","Iterator","module-52-iterator.html","Track 7 — More Design Patterns"],
+    ["53","Mediator","module-53-mediator.html","Track 7 — More Design Patterns"],
+    ["54","Memento","module-54-memento.html","Track 7 — More Design Patterns"],
+    ["55","Visitor","module-55-visitor.html","Track 7 — More Design Patterns"],
+    ["56","Interpreter","module-56-interpreter.html","Track 7 — More Design Patterns"]
+  ];
+  var here=location.pathname.split("/").pop();
+
+  // Build the "All Modules" trigger button and drop it into the nav's links group.
+  var links=document.querySelector(".module-nav .links");
+  var btn=document.createElement("button");
+  btn.type="button";btn.className="mm-btn module-nav-mmbtn";
+  btn.setAttribute("aria-haspopup","dialog");btn.setAttribute("aria-expanded","false");
+  btn.innerHTML='<span class="mm-ico"><span></span><span></span><span></span></span>All Modules';
+  if(links){links.insertBefore(btn,links.firstChild);
+    // match the nav link styling
+    var probe=links.querySelector("a");
+    if(probe){var cs=getComputedStyle(probe);btn.style.color=cs.color;btn.style.border=cs.border;btn.style.borderRadius=cs.borderRadius;btn.style.padding=cs.padding;btn.style.fontSize=cs.fontSize;}
+  } else {document.body.appendChild(btn);btn.style.position="fixed";btn.style.top="12px";btn.style.right="12px";btn.style.zIndex="202";btn.style.color="var(--text-secondary)";btn.style.border="1px solid var(--bg-elevated)";btn.style.borderRadius="var(--radius)";btn.style.padding="6px 12px";}
+
+  // Build the drawer.
+  var ov=document.createElement("div");ov.className="mm-overlay";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");ov.setAttribute("aria-label","Course modules");
+  var rows="",lastTrack="";
+  for(var i=0;i<M.length;i++){var m=M[i];
+    if(m[3]!==lastTrack){rows+='<div class="mm-track">'+m[3]+'</div>';lastTrack=m[3];}
+    var cur=m[2]===here?" current":"";
+    rows+='<a class="mm-item'+cur+'" href="'+m[2]+'" data-s="'+(m[0]+" "+m[1]).toLowerCase()+'"'+(cur?' aria-current="page"':'')+'><span class="mm-num">'+m[0]+'</span><span class="mm-t">'+m[1]+'</span></a>';
+  }
+  ov.innerHTML='<div class="mm-drawer"><div class="mm-head"><h2>All Modules</h2><button type="button" class="mm-close" aria-label="Close">&times;</button></div><div class="mm-search-wrap"><input type="search" class="mm-search" placeholder="Filter modules…" aria-label="Filter modules"></div><div class="mm-list">'+rows+'<div class="mm-empty" hidden>No modules match.</div></div></div>';
+  document.body.appendChild(ov);
+
+  var drawer=ov.querySelector(".mm-drawer");
+  var search=ov.querySelector(".mm-search");
+  var items=[].slice.call(ov.querySelectorAll(".mm-item"));
+  var tracks=[].slice.call(ov.querySelectorAll(".mm-track"));
+  var empty=ov.querySelector(".mm-empty");
+  var lastFocus=null;
+
+  function open(){lastFocus=document.activeElement;ov.classList.add("open");btn.setAttribute("aria-expanded","true");document.body.style.overflow="hidden";setTimeout(function(){search.focus();},50);
+    var c=ov.querySelector(".mm-item.current");if(c)c.scrollIntoView({block:"center"});}
+  function close(){ov.classList.remove("open");btn.setAttribute("aria-expanded","false");document.body.style.overflow="";if(lastFocus)lastFocus.focus();}
+  function filter(){var q=search.value.trim().toLowerCase();var any=false;
+    items.forEach(function(it){var show=!q||it.getAttribute("data-s").indexOf(q)>-1;it.style.display=show?"":"none";if(show)any=true;});
+    tracks.forEach(function(tr){var n=tr.nextElementSibling,vis=false;while(n&&n.classList.contains("mm-item")){if(n.style.display!=="none")vis=true;n=n.nextElementSibling;}tr.style.display=vis?"":"none";});
+    empty.hidden=any;}
+
+  btn.addEventListener("click",open);
+  ov.querySelector(".mm-close").addEventListener("click",close);
+  ov.addEventListener("click",function(e){if(e.target===ov)close();});
+  search.addEventListener("input",filter);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ov.classList.contains("open"))close();});
+  // simple focus trap
+  ov.addEventListener("keydown",function(e){if(e.key!=="Tab"||!ov.classList.contains("open"))return;
+    var f=ov.querySelectorAll("a,button,input");if(!f.length)return;var first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+})();
+</script>
+
 </body>
 </html>

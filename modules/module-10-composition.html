@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>is-a couples you; has-a frees you</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#129513; Real-world analogy</span>
+      <p><strong>Composition is building with LEGO bricks.</strong> A car <b>HAS-A</b> engine, <b>HAS-A</b> set of wheels &mdash; each is a separate brick you snap together, and you can pop one off and click in a better one without disturbing the rest. <strong>Inheritance is carving the whole car from a single block of marble</strong> (a car <b>IS-A</b> vehicle): stunning when the shape is truly fixed, but the parts are fused &mdash; you can't swap the engine, and if the sculptor re-carves the base block, every feature chiseled on top can <b>crack</b>. That crack is the &ldquo;fragile base class&rdquo; problem. Favor the bricks; carve marble only when the is-a relationship is genuine and stable.</p>
+    </div>
     <p><strong>Inheritance</strong> models <em>is-a</em>: a <span class='key'>Dog</span> is an <span class='key'>Animal</span>. It’s tight coupling — the subclass depends on the parent’s internals, and a change to the base can silently break it (the “fragile base class” problem). <strong>Composition</strong> models <em>has-a</em>: a class holds another as a field and <strong>delegates</strong> to it.</p><pre class="code" data-src="// Inheritance (is-a) — rigid, exposes Vector’s whole API
 class Stack&lt;E&gt; extends Vector&lt;E&gt; { ... }   // classic mistake
 
@@ -166,7 +174,104 @@ class Stack&lt;E&gt; {
     E pop() { return items.remove(items.size() - 1); }
 }"></pre><p>Composition lets you swap the collaborator (inject a different <span class='key'>List</span>), expose a minimal API, and avoid inheriting methods you didn’t want. Reach for inheritance only for a genuine, stable is-a relationship; otherwise hold a field and delegate. (This is also why Go and modern designs drop inheritance entirely.)</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: is-a then fragile base then has-a then delegate then swap impl"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">is-a</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">inheritance</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">fragile base</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">tight coupling</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">has-a</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">composition</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">delegate</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">forward calls</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">swap impl</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">flexible</text></g></svg></div>
-    
+    <h3>HAS-A vs IS-A: how to choose</h3>
+    <p>Inheritance declares <em>is-a</em> and is a compile-time, permanent bond; composition declares <em>has-a</em> and is a runtime, swappable one. The decision test: could you honestly substitute the subtype <em>anywhere</em> the supertype is expected (the Liskov test)? A <span class="key">Stack</span> is not substitutable for a <span class="key">Vector</span> &mdash; a Vector lets you insert at any index, which breaks stack semantics &mdash; so <span class="key">extends Vector</span> is a lie the compiler happily accepts. If the answer is &ldquo;it just needs the behavior,&rdquo; that is <em>has-a</em>: hold a field.</p>
+    <pre class="code" data-src="// IS-A must satisfy: a Subtype works EVERYWHERE the Supertype does.
+class Circle extends Shape { ... }   // OK: a Circle genuinely IS-A Shape
+
+// HAS-A: you only want the behavior, not the identity.
+class OrderService {
+    private final PaymentGateway gateway;   // HAS-A gateway (not IS-A)
+    OrderService(PaymentGateway g) { this.gateway = g; }
+    void checkout(Order o) { gateway.charge(o.total()); }   // use it
+}
+// Rule of thumb: &quot;X needs the behavior of Y&quot; -&gt; field. &quot;X is a kind of Y&quot; -&gt; extends."></pre>
+    <h3>Delegation: hold a field, forward the call</h3>
+    <p><strong>Delegation</strong> is the mechanism that makes composition work: your object receives a call and forwards it to the collaborator it holds, adding or hiding whatever it likes. Unlike inheritance, nothing leaks automatically &mdash; the wrapper's surface area is exactly the methods you chose to write. That is more typing than <span class="key">extends</span>, but it is the price of an API you fully control.</p>
+    <pre class="code" data-src="// A fixed-capacity queue that HAS-A ArrayDeque and delegates to it.
+class BoundedQueue&lt;E&gt; {
+    private final Deque&lt;E&gt; delegate = new ArrayDeque&lt;&gt;();
+    private final int capacity;
+    BoundedQueue(int capacity) { this.capacity = capacity; }
+
+    boolean offer(E e) {
+        if (delegate.size() &gt;= capacity) return false;   // extra rule WE add
+        return delegate.offerLast(e);                     // forward the call
+    }
+    E poll()      { return delegate.pollFirst(); }        // forward
+    int size()    { return delegate.size(); }             // forward
+    // No addFirst, no removeLast leak out - we never wrote them.
+}"></pre>
+    <h3>The fragile base class problem</h3>
+    <p>The classic example (from Bloch's <em>Effective Java</em>): you extend <span class="key">HashSet</span> to count how many elements were ever added. But <span class="key">HashSet.addAll</span> is implemented internally by calling <span class="key">add</span> &mdash; a self-use you can't see from outside. Your overridden <span class="key">add</span> runs once per element <em>and</em> your <span class="key">addAll</span> already added the batch count, so every element is counted twice. The subclass silently depends on a private implementation detail of the superclass.</p>
+    <pre class="code" data-src="class InstrumentedHashSet&lt;E&gt; extends HashSet&lt;E&gt; {
+    private int addCount = 0;
+
+    @Override public boolean add(E e) {
+        addCount++;
+        return super.add(e);
+    }
+    @Override public boolean addAll(Collection&lt;? extends E&gt; c) {
+        addCount += c.size();          // +3 here...
+        return super.addAll(c);        // ...but super.addAll calls this.add 3 times too!
+    }
+    int getAddCount() { return addCount; }
+}
+
+var s = new InstrumentedHashSet&lt;String&gt;();
+s.addAll(List.of(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;));
+s.getAddCount();   // expected 3, actually 6 - fragile base class in action"></pre>
+    <h3>The composition fix: a forwarding wrapper</h3>
+    <p>Rebuild the same feature with composition. The wrapper <em>holds</em> a <span class="key">Set</span> and implements the <span class="key">Set</span> interface by forwarding &mdash; so it counts correctly no matter how the underlying set implements <span class="key">addAll</span>, and it works over <em>any</em> <span class="key">Set</span>, not just <span class="key">HashSet</span>. This wrapper is exactly the <strong>Decorator</strong> pattern.</p>
+    <pre class="code" data-src="// Forwarding class: implements Set purely by delegating to another Set.
+class ForwardingSet&lt;E&gt; implements Set&lt;E&gt; {
+    private final Set&lt;E&gt; s;
+    ForwardingSet(Set&lt;E&gt; s) { this.s = s; }
+    public boolean add(E e)                        { return s.add(e); }
+    public boolean addAll(Collection&lt;? extends E&gt; c){ return s.addAll(c); }
+    public int size()                              { return s.size(); }
+    // ... forward the remaining Set methods to s ...
+}
+
+class InstrumentedSet&lt;E&gt; extends ForwardingSet&lt;E&gt; {
+    private int addCount = 0;
+    InstrumentedSet(Set&lt;E&gt; s) { super(s); }
+    @Override public boolean add(E e)                        { addCount++; return super.add(e); }
+    @Override public boolean addAll(Collection&lt;? extends E&gt; c){ addCount += c.size(); return super.addAll(c); }
+    int getAddCount() { return addCount; }
+}
+// addAll here forwards to the WRAPPED set's addAll, which never calls OUR add. Count = 3. Correct."></pre>
+    <h3>Composition + interfaces = the Strategy pattern</h3>
+    <p>When the field you hold is an <em>interface</em>, composition becomes behavior injection: you can swap the algorithm at construction time (or at runtime) without touching the class that uses it. This is the <strong>Strategy</strong> pattern, and it is why &ldquo;program to an interface&rdquo; and &ldquo;favor composition&rdquo; are two sides of one coin.</p>
+    <pre class="code" data-src="interface DiscountPolicy { int applyTo(int cents); }        // the strategy
+
+class Checkout {
+    private DiscountPolicy policy;                          // HAS-A strategy
+    Checkout(DiscountPolicy policy) { this.policy = policy; }
+    void setPolicy(DiscountPolicy p) { this.policy = p; }   // swap at RUNTIME
+    int total(int cents) { return policy.applyTo(cents); }
+}
+
+// Inject any behavior - even a lambda, since DiscountPolicy is a functional interface.
+var c = new Checkout(cents -&gt; cents);                       // no discount
+c.setPolicy(cents -&gt; cents * 90 / 100);                     // 10% off, swapped live"></pre>
+    <h3>Why inheritance breaks encapsulation</h3>
+    <p>Encapsulation says an object hides <em>how</em> it works behind a stable <em>what</em>. Inheritance punches a hole in that wall: a subclass sees <span class="key">protected</span> members and, crucially, the superclass's <em>self-use patterns</em> (which methods call which internally) &mdash; details that are not part of any published contract and can change between releases. A composed collaborator exposes only its <span class="key">public</span> API, so your code depends on the promise, not the plumbing.</p>
+    <pre class="code" data-src="// Inheritance: the subclass is COUPLED to how super uses itself.
+class CountingList&lt;E&gt; extends ArrayList&lt;E&gt; {
+    int writes = 0;
+    @Override public void add(int i, E e) { writes++; super.add(i, e); }
+    // Does super.add(E) call add(int, E)? Does addAll? You must READ the JDK source
+    // to know - and a future JDK version may change it, silently breaking you.
+}
+
+// Composition: you depend only on the PUBLIC List contract, which is stable.
+class CountingList2&lt;E&gt; {
+    private final List&lt;E&gt; list;
+    private int writes = 0;
+    CountingList2(List&lt;E&gt; list) { this.list = list; }
+    void add(E e) { writes++; list.add(e); }   // no hidden self-use to worry about
+}"></pre>
   </div>
 </section>
 
@@ -231,6 +336,9 @@ System.out.println("Swap the engine field -&gt; new behavior, no subclassing.");
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Spot the smell</h3><p class="prompt"><span class='key'>class EmailService extends SmtpClient</span> so it can send mail. Why is that likely the wrong relationship?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">An EmailService isn’t a kind of SmtpClient — it <b>uses</b> one (has-a). Extending exposes SmtpClient’s whole API and couples you to it. Hold an <span class='key'>SmtpClient</span> (ideally an interface) as a field and delegate.</div></details></div>
       <div class="exercise"><h3>2 &middot; Why so fragile?</h3><p class="prompt">How can adding a method to a base class break a subclass that never changed — the “fragile base class” problem?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">If the new base method has the same name/signature the subclass already used differently (or the base starts calling an overridden method internally), behavior shifts unexpectedly. Composition avoids this: a delegate’s new methods are invisible unless you forward them.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Count them twice</h3><p class="prompt"><span class="key">InstrumentedHashSet</span> extends <span class="key">HashSet</span>, overriding both <span class="key">add</span> and <span class="key">addAll</span> to bump a counter. After <span class="key">addAll(List.of(&quot;a&quot;,&quot;b&quot;,&quot;c&quot;))</span> the count is 6, not 3. Why &mdash; and what fixes it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class="key">HashSet.addAll</span> is implemented by calling <span class="key">this.add</span> once per element. So <span class="key">addAll</span> adds 3 (its own <span class="key">+= c.size()</span>) and then <span class="key">super.addAll</span> triggers your overridden <span class="key">add</span> 3 more times &rarr; 6. The fix is <b>composition</b>: a forwarding wrapper that holds a <span class="key">Set</span>, so <span class="key">addAll</span> forwards to the wrapped set and never re-enters your <span class="key">add</span>.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Inject the behavior</h3><p class="prompt">A <span class="key">Logger</span> currently hard-codes writing to a file. You want tests to capture output in memory and production to write to disk, without subclassing <span class="key">Logger</span> per destination. What composition-based design does this?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Extract an interface &mdash; e.g. <span class="key">interface Sink { void write(String line); }</span> &mdash; and have <span class="key">Logger</span> <b>hold a</b> <span class="key">Sink</span> field injected via its constructor. Pass a <span class="key">FileSink</span> in production and an <span class="key">InMemorySink</span> in tests. That is the <b>Strategy</b> pattern: behavior injected through a composed interface, swappable without touching <span class="key">Logger</span>.</div></details></div>
+      <div class="exercise"><h3>5 &middot; When IS inheritance right?</h3><p class="prompt">&ldquo;Favor composition&rdquo; is a default, not an absolute. Name a situation where <span class="key">extends</span> is genuinely the better choice.</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">When there is a true, stable <em>is-a</em> relationship <b>and</b> you control both classes (so no fragile-base surprises) &mdash; especially with an abstract base built <em>for</em> extension, like <span class="key">AbstractList</span> or <span class="key">AbstractMap</span>, whose self-use is documented and whose whole purpose is to be subclassed. The danger is inheriting across an API boundary you don\'t control; extending your own purpose-built abstract class is fine.</div></details></div>
   </div>
 </section>
 
@@ -380,5 +488,147 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('appinstalled', () => { if (btn) btn.hidden = true; });
 })();
 </script>
+<!-- ── Global module menu (auto-injected) ───────────────────────────── -->
+<style id="mod-menu-styles">
+.mm-btn{cursor:pointer;background:none;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px}
+.mm-btn .mm-ico{display:inline-flex;flex-direction:column;gap:3px}
+.mm-btn .mm-ico span{display:block;width:15px;height:2px;background:currentColor;border-radius:2px}
+.mm-overlay{position:fixed;inset:0;z-index:200;background:rgba(8,8,16,0.6);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity var(--transition),visibility var(--transition)}
+.mm-overlay.open{opacity:1;visibility:visible}
+.mm-drawer{position:fixed;top:0;right:0;bottom:0;z-index:201;width:min(400px,88vw);display:flex;flex-direction:column;background:var(--bg-surface);border-left:1px solid var(--bg-elevated);box-shadow:-14px 0 40px rgba(0,0,0,.5);transform:translateX(100%);transition:transform var(--transition)}
+.mm-overlay.open .mm-drawer{transform:translateX(0)}
+.mm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 12px}
+.mm-head h2{font-family:var(--font-display);font-weight:600;font-size:1.05rem;color:var(--text-primary)}
+.mm-close{cursor:pointer;background:none;border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-secondary);font-size:1.1rem;line-height:1;padding:5px 10px;transition:var(--transition)}
+.mm-close:hover{color:var(--accent-coral,#ef476f);border-color:var(--accent-coral,#ef476f)}
+.mm-search-wrap{padding:0 20px 12px}
+.mm-search{width:100%;background:var(--bg-primary);border:1px solid var(--bg-elevated);border-radius:var(--radius);color:var(--text-primary);font-family:var(--font-body);font-size:.9rem;padding:9px 12px}
+.mm-search::placeholder{color:var(--text-muted)}
+.mm-search:focus{outline:none;border-color:var(--accent-cyan)}
+.mm-list{flex:1;overflow-y:auto;padding:0 12px 20px}
+.mm-track{font-family:var(--font-code);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:16px 8px 6px}
+.mm-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius);text-decoration:none;color:var(--text-secondary);transition:background var(--transition),color var(--transition)}
+.mm-item .mm-num{font-family:var(--font-code);font-weight:700;font-size:.72rem;color:var(--accent-cyan);background:var(--bg-elevated);padding:3px 7px;border-radius:6px;flex-shrink:0}
+.mm-item .mm-t{font-size:.9rem;line-height:1.3}
+.mm-item:hover{background:var(--bg-elevated);color:var(--text-primary)}
+.mm-item.current{background:var(--bg-elevated)}
+.mm-item.current .mm-t{color:var(--accent-cyan);font-weight:600}
+.mm-empty{color:var(--text-muted);font-size:.9rem;padding:20px 10px}
+@media(prefers-reduced-motion:reduce){.mm-overlay,.mm-drawer{transition-duration:0ms}}
+</style>
+<script>
+(function(){
+  if(window.__modMenu)return;window.__modMenu=1;
+  var M=[
+    ["01","The JVM: Your Code's Real Computer","module-01-jvm-machine.html","Track 1 — The Machine"],
+    ["02","Stack, Heap & the Garbage Collector","module-02-memory-model.html","Track 1 — The Machine"],
+    ["03","From Source to Bytecode","module-03-bytecode.html","Track 1 — The Machine"],
+    ["04","Static Types, Primitives & Boxing","module-04-types-and-vars.html","Track 2 — The Language"],
+    ["05","Objects, Classes & Constructors","module-05-objects-classes.html","Track 2 — The Language"],
+    ["06","Inheritance & Polymorphism","module-06-inheritance.html","Track 2 — The Language"],
+    ["07","Interfaces & Abstract Classes","module-07-interfaces.html","Track 2 — The Language"],
+    ["08","Encapsulation & Immutability","module-08-encapsulation.html","Track 2 — The Language"],
+    ["09","Polymorphism: Overloading vs Overriding","module-09-polymorphism.html","Track 2 — The Language"],
+    ["10","Composition over Inheritance","module-10-composition.html","Track 2 — The Language"],
+    ["11","Static Members & Class Design","module-11-static-members.html","Track 2 — The Language"],
+    ["12","SOLID Principles","module-12-solid-principles.html","Track 2 — The Language"],
+    ["13","Enums & Constant Types","module-13-enums.html","Track 2 — The Language"],
+    ["14","Packages & Access Control","module-14-packages-access.html","Track 2 — The Language"],
+    ["15","Strings & Text","module-15-strings.html","Track 2 — The Language"],
+    ["16","The equals & hashCode Contract","module-16-equals-hashcode.html","Track 2 — The Language"],
+    ["17","Generics & Type Erasure","module-17-generics.html","Track 2 — The Language"],
+    ["18","The Collections Framework","module-18-collections.html","Track 2 — The Language"],
+    ["19","Checked vs Unchecked Exceptions","module-19-exceptions.html","Track 2 — The Language"],
+    ["20","Nested, Inner & Anonymous Classes","module-20-nested-classes.html","Track 2 — The Language"],
+    ["21","Lambdas & the Streams API","module-21-lambdas-streams.html","Track 3 — Modern Java"],
+    ["22","Optional & the Billion-Dollar Bug","module-22-optional-null.html","Track 3 — Modern Java"],
+    ["23","Records, Sealed Types & Pattern Matching","module-23-records-sealed.html","Track 3 — Modern Java"],
+    ["24","Dates & Times (java.time)","module-24-datetime.html","Track 3 — Modern Java"],
+    ["25","Annotations & Reflection","module-25-annotations-reflection.html","Track 3 — Modern Java"],
+    ["26","Threads, Executors & Virtual Threads","module-26-concurrency.html","Track 3 — Modern Java"],
+    ["27","Maven, Gradle & the Classpath","module-27-build-tools.html","Track 4 — The Ecosystem"],
+    ["28","JUnit & Modern Testing","module-28-testing.html","Track 4 — The Ecosystem"],
+    ["29","Dependency Injection & Spring","module-29-spring-di.html","Track 5 — Real-World Java"],
+    ["30","Databases: JDBC & JPA","module-30-persistence-jdbc.html","Track 5 — Real-World Java"],
+    ["31","JSON with Jackson","module-31-json-jackson.html","Track 5 — Real-World Java"],
+    ["32","The HTTP Client (java.net.http)","module-32-http-client.html","Track 5 — Real-World Java"],
+    ["33","Logging Done Right","module-33-logging.html","Track 5 — Real-World Java"],
+    ["34","Singleton","module-34-singleton.html","Track 6 — Design Patterns"],
+    ["35","Factory Method","module-35-factory-method.html","Track 6 — Design Patterns"],
+    ["36","Builder","module-36-builder.html","Track 6 — Design Patterns"],
+    ["37","Adapter","module-37-adapter.html","Track 6 — Design Patterns"],
+    ["38","Decorator","module-38-decorator.html","Track 6 — Design Patterns"],
+    ["39","Facade","module-39-facade.html","Track 6 — Design Patterns"],
+    ["40","Proxy","module-40-proxy.html","Track 6 — Design Patterns"],
+    ["41","Strategy","module-41-strategy.html","Track 6 — Design Patterns"],
+    ["42","Observer","module-42-observer.html","Track 6 — Design Patterns"],
+    ["43","Command","module-43-command.html","Track 6 — Design Patterns"],
+    ["44","Template Method","module-44-template-method.html","Track 6 — Design Patterns"],
+    ["45","State","module-45-state.html","Track 6 — Design Patterns"],
+    ["46","Abstract Factory","module-46-abstract-factory.html","Track 7 — More Design Patterns"],
+    ["47","Prototype","module-47-prototype.html","Track 7 — More Design Patterns"],
+    ["48","Bridge","module-48-bridge.html","Track 7 — More Design Patterns"],
+    ["49","Composite","module-49-composite.html","Track 7 — More Design Patterns"],
+    ["50","Flyweight","module-50-flyweight.html","Track 7 — More Design Patterns"],
+    ["51","Chain of Responsibility","module-51-chain-of-responsibility.html","Track 7 — More Design Patterns"],
+    ["52","Iterator","module-52-iterator.html","Track 7 — More Design Patterns"],
+    ["53","Mediator","module-53-mediator.html","Track 7 — More Design Patterns"],
+    ["54","Memento","module-54-memento.html","Track 7 — More Design Patterns"],
+    ["55","Visitor","module-55-visitor.html","Track 7 — More Design Patterns"],
+    ["56","Interpreter","module-56-interpreter.html","Track 7 — More Design Patterns"]
+  ];
+  var here=location.pathname.split("/").pop();
+
+  // Build the "All Modules" trigger button and drop it into the nav's links group.
+  var links=document.querySelector(".module-nav .links");
+  var btn=document.createElement("button");
+  btn.type="button";btn.className="mm-btn module-nav-mmbtn";
+  btn.setAttribute("aria-haspopup","dialog");btn.setAttribute("aria-expanded","false");
+  btn.innerHTML='<span class="mm-ico"><span></span><span></span><span></span></span>All Modules';
+  if(links){links.insertBefore(btn,links.firstChild);
+    // match the nav link styling
+    var probe=links.querySelector("a");
+    if(probe){var cs=getComputedStyle(probe);btn.style.color=cs.color;btn.style.border=cs.border;btn.style.borderRadius=cs.borderRadius;btn.style.padding=cs.padding;btn.style.fontSize=cs.fontSize;}
+  } else {document.body.appendChild(btn);btn.style.position="fixed";btn.style.top="12px";btn.style.right="12px";btn.style.zIndex="202";btn.style.color="var(--text-secondary)";btn.style.border="1px solid var(--bg-elevated)";btn.style.borderRadius="var(--radius)";btn.style.padding="6px 12px";}
+
+  // Build the drawer.
+  var ov=document.createElement("div");ov.className="mm-overlay";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");ov.setAttribute("aria-label","Course modules");
+  var rows="",lastTrack="";
+  for(var i=0;i<M.length;i++){var m=M[i];
+    if(m[3]!==lastTrack){rows+='<div class="mm-track">'+m[3]+'</div>';lastTrack=m[3];}
+    var cur=m[2]===here?" current":"";
+    rows+='<a class="mm-item'+cur+'" href="'+m[2]+'" data-s="'+(m[0]+" "+m[1]).toLowerCase()+'"'+(cur?' aria-current="page"':'')+'><span class="mm-num">'+m[0]+'</span><span class="mm-t">'+m[1]+'</span></a>';
+  }
+  ov.innerHTML='<div class="mm-drawer"><div class="mm-head"><h2>All Modules</h2><button type="button" class="mm-close" aria-label="Close">&times;</button></div><div class="mm-search-wrap"><input type="search" class="mm-search" placeholder="Filter modules…" aria-label="Filter modules"></div><div class="mm-list">'+rows+'<div class="mm-empty" hidden>No modules match.</div></div></div>';
+  document.body.appendChild(ov);
+
+  var drawer=ov.querySelector(".mm-drawer");
+  var search=ov.querySelector(".mm-search");
+  var items=[].slice.call(ov.querySelectorAll(".mm-item"));
+  var tracks=[].slice.call(ov.querySelectorAll(".mm-track"));
+  var empty=ov.querySelector(".mm-empty");
+  var lastFocus=null;
+
+  function open(){lastFocus=document.activeElement;ov.classList.add("open");btn.setAttribute("aria-expanded","true");document.body.style.overflow="hidden";setTimeout(function(){search.focus();},50);
+    var c=ov.querySelector(".mm-item.current");if(c)c.scrollIntoView({block:"center"});}
+  function close(){ov.classList.remove("open");btn.setAttribute("aria-expanded","false");document.body.style.overflow="";if(lastFocus)lastFocus.focus();}
+  function filter(){var q=search.value.trim().toLowerCase();var any=false;
+    items.forEach(function(it){var show=!q||it.getAttribute("data-s").indexOf(q)>-1;it.style.display=show?"":"none";if(show)any=true;});
+    tracks.forEach(function(tr){var n=tr.nextElementSibling,vis=false;while(n&&n.classList.contains("mm-item")){if(n.style.display!=="none")vis=true;n=n.nextElementSibling;}tr.style.display=vis?"":"none";});
+    empty.hidden=any;}
+
+  btn.addEventListener("click",open);
+  ov.querySelector(".mm-close").addEventListener("click",close);
+  ov.addEventListener("click",function(e){if(e.target===ov)close();});
+  search.addEventListener("input",filter);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ov.classList.contains("open"))close();});
+  // simple focus trap
+  ov.addEventListener("keydown",function(e){if(e.key!=="Tab"||!ov.classList.contains("open"))return;
+    var f=ov.querySelectorAll("a,button,input");if(!f.length)return;var first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+})();
+</script>
+
 </body>
 </html>
