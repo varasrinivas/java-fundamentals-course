@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>An action you can hold in your hand</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127860; Real-world analogy</span>
+      <p><strong>A Command is a restaurant order ticket.</strong> The waiter (the <b>client</b>) writes your request onto a slip &mdash; &ldquo;table 4: steak, medium&rdquo; &mdash; and that slip fully captures <em>what</em> to do. The waiter hangs it on the <b>rail</b> (a queue); the ticket can wait, be re-fired if the plate is dropped, or be <b>voided</b> (undone) if you change your mind. The <b>kitchen</b> (the <em>receiver</em>) reads the slip and cooks, without knowing which waiter wrote it or when it was written. The <b>expo who calls the tickets</b> (the <em>invoker</em>) triggers the work but never touches a pan. That separation &mdash; a written request, a queue, a receiver that acts on demand &mdash; is exactly the Command pattern.</p>
+    </div>
     <p>Normally a method call vanishes the instant it runs. Wrap it in a <strong>Command</strong> object — with an <span class='key'>execute()</span> (and often <span class='key'>undo()</span>) — and the action becomes data you can keep. An <em>invoker</em> (a button, a queue, a scheduler) runs commands without knowing what they do.</p><pre class="code" data-src="interface Command { void execute(); void undo(); }
 class InsertText implements Command {
     private final Document doc; private final String text;
@@ -165,7 +173,117 @@ class InsertText implements Command {
 }
 // Push executed commands on a stack -&gt; pop+undo gives you Ctrl+Z"></pre><p>Command powers undo/redo, task queues, macro recording, and GUI buttons/menu items that trigger the same action. Because a command captures everything it needs, you can run it now, later, on another thread, or replay a whole history.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: Command obj then execute() then undo() then queue / log then invoker"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">Command obj</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">a request</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">execute()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">do it</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">undo()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">reverse it</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">queue / log</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">store as data</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">invoker</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">runs them</text></g></svg></div>
-    
+
+    <h3>Intent: decouple the invoker from the receiver</h3>
+    <p>The point of Command is to <strong>encapsulate a request as an object</strong>. The thing that <em>triggers</em> the work (a button, a menu, a scheduler &mdash; the <em>invoker</em>) is separated from the thing that <em>does</em> the work (the <em>receiver</em>). The invoker holds a <span class='key'>Command</span> reference and calls <span class='key'>execute()</span>; it neither knows nor cares what happens inside. That indirection is what lets you parameterize objects with an action, queue it, log it, or reverse it.</p>
+<pre class="code" data-src="// The invoker is coded once against the interface, never against a receiver.
+class Button {
+    private final Command onClick;                 // holds a request as data
+    Button(Command onClick){ this.onClick = onClick; }
+    void press(){ onClick.execute(); }             // fires it, knows nothing else
+}
+
+// Swap the behavior without touching Button:
+Button save  = new Button(new SaveCommand(document));
+Button print = new Button(new PrintCommand(printer));"></pre>
+
+    <h3>The four participants</h3>
+    <p>Every Command setup has the same cast. The <strong>Command</strong> interface declares <span class='key'>execute()</span>. A <strong>Concrete Command</strong> implements it and holds a reference to a <strong>Receiver</strong> plus any parameters the call needs. The <strong>Invoker</strong> stores and triggers commands. The <strong>Client</strong> wires a concrete command to its receiver and hands it to the invoker.</p>
+<pre class="code" data-src="interface Command { void execute(); }             // Command
+
+class Light {                                      // Receiver: has the real logic
+    void on()  { System.out.println(&quot;light on&quot;); }
+    void off() { System.out.println(&quot;light off&quot;); }
+}
+
+class LightOnCommand implements Command {          // Concrete Command
+    private final Light light;                     // bound to a receiver
+    LightOnCommand(Light light){ this.light = light; }
+    public void execute(){ light.on(); }           // delegates to the receiver
+}
+
+// Client wires receiver -&gt; command -&gt; invoker
+Light kitchen = new Light();
+Command cmd   = new LightOnCommand(kitchen);
+new Button(cmd).press();                           // Invoker triggers it"></pre>
+
+    <h3>A worked example: a remote control</h3>
+    <p>The classic Command example is a programmable remote: each slot holds a command object, so the remote (invoker) is generic and every device (receiver) plugs in without the remote knowing its API. Adding a new gadget means writing a new concrete command, not editing the remote.</p>
+<pre class="code" data-src="class Stereo {
+    void on(){ System.out.println(&quot;stereo on&quot;); }
+    void setVolume(int v){ System.out.println(&quot;volume = &quot; + v); }
+}
+class StereoOnCommand implements Command {
+    private final Stereo stereo;
+    StereoOnCommand(Stereo s){ this.stereo = s; }
+    public void execute(){ stereo.on(); stereo.setVolume(7); }  // a whole request
+}
+
+class Remote {
+    private final Command[] slots = new Command[7];
+    void setSlot(int i, Command c){ slots[i] = c; }
+    void pressSlot(int i){ slots[i].execute(); }   // same code for any device
+}"></pre>
+
+    <h3>Undo/redo: the big payoff of reifying actions</h3>
+    <p>Because a command is an object, it can remember how to reverse itself. Add an <span class='key'>undo()</span> method and keep a <strong>history stack</strong>: push each command as you execute it, pop and <span class='key'>undo()</span> for Ctrl+Z, and keep a second &ldquo;redo&rdquo; stack for Ctrl+Y. The command must capture whatever state undo needs &mdash; the old value, the deleted text, the previous position.</p>
+<pre class="code" data-src="interface Command { void execute(); void undo(); }
+
+class SetPriceCommand implements Command {
+    private final Product p; private final int newPrice;
+    private int oldPrice;                           // captured for undo
+    SetPriceCommand(Product p, int newPrice){ this.p = p; this.newPrice = newPrice; }
+    public void execute(){ oldPrice = p.price(); p.setPrice(newPrice); }
+    public void undo(){ p.setPrice(oldPrice); }     // reverse using captured state
+}
+
+class History {
+    private final Deque&lt;Command&gt; done = new ArrayDeque&lt;&gt;();
+    void run(Command c){ c.execute(); done.push(c); }
+    void undo(){ if(!done.isEmpty()) done.pop().undo(); }   // Ctrl+Z
+}"></pre>
+
+    <h3>Queuing, logging, scheduling</h3>
+    <p>A reified action is just data, so you can put it anywhere data goes. Drop commands on a <strong>task queue</strong> for a worker thread; batch several into a <strong>macro command</strong> that runs them in order; <strong>log</strong> each executed command to disk so that after a crash you can <em>replay</em> the log to rebuild state (the transactional / event-sourcing idea). None of this is possible with a bare method call, which leaves nothing behind.</p>
+<pre class="code" data-src="// A macro command is itself a Command that runs a list of commands.
+class MacroCommand implements Command {
+    private final List&lt;Command&gt; steps;
+    MacroCommand(List&lt;Command&gt; steps){ this.steps = steps; }
+    public void execute(){ steps.forEach(Command::execute); }
+    public void undo(){                              // undo in reverse order
+        for (int i = steps.size() - 1; i &gt;= 0; i--) steps.get(i).undo();
+    }
+}
+
+// Queue commands for later / another thread:
+BlockingQueue&lt;Command&gt; jobs = new LinkedBlockingQueue&lt;&gt;();
+jobs.put(new SaveCommand(doc));                      // producer
+// worker: while(true) jobs.take().execute();        // consumer"></pre>
+
+    <h3>The modern Java form: a command is often just a lambda</h3>
+    <p>Command's original ceremony &mdash; an interface plus a class per action &mdash; largely dissolves in modern Java. A no-undo command is just a functional interface, so <span class='key'>Runnable</span> <em>is</em> a command and a <strong>lambda IS a concrete command</strong>. And <span class='key'>ExecutorService.submit(Runnable)</span> is literally the pattern: the runnable is the command, the executor is the invoker that decides when and on which thread it runs. Reach for an explicit interface only when you need <span class='key'>undo()</span> or extra metadata.</p>
+<pre class="code" data-src="// A lambda is a Command. No boilerplate class needed.
+Runnable save = () -&gt; document.save();
+save.run();                                          // execute()
+
+// ExecutorService is the invoker; the Runnable is the command.
+ExecutorService pool = Executors.newFixedThreadPool(4);
+pool.submit(() -&gt; document.save());                  // command + invoker, built in
+pool.submit(() -&gt; index.rebuild());
+
+// Need undo? Then you still want a small interface:
+interface Command { void execute(); void undo(); }"></pre>
+
+    <h3>Command vs Strategy</h3>
+    <p>Both wrap behavior in an object, so they look alike. The difference is intent. A <strong>Strategy</strong> is an interchangeable <em>algorithm</em> &mdash; a different <em>how</em> for one well-defined job (e.g. which sort or which compression). A <strong>Command</strong> is a whole <em>request</em> or action &mdash; a <em>what to do</em>, frequently bound to a specific receiver and often carrying <span class='key'>undo()</span>. You swap a strategy to change the way a task is done; you queue, log, and replay commands because each one <em>is</em> a task.</p>
+<pre class="code" data-src="// STRATEGY: pick an algorithm; the caller still drives the loop.
+interface SortStrategy { void sort(int[] a); }
+List.of(new QuickSort(), new MergeSort());           // interchangeable HOW
+
+// COMMAND: a self-contained request you can store and reverse.
+interface Command { void execute(); void undo(); }
+new InsertText(doc, &quot;hi&quot;);                            // a WHAT, with undo"></pre>
+
   </div>
 </section>
 
@@ -230,6 +348,9 @@ System.out.println("undo works because each command is an object.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; What enables undo?</h3><p class="prompt">Why can a Command implement <span class='key'>undo()</span> when a plain method call can’t be “taken back”?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The command object <b>captures the state/inputs</b> needed to reverse itself (e.g. what text it inserted and where). A bare call leaves nothing behind to reverse; the object persists that information.</div></details></div>
       <div class="exercise"><h3>2 &middot; One action, two buttons</h3><p class="prompt">A toolbar button and a menu item should both “Save.” How does Command avoid duplicating logic?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Both invokers hold the <b>same SaveCommand</b> object and call <span class='key'>execute()</span>. The action lives in one place; the button and menu are just different invokers triggering it.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Name the four participants</h3><p class="prompt">In <span class='key'>new Button(new LightOnCommand(light))</span>, which object is the invoker, which is the concrete command, and which is the receiver?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>Button</span> is the <b>invoker</b> (it triggers <span class='key'>execute()</span>), <span class='key'>LightOnCommand</span> is the <b>concrete command</b>, and <span class='key'>light</span> is the <b>receiver</b> that holds the real <span class='key'>on()</span> logic. The code that wires them together is the <b>client</b>.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Undo a macro</h3><p class="prompt">A <span class='key'>MacroCommand</span> runs steps A, B, C in order. In what order must its <span class='key'>undo()</span> reverse them, and why?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><b>C, then B, then A</b> &mdash; reverse order. Later steps may depend on the state left by earlier ones, so you must unwind the most recent change first, exactly like popping an undo stack.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Command or Strategy?</h3><p class="prompt">You have an object that picks <em>which compression algorithm</em> a backup uses. Is that a Command or a Strategy? What if instead it represented &ldquo;run this backup now, and be able to roll it back&rdquo;?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Choosing the algorithm is a <b>Strategy</b> &mdash; an interchangeable <em>how</em> for one job. &ldquo;Run this backup, with rollback&rdquo; is a <b>Command</b> &mdash; a whole self-contained request (a <em>what</em>) you can queue, log, and <span class='key'>undo()</span>.</div></details></div>
   </div>
 </section>
 

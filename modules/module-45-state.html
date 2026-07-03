@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Each state is its own object</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#128678; Real-world analogy</span>
+      <p><strong>The State pattern is a traffic light.</strong> Feed the very same &ldquo;tick&rdquo; event into the light and it does something <em>different</em> depending on which lamp is currently lit: a tick on <b>green</b> turns it <b>yellow</b>, a tick on <b>yellow</b> turns it <b>red</b>, a tick on <b>red</b> turns it back to <b>green</b>. The light&rsquo;s behavior is driven entirely by its <b>internal state</b>, and each state already knows which state comes next &mdash; there is no giant &ldquo;if the light is currently&hellip;&rdquo; conditional bolted onto the wiring. Swap the pattern in and each colored lamp becomes its own small object that owns both its behavior and its transition.</p>
+    </div>
     <p>The naive version is a giant <span class='key'>switch(status)</span> repeated in every method — brittle and sprawling. The <strong>State</strong> pattern makes each state a class implementing a shared interface; the context delegates behavior to its current state object, and states decide the transitions.</p><pre class="code" data-src="interface LightState { LightState next(); }
 class Green  implements LightState { public LightState next(){ return new Yellow(); } }
 class Yellow implements LightState { public LightState next(){ return new Red(); } }
@@ -165,7 +173,102 @@ class TrafficLight {
     private LightState state = new Green();
     void change(){ state = state.next(); }   // behavior + transition delegated
 }"></pre><p>State turns tangled conditionals into small, focused classes and makes the legal transitions explicit. You’ll meet it in workflow engines (draft → review → published), vending machines, TCP connection states, and game character modes.</p>
-    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: TrafficLight then state field then Green/Yellow/Red then change() then next state"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">TrafficLight</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">context</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">state field</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">current state</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Green/Yellow/Red</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">state classes</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">change()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">delegates</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">next state</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">transition</text></g></svg></div>
+    <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: TrafficLight then state field then Green/Yellow/Red then change() then next state"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">TrafficLight</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">context</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">state field</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">current state</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">Green/Yellow/Red</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">state classes</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">change()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">delegates</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">next state</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">transition</text></g>
+    <h3>The pattern&rsquo;s intent</h3>
+    <p>The Gang of Four define State as: <em>&ldquo;allow an object to alter its behavior when its internal state changes &mdash; the object will appear to change its class.&rdquo;</em> That last phrase is the whole idea. From the caller&rsquo;s side, <span class='key'>player.play()</span> does one thing while stopped and a completely different thing while paused, as though the reference suddenly pointed at a different type. Internally there&rsquo;s one <strong>context</strong> object holding a reference to a <strong>state</strong> object, and every public method just forwards to it.</p>
+    <pre class="code" data-src="// The CONTEXT keeps a reference to its current state and delegates every
+// operation to it. It never asks &quot;which state am I in?&quot; -- the state answers.
+class Player {
+    private PlayerState state = new Stopped();
+    void setState(PlayerState s) { this.state = s; }   // states call this
+    void play()  { state.play(this); }
+    void pause() { state.pause(this); }
+    void stop()  { state.stop(this); }
+}
+
+interface PlayerState {           // one method per event the context handles
+    void play(Player p);
+    void pause(Player p);
+    void stop(Player p);
+}"></pre>
+    <p>Because the context delegates, you can add a whole new behavior mode by writing one class &mdash; the context never changes.</p>
+    <h3>Replacing the giant switch</h3>
+    <p>The tell-tale smell State fixes is the <em>same</em> <span class='key'>switch(status)</span> duplicated across every method. Each state class instead pulls together all the behavior for one mode in one place. Here is a media player with <span class='key'>Stopped</span>, <span class='key'>Playing</span>, and <span class='key'>Paused</span> states, each implementing the same interface and each deciding its own transitions.</p>
+    <pre class="code" data-src="class Stopped implements PlayerState {
+    public void play(Player p)  { System.out.println(&quot;start&quot;); p.setState(new Playing()); }
+    public void pause(Player p) { System.out.println(&quot;(nothing to pause)&quot;); }
+    public void stop(Player p)  { /* already stopped: ignore */ }
+}
+class Playing implements PlayerState {
+    public void play(Player p)  { /* already playing: ignore */ }
+    public void pause(Player p) { System.out.println(&quot;pause&quot;);  p.setState(new Paused()); }
+    public void stop(Player p)  { System.out.println(&quot;stop&quot;);   p.setState(new Stopped()); }
+}
+class Paused implements PlayerState {
+    public void play(Player p)  { System.out.println(&quot;resume&quot;); p.setState(new Playing()); }
+    public void pause(Player p) { /* already paused: ignore */ }
+    public void stop(Player p)  { System.out.println(&quot;stop&quot;);   p.setState(new Stopped()); }
+}"></pre>
+    <p>Notice how illegal events (pausing while stopped) become a quiet no-op <em>inside the state that knows it&rsquo;s illegal</em>, instead of a defensive <span class='key'>if</span> scattered everywhere.</p>
+    <h3>Who triggers the transition?</h3>
+    <p>There are two schools. In the classic form, <strong>each state decides the next state</strong> and calls <span class='key'>context.setState(&hellip;)</span> &mdash; transitions live next to the behavior that causes them. Alternatively the <strong>context owns a transition table</strong> and the states stay purely behavioral. Table-driven transitions are easier to visualize and validate as a whole; state-driven transitions keep related logic together.</p>
+    <pre class="code" data-src="// Option A -- states own the transitions (behavior + &quot;what's next&quot; together).
+class Green implements LightState {
+    public LightState next() { return new Yellow(); }   // Green decides
+}
+
+// Option B -- the context owns a transition table; states stay behavior-only.
+enum Signal { GREEN, YELLOW, RED }
+Map&lt;Signal, Signal&gt; table = Map.of(
+    Signal.GREEN,  Signal.YELLOW,
+    Signal.YELLOW, Signal.RED,
+    Signal.RED,    Signal.GREEN);
+Signal next = table.get(current);   // the TrafficLight looks it up"></pre>
+    <h3>An enum as a compact state machine</h3>
+    <p>Java enums can carry <strong>constant-specific method bodies</strong>: declare an <span class='key'>abstract</span> method on the enum and let each constant override it. That gives you a state machine with zero boilerplate classes &mdash; the constants <em>are</em> the states, and because enum constants are singletons, transitions allocate nothing.</p>
+    <pre class="code" data-src="enum LightState {
+    GREEN  { LightState next() { return YELLOW; } },
+    YELLOW { LightState next() { return RED;    } },
+    RED    { LightState next() { return GREEN;  } };
+
+    abstract LightState next();     // each constant supplies its own body
+}
+
+LightState s = LightState.GREEN;
+s = s.next();     // YELLOW
+s = s.next();     // RED   -- no `new` objects; enum constants are singletons"></pre>
+    <p>This is the most idiomatic Java form when the states are fixed and known at compile time. Reach for full classes only when a state needs its own fields or must be created dynamically.</p>
+    <h3>State vs Strategy</h3>
+    <p>State and Strategy share an <em>identical</em> UML diagram &mdash; an interface plus a field the context delegates to &mdash; so they&rsquo;re constantly confused. The difference is entirely in <strong>intent</strong>. Strategy is about interchangeable algorithms the <em>client</em> chooses (and usually leaves put); State is about a <em>self-driven lifecycle</em> where the object swaps its own behavior as events arrive.</p>
+    <pre class="code" data-src="// STRATEGY: the CLIENT injects an algorithm; the object keeps the one it's given.
+Sorter sorter = new Sorter(new QuickSort());   // chosen once, from the outside
+
+// STATE: the OBJECT swaps its own behavior as events arrive over its lifetime.
+Player p = new Player();   // starts Stopped
+p.play();                  // -&gt; Playing   (the object transitioned itself)
+p.pause();                 // -&gt; Paused
+
+// Same UML (an interface + a field the context delegates to), opposite intent:
+//   Strategy = interchangeable HOW, picked by the client.
+//   State    = a self-driven lifecycle, transitions triggered from within."></pre>
+    <h3>Pitfalls: shared data &amp; transition explosion</h3>
+    <p>Two traps show up in real code. First, <strong>where does shared data live?</strong> Keep it in the context and pass the context into each state method &mdash; don&rsquo;t copy it into every state object. Second, <strong>transition explosion</strong>: with N states and M events you can drift toward N&times;M methods. Keep states stateless singletons, give a base class no-op defaults, and consider a transition table once the graph gets busy.</p>
+    <pre class="code" data-src="// Shared data belongs in the CONTEXT, not copied into every state object.
+class Doc {
+    String body = &quot;&quot;;                 // shared data lives here...
+    DocState state = new Draft();
+    void publish() { state.publish(this); }   // ...passed in so states can use it
+}
+
+// States are usually stateless -&gt; make them singletons (or enum constants)
+// so you don't allocate a new object on every transition:
+enum DocState2 { DRAFT, REVIEW, PUBLISHED }   // exactly one instance each
+
+// Transition explosion: N states x M events = up to N*M methods. Tame it with
+// an enum table, a shared abstract base with no-op defaults, or by ignoring
+// illegal events instead of throwing."></pre>
+    
+</svg></div>
     
   </div>
 </section>
@@ -232,6 +335,9 @@ System.out.println("same object, behavior set by its state.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; What smell does it fix?</h3><p class="prompt">You see the same <span class='key'>switch(status)</span> copy-pasted across five methods. Why is State a good remedy?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">That duplicated conditional is the smell. State moves each branch into its own class, so behavior for a status lives in one place and the methods just delegate. Adding a status becomes adding a class, not editing five switches.</div></details></div>
       <div class="exercise"><h3>2 &middot; State vs Strategy</h3><p class="prompt">State and Strategy have the same class diagram. What’s the key difference in how the object changes?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">In <b>Strategy</b>, the client picks the algorithm and it usually stays put. In <b>State</b>, the object <b>transitions itself</b> between states over time (often the states decide the next state), changing its own behavior as it runs.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Where does the data live?</h3><p class="prompt">A document workflow has <span class='key'>Draft</span>, <span class='key'>Review</span>, and <span class='key'>Published</span> states, and every state needs the document&rsquo;s text. Where should that text be stored, and how do the states reach it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Store shared data in the <b>context</b> (the <span class='key'>Doc</span>), not duplicated inside each state. Pass the context into each state method &mdash; <span class='key'>state.publish(this)</span> &mdash; so the state can read and mutate it. State objects then stay stateless and can be shared singletons.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Enum or classes?</h3><p class="prompt">When is the <span class='key'>enum</span> form (constants with an abstract <span class='key'>next()</span>) the better choice, and when do you need full state classes?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Use the <b>enum</b> when the set of states is fixed and known at compile time and the states hold no per-instance data &mdash; you get singletons and zero boilerplate. Reach for full <b>classes</b> when a state needs its own fields, must be created dynamically, or the state set is open for extension.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Trace the transitions</h3><p class="prompt">Starting from <span class='key'>Stopped</span>, what states does the media player pass through for the sequence <span class='key'>play()</span>, <span class='key'>pause()</span>, <span class='key'>play()</span>, <span class='key'>stop()</span>? Who performs each transition?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Stopped &rarr; <b>Playing</b> (play) &rarr; <b>Paused</b> (pause) &rarr; <b>Playing</b> (play resumes) &rarr; <b>Stopped</b> (stop). Each current <em>state</em> performs its own transition by calling <span class='key'>p.setState(&hellip;)</span>; the context never decides &mdash; it only delegates.</div></details></div>
   </div>
 </section>
 

@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Publish once, many react</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>Observer is a newsletter subscription.</strong> The <b>publisher</b> (the subject) does not know or care who its readers are &mdash; it keeps a mailing list. When a new issue drops it <b>notifies every current subscriber</b> at once, without addressing anyone by name. Readers <b>subscribe</b> and <b>unsubscribe</b> whenever they like, and the publisher never changes its code to add or drop one. If a reader moves away but forgets to cancel, the publisher keeps mailing into the void &mdash; the <em>lapsed-listener</em> leak. Swap &ldquo;newsletter&rdquo; for a podcast feed or a YouTube channel and the shape is identical: one broadcaster, many independent listeners, loose coupling in both directions.</p>
+    </div>
     <p>The <strong>subject</strong> keeps a list of <strong>observers</strong> and, when something happens, loops over them and calls a notify method. Observers register and unregister themselves. The subject depends only on a small interface, so it never needs to know the concrete subscribers — that’s loose coupling.</p><pre class="code" data-src="interface Subscriber { void onNewVideo(String title); }
 class Channel {
     private final List&lt;Subscriber&gt; subs = new ArrayList&lt;&gt;();
@@ -167,6 +175,114 @@ class Channel {
 }"></pre><p>This is the engine behind event systems and UIs: <span class='key'>button.addActionListener(...)</span>, <span class='key'>PropertyChangeListener</span>, and reactive libraries are all Observer. It decouples producers from consumers — but watch for memory leaks if observers forget to unsubscribe, and beware notification storms.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: subscribe() then Channel then upload() then notify all then onNewVideo()"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">subscribe()</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">register</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">Channel</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">the subject</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">upload()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">event fires</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">notify all</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">loop subs</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">onNewVideo()</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">each reacts</text></g></svg></div>
     
+    <h3>Intent: a one-to-many dependency</h3>
+    <p>Observer defines a <strong>one-to-many</strong> relationship: when one object &mdash; the <strong>subject</strong> &mdash; changes state, every registered <strong>observer</strong> is notified and updated automatically. The subject depends only on a tiny <span class='key'>Observer</span> interface, so it broadcasts to dependents it has never heard of. That inverted, name-free dependency is what keeps producers and consumers loosely coupled.</p>
+    <pre class="code" data-src="// Intent: a ONE-to-MANY dependency. When the one (subject) changes state,
+// all its many dependents (observers) are notified automatically.
+interface Observer { void update(); }        // the only type the subject depends on
+
+interface Subject {
+    void register(Observer o);
+    void unregister(Observer o);
+    void notifyObservers();                   // loop the list, call update() on each
+}
+// The subject holds Observer references, never concrete observer classes, so you can
+// add or drop observer *types* without editing the subject. That is the loose coupling."></pre>
+    <h3>The two roles: Subject and Observer</h3>
+    <p>A concrete subject owns the subscriber list and three responsibilities: <span class='key'>register</span>, <span class='key'>unregister</span>, and a private <span class='key'>notify</span> that walks the list. Each observer implements a single <span class='key'>update</span> callback. Nothing else is shared &mdash; the subject calls <span class='key'>update</span> through the interface and never casts to a concrete display type.</p>
+    <pre class="code" data-src="interface Observer { void update(float tempC); }          // the callback
+
+class WeatherStation {                                    // the concrete Subject
+    private final List&lt;Observer&gt; observers = new ArrayList&lt;&gt;();
+    private float tempC;
+
+    void register(Observer o)   { observers.add(o); }
+    void unregister(Observer o) { observers.remove(o); }
+
+    void setTemperature(float t) {                        // a state change...
+        this.tempC = t;
+        notifyObservers();                                // ...triggers the broadcast
+    }
+    private void notifyObservers() {
+        for (Observer o : observers) o.update(tempC);     // push new state to each
+    }
+}
+
+class PhoneDisplay implements Observer {
+    public void update(float tempC) { System.out.println(&quot;Phone: &quot; + tempC + &quot;C&quot;); }
+}
+// new PhoneDisplay() registers once; every setTemperature() call refreshes it."></pre>
+    <h3>Push vs pull</h3>
+    <p>How much does the subject hand the observer? In the <strong>push</strong> model it passes the changed values as arguments; in the <strong>pull</strong> model it passes only a reference to itself and lets each observer read what it needs. Push is simplest; pull scales better as state grows. The common middle ground is to push a single immutable <em>event object</em>, which stays type-safe without freezing the argument list.</p>
+    <pre class="code" data-src="// PUSH: the subject sends the changed data as method arguments.
+interface Observer { void update(float tempC, float humidity); }
+//  + dead simple for the observer;  - the signature is fixed, and observers that
+//    only care about temperature still receive humidity they must ignore.
+
+// PULL: the subject passes a reference to itself; the observer asks for what it needs.
+interface Observer { void update(WeatherStation source); }
+class Display implements Observer {
+    public void update(WeatherStation source) {
+        render(source.getTemperature());                 // pull only the fields you use
+    }
+}
+//  + flexible and future-proof as state grows;  - couples the observer to the
+//    subject's getters. Most modern APIs push an immutable *event object* instead."></pre>
+    <h3>Modern Java: lambdas, listeners &amp; PropertyChangeListener</h3>
+    <p>When the observer interface is <strong>functional</strong> (one method), any lambda becomes an observer &mdash; no class needed. The JDK has shipped Observer-shaped APIs for decades: <span class='key'>addActionListener</span> in Swing, JavaBeans' <span class='key'>PropertyChangeSupport</span>/<span class='key'>PropertyChangeListener</span>, and <span class='key'>Flow.Subscriber</span> for reactive streams. A tidy idiom is to return an <em>unsubscribe handle</em> from <span class='key'>register</span> so callers can tear down cleanly.</p>
+    <pre class="code" data-src="// JavaBeans ships a ready-made Subject: PropertyChangeSupport does the list + loop.
+class Thermostat {
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private double temp;
+    void addListener(PropertyChangeListener l)    { pcs.addPropertyChangeListener(l); }
+    void removeListener(PropertyChangeListener l) { pcs.removePropertyChangeListener(l); }
+    void setTemp(double t) {
+        double old = temp; temp = t;
+        pcs.firePropertyChange(&quot;temp&quot;, old, t);           // fires only when old != new
+    }
+}
+
+// PropertyChangeListener is a functional interface, so any lambda is an observer:
+thermostat.addListener(evt -&gt;
+    System.out.println(evt.getPropertyName() + &quot;: &quot;
+                     + evt.getOldValue() + &quot; -&gt; &quot; + evt.getNewValue()));
+// Swing/AWT (addActionListener), Flow.Subscriber, and RxJava all follow this shape."></pre>
+    <h3>Why java.util.Observable was deprecated</h3>
+    <p>The original <span class='key'>java.util.Observable</span> class and <span class='key'>java.util.Observer</span> interface were <strong>deprecated in Java 9</strong>. <span class='key'>Observable</span> is a class, so your subject must extend it and can inherit nothing else; the callback hands you an untyped <span class='key'>Object</span>; and the <span class='key'>setChanged()</span>/<span class='key'>notifyObservers()</span> protocol fails silently if you forget a step. Roll your own typed interface or use <span class='key'>PropertyChangeListener</span> / <span class='key'>Flow</span> instead.</p>
+    <pre class="code" data-src="// DEPRECATED since Java 9 - do NOT build new code on these:
+//   java.util.Observable  (a class)      java.util.Observer  (update(Observable, Object))
+
+// Why they were retired:
+//  1. Observable is a CLASS, not an interface -&gt; your subject must extend it and can
+//     inherit nothing else (Java has no multiple inheritance of classes).
+//  2. update(Observable o, Object arg) hands you a raw Object -&gt; no type safety.
+//  3. The setChanged()/notifyObservers() two-step is easy to get wrong: forget
+//     setChanged() and no notification fires, silently.
+//  4. Notification order and thread-safety were never specified.
+
+// Prefer instead: your own typed listener interface, PropertyChangeListener,
+// or java.util.concurrent.Flow (reactive streams, since Java 9)."></pre>
+    <h3>Pitfalls: lapsed listeners, re-entrancy &amp; order</h3>
+    <p>Three bugs recur. The <strong>lapsed-listener</strong> leak: a long-lived subject pins short-lived observers that forgot to unregister, so they never get collected. <strong>Re-entrancy</strong>: an observer that subscribes or unsubscribes <em>during</em> notification mutates the list mid-loop, throwing <span class='key'>ConcurrentModificationException</span> &mdash; iterate over a snapshot or a <span class='key'>CopyOnWriteArrayList</span>. And guard the loop: an <strong>exception</strong> from one observer must not stop the others, and observers must never rely on <strong>notification order</strong>.</p>
+    <pre class="code" data-src="private final List&lt;Observer&gt; observers = new CopyOnWriteArrayList&lt;&gt;();
+
+private void notifyObservers(float tempC) {
+    // RE-ENTRANCY: an observer that (un)registers *during* notify would throw
+    // ConcurrentModificationException on a plain ArrayList. A CopyOnWriteArrayList
+    // (or iterating over a snapshot copy) makes the loop safe.
+    for (Observer o : observers) {
+        try {
+            o.update(tempC);
+        } catch (RuntimeException ex) {
+            // EXCEPTIONS: one misbehaving observer must not abort the rest.
+            log.warn(&quot;observer failed, skipping&quot;, ex);
+        }
+    }
+}
+// LAPSED LISTENER: forgetting unregister() keeps dead observers reachable forever
+//   -&gt; a memory leak. Always pair register/unregister, or hold WeakReferences.
+// ORDER: never rely on the order observers fire; keep them mutually independent."></pre>
+
   </div>
 </section>
 
@@ -230,7 +346,10 @@ System.out.println("everyone notified? " + (notifications == subscribers));</tex
     <p class="section-kicker">Exercises</p>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Why the interface?</h3><p class="prompt">Why does the Channel depend on a <span class='key'>Subscriber</span> interface instead of concrete subscriber classes?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">So the subject is <b>decoupled</b> from who’s listening — any class implementing the interface can subscribe, and you can add new subscriber types without touching the Channel. That loose coupling is the whole point.</div></details></div>
-      <div class="exercise"><h3>2 &middot; The leak</h3><p class="prompt">A long-lived subject holds subscribers that are short-lived UI objects. What bug can appear, and the fix?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">A <b>memory leak</b>: the subject’s list keeps references alive, so subscribers (and what they hold) are never garbage-collected. Fix by <b>unsubscribing</b> when the observer is done (or using weak references).</div></details></div>
+      <div class="exercise"><h3>2 &middot; The leak</h3><p class="prompt">A long-lived subject holds subscribers that are short-lived UI objects. What bug can appear, and the fix?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">A <b>memory leak</b>: the subject’s list keeps references alive, so subscribers (and what they hold) are never garbage-collected. Fix by <b>unsubscribing</b> when the observer is done (or using weak references).</div></details></div>      <div class="exercise"><h3>3 &middot; Push or pull?</h3><p class="prompt">Your subject exposes ten fields today and will grow. Do you design the observer callback to <span class='key'>update(a, b, c, ...)</span> or <span class='key'>update(subject)</span>? What is the trade-off?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Prefer <b>pull</b> (<span class='key'>update(subject)</span>) or push a single immutable <b>event object</b>. A wide push signature must change every time you add a field, breaking all observers; pull lets each observer read only the fields it cares about. The cost of pull is a tighter coupling to the subject's getters.</div></details></div>
+      <div class="exercise"><h3>4 &middot; What replaced Observable?</h3><p class="prompt">Why did Java 9 deprecate <span class='key'>java.util.Observable</span> and <span class='key'>java.util.Observer</span>, and what should you reach for now?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>Observable</span> is a <b>class</b> (forces inheritance, blocks extending anything else), its callback passes a raw <span class='key'>Object</span> (no type safety), and the <span class='key'>setChanged()</span>/<span class='key'>notifyObservers()</span> dance fails silently. Use a <b>typed listener interface</b> of your own, <span class='key'>PropertyChangeListener</span>, or <span class='key'>java.util.concurrent.Flow</span>.</div></details></div>
+      <div class="exercise"><h3>5 &middot; The vanishing observer</h3><p class="prompt">During <span class='key'>notifyObservers()</span>, one observer calls <span class='key'>unregister(this)</span> inside its own <span class='key'>update()</span>. With a plain <span class='key'>ArrayList</span> and a for-each loop, what happens &mdash; and how do you fix it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The for-each iterator detects the mid-loop mutation and throws <b><span class='key'>ConcurrentModificationException</span></b>. Fix by iterating over a <b>snapshot copy</b> (<span class='key'>new ArrayList&lt;&gt;(observers)</span>) or by storing observers in a <span class='key'>CopyOnWriteArrayList</span>, whose iterator reads a stable snapshot while writes go to a fresh copy.</div></details></div>
+
   </div>
 </section>
 

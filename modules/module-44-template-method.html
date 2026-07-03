@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>The base class owns the structure</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>A template method is a recipe card with a few fill-in-the-blank steps.</strong> The card reads: &ldquo;prepare the batter, <b>[add YOUR flavor]</b>, bake 30&nbsp;min, cool.&rdquo; The overall <b>sequence is locked by the recipe</b> &mdash; every cook boils, then flavors, then bakes, then cools, in exactly that order. What each cook <em>gets to decide</em> is only the blank: vanilla, chocolate, or lemon. You cannot bake before you mix, and you cannot skip the cooling; you may only <b>fill in the blanks</b>. The recipe card is the <b>abstract base class</b> (it owns the flow), and each cook who supplies a flavor is a <b>subclass</b> (it supplies one step). That is Template Method: the algorithm&rsquo;s skeleton lives in one place, and the interchangeable steps are deferred to whoever fills them in.</p>
+    </div>
     <p>A <strong>template method</strong> is a <span class='key'>final</span> method in an abstract class that calls a fixed sequence of steps. Some steps are implemented in the base; others are <span class='key'>abstract</span> hooks the subclasses must supply. Subclasses customize <em>what</em> happens at each step but can’t change the overall <em>order</em>.</p><pre class="code" data-src="abstract class HotDrink {
     final void make() {          // the template: fixed order, can\u2019t override
         boilWater();
@@ -168,7 +176,125 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
 }
 class Tea extends HotDrink { protected void addMainIngredient(){ steepTeaBag(); } }"></pre><p>It’s the inheritance-based counterpart to Strategy: instead of injecting a behavior object, you subclass and override a hook. The JDK uses it in <span class='key'>AbstractList</span> (implement <span class='key'>get</span>/<span class='key'>size</span>, inherit the rest) and servlet <span class='key'>HttpServlet</span> (override <span class='key'>doGet</span>/<span class='key'>doPost</span>).</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: make() then boilWater() then addIngredient() then subclass fills then pour()"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">make()</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">skeleton</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">boilWater()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fixed step</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">addIngredient()</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">abstract hook</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">subclass fills</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">Tea / Coffee</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">pour()</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fixed step</text></g></svg></div>
-    
+
+    <h3>Intent: a skeleton you can&rsquo;t reshape</h3>
+    <p>The <strong>intent</strong> of Template Method is to define the skeleton of an algorithm in one base method, deferring specific steps to subclasses <em>without changing the algorithm&rsquo;s structure</em>. The base class decides the order and the invariant parts; subclasses decide only the pluggable parts. This is the classic way to factor out the &ldquo;same shape, different details&rdquo; duplication you find across a family of related operations.</p>
+    <pre class="code" data-src="// INTENT: define the skeleton of an algorithm once; defer specific
+// steps to subclasses WITHOUT letting them change the overall structure.
+abstract class DataProcessor {
+
+    // The template method: the fixed skeleton. final =&gt; subclasses can't reorder it.
+    public final void process() {
+        String raw = readData();      // step 1 - varies per source
+        String clean = validate(raw); // step 2 - shared default (a hook)
+        String result = transform(clean); // step 3 - varies per format
+        writeData(result);            // step 4 - varies per sink
+    }
+
+    // &quot;Primitive operations&quot; every subclass MUST supply:
+    protected abstract String readData();
+    protected abstract String transform(String data);
+    protected abstract void   writeData(String result);
+
+    // A &quot;hook&quot;: a step with a usable default the subclass MAY override.
+    protected String validate(String data) { return data.strip(); }
+}"></pre>
+
+    <h3>Mechanics: template + primitives + hooks</h3>
+    <p>The moving parts have names. The <span class='key'>final</span> <strong>template method</strong> calls a sequence of <strong>primitive operations</strong> &mdash; <span class='key'>abstract</span> steps every subclass must implement. Between them you can also place <strong>hooks</strong>: methods with a default (often no-op) body that a subclass <em>may</em> override but doesn&rsquo;t have to. Primitives are the required blanks; hooks are the optional ones.</p>
+    <pre class="code" data-src="class CsvToJson extends DataProcessor {
+    protected String readData()             { return loadCsvFile(); }
+    protected String transform(String csv)  { return csvToJson(csv); }
+    protected void   writeData(String json) { saveToApi(json); }
+    // validate() is NOT overridden - the base default (strip) is inherited.
+}
+
+// The caller never touches the individual steps - just the skeleton:
+new CsvToJson().process();
+// The base class' process() runs read -&gt; validate -&gt; transform -&gt; write,
+// calling DOWN into whichever step the subclass provided."></pre>
+
+    <h3>The Hollywood Principle</h3>
+    <p>Template Method is the textbook example of the <strong>Hollywood Principle</strong>: &ldquo;Don&rsquo;t call us, we&rsquo;ll call you.&rdquo; Control is <em>inverted</em> &mdash; you never invoke the individual steps, the base class does, calling <em>down</em> into your overrides at the moments it chooses. This inversion of control is what frameworks are built on: you supply the pieces, the framework owns the flow.</p>
+    <pre class="code" data-src="// Hollywood Principle: &quot;Don't call us, we'll call you.&quot;
+// You NEVER call the primitive steps yourself; the base class calls them.
+
+abstract class Game {
+    public final void play() {   // base controls the flow
+        initialize();            // it &quot;calls you&quot; (the subclass) here...
+        startPlay();             // ...and here...
+        endPlay();               // ...and here.
+    }
+    protected abstract void initialize();
+    protected abstract void startPlay();
+    protected abstract void endPlay();
+}
+
+class Chess extends Game {
+    protected void initialize() { System.out.println(&quot;Set up 32 pieces&quot;); }
+    protected void startPlay()  { System.out.println(&quot;White moves first&quot;); }
+    protected void endPlay()    { System.out.println(&quot;Checkmate!&quot;); }
+}
+// You write the steps; the framework decides WHEN to invoke them."></pre>
+
+    <h3>Why <span class='key'>final</span> template, <span class='key'>protected</span> primitives</h3>
+    <p>Two access choices protect the pattern. Making the template method <span class='key'>final</span> stops a subclass from overriding it and rearranging or skipping steps &mdash; the sequence is the one thing that must not vary. Making the primitives <span class='key'>protected</span> lets subclasses fill them in while keeping them out of the public API, so callers can only invoke the whole algorithm, never a dangling half-step.</p>
+    <pre class="code" data-src="abstract class ReportBuilder {
+    // final: locks the sequence so no subclass can break the algorithm.
+    public final String build() {
+        return header() + body() + footer();
+    }
+    // protected (not public): subclasses fill these in, but outside code
+    // can't call a half-step directly - only the whole build() is public.
+    protected abstract String body();
+    // hooks with sensible defaults - override only if you need to:
+    protected String header() { return &quot;=== REPORT ===\n&quot;; }
+    protected String footer() { return &quot;\n=== END ===&quot;;    }
+}
+// A subclass supplies body(); it CANNOT override build() (final)
+// and SHOULD NOT widen the primitives to public."></pre>
+
+    <h3>Template Method vs Strategy</h3>
+    <p>Both patterns let one algorithm vary, but along different axes. <strong>Template Method uses inheritance</strong>: the variation point is an overridden method, bound at <em>compile time</em>, one subclass per variant. <strong>Strategy uses composition</strong>: the whole algorithm is an object you inject and can swap at <em>runtime</em>. Reach for Template Method when a shared skeleton has one or two fixed holes; reach for Strategy when you need runtime flexibility or want to avoid a subclass explosion.</p>
+    <pre class="code" data-src="// TEMPLATE METHOD: vary a step via INHERITANCE, chosen at COMPILE time.
+abstract class Sorter {
+    public final void run(int[] a) { /* fixed loop */ compare(a[0], a[1]); }
+    protected abstract int compare(int x, int y);   // the overridable step
+}
+class Ascending extends Sorter { protected int compare(int x,int y){return x-y;} }
+
+// STRATEGY: vary the WHOLE algorithm via COMPOSITION, swapped at RUNTIME.
+class Context {
+    private Comparator&lt;Integer&gt; strategy;          // a plugged-in object
+    Context(Comparator&lt;Integer&gt; s) { this.strategy = s; }
+    void run(int x, int y) { strategy.compare(x, y); }
+}
+new Context((x, y) -&gt; x - y);                       // inject at runtime
+
+// Rule of thumb: one fixed variation point + shared skeleton -&gt; Template Method.
+// Need to swap behavior at runtime / avoid subclassing -&gt; Strategy."></pre>
+
+    <h3>Template Method in the JDK</h3>
+    <p>You have already been filling in template methods without naming them. <span class='key'>AbstractList</span> asks you for just <span class='key'>get</span> and <span class='key'>size</span> and builds the rest of the <span class='key'>List</span> contract on top. <span class='key'>HttpServlet.service</span> is a template that dispatches to <span class='key'>doGet</span>/<span class='key'>doPost</span>. <span class='key'>InputStream</span> implements the bulk <span class='key'>read(byte[], int, int)</span> in terms of the single abstract <span class='key'>read()</span>. Each one owns the flow and calls down to your override.</p>
+    <pre class="code" data-src="// The JDK is full of template methods - you fill in the blanks:
+
+// 1. AbstractList: implement get(i) + size(); inherit iterator(), indexOf(),
+//    contains(), equals(), hashCode(), subList()... all built on those two.
+class Fixed extends AbstractList&lt;String&gt; {
+    public String get(int i) { return &quot;item &quot; + i; }
+    public int size()        { return 10; }
+}
+
+// 2. HttpServlet.service() is the template: it inspects the HTTP method and
+//    dispatches DOWN to doGet(), doPost(), doPut()... which you override.
+class Hello extends HttpServlet {
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) { }
+    // service() calls doGet for you - Hollywood Principle in the servlet API.
+}
+
+// 3. InputStream.read(byte[], off, len) is implemented in terms of the single
+//    abstract read() - subclasses supply one byte; the bulk read is inherited."></pre>
+
   </div>
 </section>
 
@@ -233,6 +359,9 @@ System.out.println("total run steps = " + totalSteps);</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Why final?</h3><p class="prompt">Why is the template method itself usually <span class='key'>final</span> (non-overridable)?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">To protect the <b>invariant order</b> of steps. The whole point is that subclasses customize individual steps, not rearrange or skip them. Making the template final stops a subclass from breaking the algorithm’s structure.</div></details></div>
       <div class="exercise"><h3>2 &middot; Template vs Strategy</h3><p class="prompt">Both let behavior vary. When would you pick Strategy over Template Method?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Template Method varies steps via <b>inheritance</b> (compile-time, one subclass per variant). Strategy varies the whole algorithm via <b>composition</b> (swap an object at runtime). Prefer Strategy when you need runtime flexibility or want to avoid subclassing.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Primitive vs hook</h3><p class="prompt">A subclass must supply <span class='key'>readData()</span> but may leave <span class='key'>validate()</span> alone. Which is the &ldquo;primitive operation&rdquo; and which is the &ldquo;hook&rdquo;, and how does the base class signal the difference?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>readData()</span> is a <b>primitive operation</b>: it&rsquo;s <span class='key'>abstract</span>, so every subclass is forced to implement it. <span class='key'>validate()</span> is a <b>hook</b>: it has a concrete default body (e.g. <span class='key'>return data.strip();</span>), so overriding it is optional. The base class signals the difference purely by whether the method is <span class='key'>abstract</span> or has a default implementation.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Name the principle</h3><p class="prompt">In Template Method you write the steps but never call them &mdash; the base class calls down into your overrides. What is this inversion of control called, and why do frameworks love it?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">It&rsquo;s the <b>Hollywood Principle</b>: &ldquo;Don&rsquo;t call us, we&rsquo;ll call you.&rdquo; The framework owns the algorithm&rsquo;s flow and invokes your code at the right moments. That&rsquo;s exactly how <span class='key'>HttpServlet.service()</span> calls your <span class='key'>doGet()</span>, or how <span class='key'>AbstractList</span> calls your <span class='key'>get()</span> &mdash; you plug in the pieces, the framework drives.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Spot the template in the JDK</h3><p class="prompt">You extend <span class='key'>AbstractList&lt;T&gt;</span> and implement only <span class='key'>get(int)</span> and <span class='key'>size()</span>, yet <span class='key'>contains()</span>, <span class='key'>indexOf()</span> and iteration all work. How?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>AbstractList</span> is a template-method skeleton: its concrete methods (<span class='key'>contains</span>, <span class='key'>indexOf</span>, <span class='key'>iterator</span>, &hellip;) are all written in terms of the two <em>primitive</em> operations you supplied, <span class='key'>get(int)</span> and <span class='key'>size()</span>. You fill the two blanks; the base class&rsquo;s fixed algorithms do the rest by calling down to them.</div></details></div>
   </div>
 </section>
 
