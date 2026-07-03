@@ -498,6 +498,7 @@ if ('serviceWorker' in navigator) {
 .mm-item.current{background:var(--bg-elevated)}
 .mm-item.current .mm-t{color:var(--accent-cyan);font-weight:600}
 .mm-empty{color:var(--text-muted);font-size:.9rem;padding:20px 10px}
+@media (max-width:560px){.module-nav .wrap{flex-wrap:wrap;row-gap:10px}.module-nav-mmbtn{gap:0;min-width:40px;justify-content:center}.module-nav-mmbtn .mm-label{display:none}.diagram-wrap{scrollbar-width:thin}.diagram-wrap svg{min-width:520px}}
 @media(prefers-reduced-motion:reduce){.mm-overlay,.mm-drawer{transition-duration:0ms}}
 </style>
 <script>
@@ -568,7 +569,7 @@ if ('serviceWorker' in navigator) {
   var btn=document.createElement("button");
   btn.type="button";btn.className="mm-btn module-nav-mmbtn";
   btn.setAttribute("aria-haspopup","dialog");btn.setAttribute("aria-expanded","false");
-  btn.innerHTML='<span class="mm-ico"><span></span><span></span><span></span></span>All Modules';
+  btn.setAttribute("aria-label","All Modules");btn.innerHTML='<span class="mm-ico"><span></span><span></span><span></span></span><span class="mm-label">All Modules</span>';
   if(links){links.insertBefore(btn,links.firstChild);
     // match the nav link styling
     var probe=links.querySelector("a");
