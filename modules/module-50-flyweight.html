@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Split state into shared and unique</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>A flyweight is a piece of movable metal type in a printing press.</strong> The foundry casts <em>one</em> physical &lsquo;e&rsquo; sort, and the compositor reuses that same little block for every &lsquo;e&rsquo; on the page. The letter&rsquo;s <b>shape</b> &mdash; the raised, mirror-image glyph &mdash; is <em>intrinsic</em>: cast once, shared by every &lsquo;e&rsquo; ever printed. Where the letter sits in the forme &mdash; its <b>position</b> on the page &mdash; is <em>extrinsic</em>: supplied at the moment it is placed, and never stored in the sort itself. A page of a million letters is set from a case of only a few dozen shared pieces. Java&rsquo;s <span class='key'>Integer</span> cache and <span class='key'>String</span> pool are exactly this: a small drawer of shared sorts backing an unbounded amount of text.</p>
+    </div>
     <p>The key move is separating <strong>intrinsic</strong> state (shared, the same for many objects — the mesh, the texture) from <strong>extrinsic</strong> state (unique per object — the x/y position). The intrinsic part becomes an immutable <em>flyweight</em> stored once; a factory hands out the same instance for the same key.</p><pre class="code" data-src="class TreeType { final String mesh, texture; /* intrinsic, shared */ }
 class Tree { final int x, y; final TreeType type; }   // type is shared
 
@@ -168,6 +176,91 @@ class TreeFactory {
 forest.add(new Tree(10, 20, factory.get(&quot;oak&quot;)));   // 1M trees, one TreeType"></pre><p>You’ve already met a flyweight: Java caches small <span class='key'>Integer</span> objects (−128..127, module 04) and interns String literals (module 15) — both are flyweights. It’s a memory optimization, so reach for it only when you truly have a huge number of similar objects.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: 1000 trees then split state then flyweight then factory caches then tiny objects"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">1000 trees</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">too much memory</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">split state</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">shared vs unique</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">flyweight</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">shared mesh</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">factory caches</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">one per type</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">tiny objects</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">just position</text></g></svg></div>
     
+    <h3>Intrinsic vs extrinsic: the split that makes it work</h3>
+    <p>Every field on your object is one of two things: <strong>intrinsic</strong> (the same value for a huge number of instances &mdash; move it into the shared flyweight) or <strong>extrinsic</strong> (unique per instance or dependent on context &mdash; keep it out, and pass it in as a method argument). Getting this partition right is the entire pattern. In a text document, the <em>shape</em> of the letter &lsquo;e&rsquo; is intrinsic; <em>where</em> a particular &lsquo;e&rsquo; is drawn is extrinsic.</p>
+    <pre class="code" data-src="// A document with millions of characters. The glyph (its outline, advance
+// width, font metrics) is INTRINSIC - identical for every 'e' in the file.
+final class Glyph {                     // the flyweight: immutable, shared
+    private final char symbol;
+    private final int[] outline;        // heavy vector data, loaded once
+    Glyph(char symbol, int[] outline) {
+        this.symbol = symbol;
+        this.outline = outline;
+    }
+    // EXTRINSIC state (x, y, size) is passed in - never stored on the flyweight:
+    void drawAt(Canvas c, int x, int y, int size) {
+        c.render(outline, x, y, size);
+    }
+}"></pre>
+
+    <h3>The flyweight factory</h3>
+    <p>Callers never <span class='key'>new</span> a flyweight directly &mdash; they ask a <strong>factory</strong> for one by its intrinsic key. The factory keeps a <span class='key'>Map</span> of already-created flyweights and returns the cached instance on every subsequent request, so identical keys always yield the <em>same</em> object (<span class='key'>e1 == e2</span> is true). <span class='key'>computeIfAbsent</span> makes this a one-liner.</p>
+    <pre class="code" data-src="final class GlyphFactory {
+    private final Map&lt;Character, Glyph&gt; pool = new HashMap&lt;&gt;();
+    Glyph of(char symbol) {
+        // build on first request, then hand back the SAME instance forever
+        return pool.computeIfAbsent(symbol, Loader::loadGlyph);
+    }
+}
+
+GlyphFactory f = new GlyphFactory();
+Glyph e1 = f.of('e');
+Glyph e2 = f.of('e');
+System.out.println(e1 == e2);   // true - one shared instance
+// a million 'e's on screen are backed by ONE Glyph object"></pre>
+
+    <h3>Extrinsic state lives with the caller</h3>
+    <p>Because the flyweight is shared, its methods can&rsquo;t hold the per-use data &mdash; the caller must supply it on each call, or park it in a small <em>context</em> object that also holds a reference to the shared flyweight. That context object is cheap: a few primitives plus one pointer, versus a full copy of the heavy intrinsic state.</p>
+    <pre class="code" data-src="// The lightweight per-character record: unique state + a shared reference.
+record Placement(Glyph glyph, int x, int y, int size) {}   // just a few ints + a ref
+
+List&lt;Placement&gt; page = new ArrayList&lt;&gt;();
+for (Positioned p : layout)
+    page.add(new Placement(factory.of(p.ch()), p.x(), p.y(), p.size()));
+
+// At render time the caller supplies the extrinsic state to the shared flyweight:
+for (Placement pl : page)
+    pl.glyph().drawAt(canvas, pl.x(), pl.y(), pl.size());"></pre>
+
+    <h3>Flyweights already in the JDK</h3>
+    <p>You use flyweights before you ever write one. <span class='key'>Integer.valueOf</span> caches the boxed values <span class='key'>-128..127</span>, so autoboxing in that range hands back shared instances &mdash; which is exactly why <span class='key'>==</span> on two <span class='key'>Integer</span>s is a classic trap. <span class='key'>Boolean.valueOf</span> always returns the shared <span class='key'>TRUE</span>/<span class='key'>FALSE</span>, and <span class='key'>String</span> literals are interned into one shared pool (module 15). <span class='key'>Character</span>, <span class='key'>Short</span>, <span class='key'>Long</span>, and <span class='key'>Byte</span> have caches too.</p>
+    <pre class="code" data-src="Integer a = Integer.valueOf(127);
+Integer b = Integer.valueOf(127);
+System.out.println(a == b);          // true  - both from the -128..127 cache
+
+Integer c = Integer.valueOf(128);
+Integer d = Integer.valueOf(128);
+System.out.println(c == d);          // false - outside the cache: fresh objects
+
+System.out.println(Boolean.valueOf(true) == Boolean.TRUE);  // true - shared
+System.out.println(&quot;hi&quot; == &quot;hi&quot;);    // true - String literals share the pool"></pre>
+
+    <h3>Flyweights must be immutable</h3>
+    <p>A flyweight is shared by every object that requested it, so if one caller could mutate it, the change would silently ripple to all the others. Make all intrinsic fields <span class='key'>final</span>, expose no setters, and treat anything that varies or changes over time as extrinsic. As a bonus, immutable flyweights are inherently thread-safe.</p>
+    <pre class="code" data-src="// WRONG: a mutable flyweight - one caller's change leaks to every user.
+class BadGlyph { int color; void setColor(int c) { color = c; } }
+// glyphA.setColor(RED) would tint EVERY character that shares glyphA.
+
+// RIGHT: intrinsic state is final; color is extrinsic, passed at draw time.
+final class Glyph {
+    private final int[] outline;                    // shared, never mutated
+    void drawAt(Canvas c, int x, int y, int color) { /* color is per-call */ }
+}
+// Immutable flyweights are also automatically safe to share across threads."></pre>
+
+    <h3>When Flyweight actually pays off</h3>
+    <p>Flyweight trades a little CPU and complexity &mdash; a factory, a map lookup on every access, and the discipline of threading extrinsic state through your call chain &mdash; for a large drop in memory. That trade only wins at scale: many objects, heavy and highly repeated intrinsic state, and small extrinsic state. For a few hundred objects, skip it and keep your code simple.</p>
+    <pre class="code" data-src="// Worth it only when ALL of these hold:
+//   count          : very many objects (10^5 - 10^7)
+//   intrinsic part : large and heavily duplicated (meshes, glyphs, textures)
+//   extrinsic part : small and cheap to thread through the call chain
+// savings ~= (totalObjects - distinctIntrinsic) * sizeof(intrinsic)
+
+long naiveBytes     = 1_000_000L * 50_000;    // 50 KB mesh per tree ~ 50 GB
+long flyweightBytes = 12L * 50_000            // 12 shared TreeType flyweights
+                    + 1_000_000L * 16;        // 16 bytes of position per tree
+// ~50 GB collapses to ~16 MB - but only because the counts are this extreme.
+// With a few hundred objects, the factory + Map lookups aren't worth it."></pre>
   </div>
 </section>
 
@@ -233,6 +326,9 @@ System.out.println("big saving? " + (flyweight &lt; naive));</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Intrinsic vs extrinsic</h3><p class="prompt">For a million on-screen characters of text, which state is intrinsic (shared) and which is extrinsic (unique)?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Intrinsic (shared): the <b>glyph shape/font data</b> for each character code — one ‘A’ glyph reused everywhere. Extrinsic (unique): each character’s <b>position, size, color</b> on the page. The flyweight stores the glyph once.</div></details></div>
       <div class="exercise"><h3>2 &middot; Must it be immutable?</h3><p class="prompt">Why must the shared flyweight state be immutable?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Because it’s shared by many objects — if one could mutate it, every object using that flyweight would change too. Immutability makes the sharing safe (and thread-safe).</div></details></div>
+      <div class="exercise"><h3>3 &middot; The factory&rsquo;s job</h3><p class="prompt">Why do callers ask a factory for a flyweight instead of writing <span class='key'>new Glyph('e')</span> themselves? And what must be true of the type used as the cache&rsquo;s <span class='key'>Map</span> key?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Direct <span class='key'>new</span> would create a fresh object each time &mdash; defeating the sharing that is the whole point. The factory guarantees one instance per key via <span class='key'>computeIfAbsent</span>. The key must have correct <span class='key'>equals</span>/<span class='key'>hashCode</span> so equal keys collapse to one entry (<span class='key'>Character</span> and <span class='key'>String</span> already do).</div></details></div>
+      <div class="exercise"><h3>4 &middot; The Integer <span class='key'>==</span> trap</h3><p class="prompt">Given <span class='key'>Integer x = 127, y = 127;</span> what does <span class='key'>x == y</span> print? What about the same code with <span class='key'>1000</span> instead of <span class='key'>127</span>?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><b>127 &rarr; true</b>, <b>1000 &rarr; false</b>. Autoboxing calls <span class='key'>Integer.valueOf</span>, which shares cached instances only for <span class='key'>-128..127</span>; outside that range you get new objects with distinct identities. Always compare boxed numbers with <span class='key'>.equals</span>, never <span class='key'>==</span>.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Sort the particle&rsquo;s state</h3><p class="prompt">A game spawns a million spark particles, each with: a <span class='key'>sprite</span> texture, a screen <span class='key'>position</span>, a <span class='key'>velocity</span>, and a remaining <span class='key'>lifetime</span>. Which fields belong in the shared flyweight, and which stay per-particle?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Intrinsic (shared flyweight): the <b>sprite/texture</b> &mdash; identical for every spark and never changes. Extrinsic (per particle): <b>position, velocity, lifetime</b> &mdash; unique to each and mutated every frame. Anything that varies per instance or over time cannot live on the immutable shared object.</div></details></div>
   </div>
 </section>
 

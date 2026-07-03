@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Hold the implementation, don’t inherit it</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>Bridge is a TV remote and the TV it points at.</strong> The <b>remote</b> (the abstraction) and the <b>device</b> (the implementation) evolve on their own: any remote works any brand of TV because they meet at a tiny agreed interface &mdash; <span class='key'>power</span>, <span class='key'>volume</span>, <span class='key'>channel</span>. Ship a fancier remote (add a voice button) and every existing TV still works; a manufacturer ships a new TV and every existing remote still drives it. Nobody builds a <em>separate remote model per TV brand</em> &mdash; that grid of combinations is exactly the class explosion Bridge dissolves. The remote simply <b>holds a reference</b> to whatever device it is paired with and <b>delegates</b> the low-level work across the bridge.</p>
+    </div>
     <p>Suppose you have 2 kinds of remote and 3 devices. Subclassing every combination gives 6 classes — and 12 if a device is added. Bridge instead has the abstraction (<span class='key'>Remote</span>) <em>hold a reference</em> to the implementation (<span class='key'>Device</span>). Now you add classes; you don’t multiply them.</p><pre class="code" data-src="interface Device { void setVolume(int v); }     // implementation side
 class Tv implements Device { /* ... */ }
 class Radio implements Device { /* ... */ }
@@ -168,6 +176,101 @@ class SmartRemote extends Remote { SmartRemote(Device d){ super(d); } }
 Remote r = new SmartRemote(new Tv());            // mix any remote x any device"></pre><p>Bridge is “prefer composition over inheritance” (module 10) applied to two dimensions of change. Recognize it when you’d otherwise get a class explosion from combining two independent hierarchies — like shapes × renderers, or messages × delivery channels.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: Remote then Device then remote has device then vary apart then mix freely"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">Remote</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">abstraction</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">Device</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">implementation</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">remote has device</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">the bridge</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">vary apart</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">add, not multiply</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">mix freely</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">any combo</text></g></svg></div>
     
+    <h3>Intent: decouple an abstraction from its implementation</h3>
+    <p>The Gang of Four one-liner is &ldquo;decouple an abstraction from its implementation so the two can vary independently.&rdquo; The trick is that <em>both</em> are their own class hierarchy. The <strong>abstraction</strong> (what callers use &mdash; <span class='key'>Shape</span>, <span class='key'>Remote</span>) is joined to the <strong>implementor</strong> (the low-level engine &mdash; <span class='key'>Renderer</span>, <span class='key'>Device</span>) by a <em>reference</em>, not by <span class='key'>extends</span>. It is composition, not inheritance, taken to two dimensions.</p>
+    <pre class="code" data-src="// Abstraction and implementation are TWO separate hierarchies,
+// joined by a single reference rather than by inheritance.
+interface Renderer {                 // implementor: the &quot;how&quot;
+    String drawCircle(double x, double y, double r);
+}
+abstract class Shape {               // abstraction: the &quot;what&quot;
+    protected final Renderer renderer;   // &lt;-- the bridge
+    protected Shape(Renderer r) { this.renderer = r; }
+    abstract String draw();
+}
+// Shape can grow (Circle, Square, Triangle) and Renderer can grow
+// (Svg, Canvas, OpenGL) on their own axes, never touching each other."></pre>
+    <h3>The class explosion it prevents: M&times;N &rarr; M+N</h3>
+    <p>When two features vary at once and you model every pairing with a subclass, the class count is the <em>product</em> of the axes. Bridge makes it the <em>sum</em>. That is the whole payoff: growth becomes linear instead of combinatorial, and adding one shape or one renderer touches exactly one class.</p>
+    <pre class="code" data-src="// WITHOUT bridge: one subclass per combination -&gt; M x N classes.
+class SvgCircle {}   class CanvasCircle {}
+class SvgSquare {}   class CanvasSquare {}
+// 2 shapes x 2 renderers = 4 classes. Add OpenGL -&gt; 6. Add Triangle -&gt; 9...
+
+// WITH bridge: the two axes are independent -&gt; M + N classes.
+//   shapes:    Circle, Square, Triangle              (M = 3)
+//   renderers: SvgRenderer, CanvasRenderer, GlRenderer (N = 3)
+// 3 + 3 = 6 classes cover all 9 pairings, and each new type adds ONE class,
+// not a whole new row or column of the grid."></pre>
+    <h3>Anatomy of the bridge</h3>
+    <p>The abstraction keeps a field of the implementor interface and <strong>delegates</strong> each high-level operation down to it. Subclasses of the abstraction are called <em>refined abstractions</em>; they add or reshape high-level behaviour and never mention a concrete implementor. Concrete implementors provide the primitives &mdash; and can be swapped at construction time or even at runtime.</p>
+    <pre class="code" data-src="// The abstraction DELEGATES the primitive work to its implementor.
+class Circle extends Shape {
+    private final double x, y, radius;
+    Circle(Renderer r, double x, double y, double radius) {
+        super(r); this.x = x; this.y = y; this.radius = radius;
+    }
+    @Override String draw() {
+        return renderer.drawCircle(x, y, radius);   // hand off the &quot;how&quot;
+    }
+}
+// A &quot;refined abstraction&quot; adds behaviour WITHOUT touching any Renderer:
+class DashedCircle extends Circle {
+    DashedCircle(Renderer r, double x, double y, double radius) {
+        super(r, x, y, radius);
+    }
+    @Override String draw() { return &quot;dashed &quot; + super.draw(); }
+}"></pre>
+    <h3>A worked example: RemoteControl &rarr; Device</h3>
+    <p>Here the two hierarchies are complete. <span class='key'>Remote</span> is the abstraction and <span class='key'>Device</span> the implementor; <span class='key'>SmartRemote</span> is a refined abstraction that adds <span class='key'>mute()</span> for free across every device. Construct any remote with any device and the bridge routes each call to the right implementation.</p>
+    <pre class="code" data-src="interface Device {                       // implementor
+    void setVolume(int percent);
+    int  getVolume();
+}
+class Tv implements Device {
+    private int volume = 10;
+    public void setVolume(int p) { volume = Math.max(0, Math.min(100, p)); }
+    public int  getVolume()      { return volume; }
+}
+class Remote {                           // abstraction (holds a Device)
+    protected final Device device;
+    Remote(Device d) { this.device = d; }
+    void volumeUp() { device.setVolume(device.getVolume() + 10); }
+}
+class SmartRemote extends Remote {       // refined abstraction
+    SmartRemote(Device d) { super(d); }
+    void mute() { device.setVolume(0); }
+}
+
+Remote r = new SmartRemote(new Tv());    // any remote x any device
+r.volumeUp();                            // 10 -&gt; 20, delegated to the Tv"></pre>
+    <h3>Bridge vs Adapter</h3>
+    <p>Both put one object in front of another, so they are easy to confuse. The difference is <em>intent and timing</em>. Adapter is a <strong>retrofit</strong>: an incompatible class already exists and you wrap it to fit an interface. Bridge is a <strong>deliberate up-front split</strong> of two dimensions you know will both change. Adapter reacts to the past; Bridge plans for the future.</p>
+    <pre class="code" data-src="// ADAPTER (module 37) = retrofit. A LegacyPrinter already EXISTS with the
+// wrong-shaped API; you wrap it so it satisfies the interface callers expect.
+class PrinterAdapter implements Printer {
+    private final LegacyPrinter legacy;          // pre-existing, uncontrolled
+    public void print(String s) { legacy.doPrint(s); }   // translate the call
+}
+
+// BRIDGE = planned. You DESIGN Shape and Renderer up front as two axes so
+// they can vary independently from day one -- nothing is being made to fit
+// after the fact.
+abstract class Shape { protected final Renderer renderer; /* ... */ }"></pre>
+    <h3>Bridge vs Strategy</h3>
+    <p>Structurally they look the same &mdash; an object holds a reference to swappable behaviour. But Strategy is <strong>behavioural</strong>: it varies a single algorithm behind one method. Bridge is <strong>structural</strong>: it separates an entire abstraction hierarchy from an entire implementation hierarchy, both of which keep growing. Strategy varies one plug-in point; Bridge organises two whole family trees.</p>
+    <pre class="code" data-src="// STRATEGY (module 41) = swap ONE algorithm behind a single method.
+class TextField {
+    private Validator validator;             // pick one behaviour, hot-swappable
+    boolean accept(String s) { return validator.isValid(s); }
+}
+
+// BRIDGE = separate a whole ABSTRACTION hierarchy (Shape: Circle, Square...)
+// from a whole IMPLEMENTATION hierarchy (Renderer: Svg, Canvas...).
+// Structurally near-identical (both hold a reference), but bridge spans two
+// hierarchies that each keep growing; strategy just varies one plug-in point.
+abstract class Shape { protected final Renderer renderer; }"></pre>
+
   </div>
 </section>
 
@@ -233,6 +336,9 @@ System.out.println("fewer classes? " + (classesWritten &lt; combinations));</tex
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Bridge vs Adapter</h3><p class="prompt">Both involve one object holding another. How does Bridge differ in intent from Adapter (37)?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Adapter makes an <b>existing, incompatible</b> class fit an interface after the fact. Bridge is a <b>deliberate up-front</b> design that separates an abstraction from its implementation so both can vary independently. Adapter = retrofit; Bridge = planned.</div></details></div>
       <div class="exercise"><h3>2 &middot; Spot the explosion</h3><p class="prompt">You’re about to write <span class='key'>SmsUrgentMessage</span>, <span class='key'>SmsNormalMessage</span>, <span class='key'>EmailUrgentMessage</span>… Why is Bridge the fix?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Two independent axes (message type × delivery channel) are being multiplied into subclasses. Bridge holds a <span class='key'>Channel</span> reference inside <span class='key'>Message</span>, so you add a few classes per axis instead of one per combination.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Bridge vs Strategy</h3><p class="prompt">Both hold a reference to swappable behaviour. So what actually makes Bridge different from Strategy (41)?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Strategy is <b>behavioural</b> &mdash; it swaps <em>one</em> algorithm behind a single method. Bridge is <b>structural</b> &mdash; it separates a whole <b>abstraction hierarchy</b> (<span class='key'>Shape</span>, <span class='key'>Circle</span>&hellip;) from a whole <b>implementation hierarchy</b> (<span class='key'>Renderer</span>, <span class='key'>Svg</span>&hellip;), each of which keeps growing on its own axis.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Count the classes</h3><p class="prompt">You need to render 4 shapes on 3 different back-ends. How many classes with subclass-per-combination, and how many with Bridge?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Subclass grid: <span class='key'>4 &times; 3 = 12</span> combination classes. Bridge: <span class='key'>4 + 3 = 7</span> classes (4 shapes on one axis, 3 renderers on the other). And each new shape <em>or</em> renderer then adds exactly <b>one</b> class instead of a whole row or column.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Which side is which?</h3><p class="prompt">In <span class='key'>new AdvancedRemote(new Projector())</span>, which object is the abstraction and which is the implementor &mdash; and where does a high-level <span class='key'>skipToNext()</span> belong versus a low-level <span class='key'>setInputSource()</span>?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The <b>Remote</b> hierarchy is the abstraction (high-level operations the user invokes); <b>Device</b>/<span class='key'>Projector</span> is the implementor (the primitives). <span class='key'>skipToNext()</span> is a refined-abstraction method on <span class='key'>AdvancedRemote</span> built <em>out of</em> primitives; <span class='key'>setInputSource()</span> is a primitive on the <span class='key'>Device</span> side. Adding <span class='key'>skipToNext()</span> touches no device class at all.</div></details></div>
   </div>
 </section>
 

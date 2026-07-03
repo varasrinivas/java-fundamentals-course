@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>A line of handlers, each with a choice</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>Chain of Responsibility is a customer-support escalation ladder.</strong> You open a ticket and it lands with <b>tier 1</b>. If they can resolve it, you&rsquo;re done; if not, they escalate it to <b>tier 2</b>, and from there to a <b>manager</b>. You, the customer, never choose who fixes your problem &mdash; you hand it to the front of the line, and each rung decides for itself whether to <em>handle</em> the ticket or <em>pass it up</em>. Slot in a new tier, or reorder the rungs, and the person filing the ticket changes nothing. And if it climbs past the top rung with nobody able to help, it simply <b>falls off the end</b> &mdash; unresolved, unless someone parked a catch-all at the top.</p>
+    </div>
     <p>Instead of one big method with a tangle of <span class='key'>if/else</span> deciding who handles what, you make a chain of small <strong>handler</strong> objects. Each handler either processes the request or forwards it to the next. The sender doesn’t know (or care) which handler will deal with it.</p><pre class="code" data-src="abstract class Handler {
     private Handler next;
     Handler setNext(Handler h){ this.next = h; return h; }
@@ -169,6 +177,99 @@ tier1.setNext(tier2).setNext(manager);
 tier1.handle(request);     // travels the chain until handled"></pre><p>This decouples senders from receivers and lets you reorder or insert handlers freely. It’s the backbone of request pipelines: servlet <span class='key'>Filter</span> chains, logging handlers, and validation pipelines all work this way (it’s the same idea as web “middleware”).</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: request then handler 1 then pass along then handler 2 then or unhandled"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">request</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">enters chain</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">handler 1</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">can handle?</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">pass along</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">to next</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">handler 2</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">handles it</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">or unhandled</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">falls off end</text></g></svg></div>
     
+    <h3>Intent: decouple the sender from the receiver</h3>
+    <p>The pattern&rsquo;s goal is to give <strong>more than one object a chance to handle a request</strong> without the sender knowing which one will. You avoid coupling the caller to a specific receiver by threading the request through a chain of candidate handlers; the first one able to deal with it does, and the rest are spared. The sender only ever touches the head of the chain.</p>
+    <pre class="code" data-src="// The sender holds ONE reference (the head of the chain) and fires the request in.
+// It has no idea which link will actually deal with it -- that is the whole point.
+interface Handler {
+    void handle(Request r);   // process it, or delegate to the next link
+}
+
+Handler chain = buildChain();   // all the wiring lives in one place
+chain.handle(request);          // sender is decoupled from every concrete handler"></pre>
+    <h3>The handler&rsquo;s two jobs: check, then process or forward</h3>
+    <p>Structurally, a handler is just an object with a reference to the <strong>next</strong> handler and a <span class='key'>handle()</span> method. That method asks one question &mdash; <em>can I deal with this?</em> &mdash; and either processes the request or delegates to <span class='key'>next</span>. Because the wiring is a plain linked list, you compose chains at runtime and insert, remove, or reorder links without editing any handler.</p>
+    <pre class="code" data-src="abstract class Handler {
+    protected Handler next;                                  // successor link (may be null)
+    Handler setNext(Handler h) { this.next = h; return h; }  // fluent wiring: a.setNext(b).setNext(c)
+
+    void handle(Request r) {
+        if (canHandle(r)) process(r);           // 1. this link owns it -&gt; stop
+        else if (next != null) next.handle(r);  // 2. otherwise delegate to the successor
+    }
+    protected abstract boolean canHandle(Request r);
+    protected abstract void process(Request r);
+}"></pre>
+    <h3>A worked example: a purchase-approval chain</h3>
+    <p>Approval limits are the textbook case. A team lead signs off small amounts, a manager larger ones, a director larger still. Wire them into a chain once, then throw amounts at the head; each request travels only as far as it must. Note the last <span class='key'>else</span> &mdash; a request too big for everyone falls off the end.</p>
+    <pre class="code" data-src="// A purchase-approval chain: larger amounts escalate to higher authority.
+abstract class Approver {
+    private Approver next;
+    Approver linkTo(Approver n) { this.next = n; return n; }
+
+    final void approve(int amount) {
+        if (amount &lt;= limit())
+            System.out.println(title() + &quot; approved $&quot; + amount);
+        else if (next != null)
+            next.approve(amount);                 // escalate up the ladder
+        else
+            System.out.println(&quot;No one can approve $&quot; + amount);
+    }
+    abstract int limit();
+    abstract String title();
+}
+
+class TeamLead extends Approver { int limit(){ return 1_000; }   String title(){ return &quot;Team lead&quot;; } }
+class Manager  extends Approver { int limit(){ return 10_000; }  String title(){ return &quot;Manager&quot;; } }
+class Director extends Approver { int limit(){ return 100_000; } String title(){ return &quot;Director&quot;; } }
+
+Approver chain = new TeamLead();
+chain.linkTo(new Manager()).linkTo(new Director());   // build the chain once
+
+chain.approve(500);       // Team lead approved $500
+chain.approve(7_500);     // Manager approved $7500
+chain.approve(250_000);   // No one can approve $250000"></pre>
+    <h3>Handle-or-forward, and the request that falls off the end</h3>
+    <p>Each link makes an independent <strong>handle-vs-forward</strong> decision, so a request may be consumed early, consumed late, or never consumed at all. Falling off the end unhandled is a legitimate design choice, not a bug &mdash; but decide deliberately: throw, log, or park a catch-all default handler at the tail so nothing vanishes silently.</p>
+    <pre class="code" data-src="void handle(Request r) {
+    if (canHandle(r)) {
+        process(r);
+        // Some chains STOP here. Others (e.g. logging/audit filters) still call
+        // next.handle(r) so every matching link gets a turn -- it's your choice.
+    } else if (next != null) {
+        next.handle(r);
+    } else {
+        // Reached the tail with nobody able to help. Design decision:
+        throw new IllegalStateException(&quot;No handler for &quot; + r);
+        //  ...or log a warning, or install a catch-all default handler as the last link.
+    }
+}"></pre>
+    <h3>You already use this: filters, security, logging</h3>
+    <p>Chain of Responsibility is everywhere in the Java ecosystem. Servlet <span class='key'>Filter</span> chains, the Spring Security filter chain, <span class='key'>java.util.logging</span> handler/parent-logger propagation, and even exception propagation up the call stack are all the same idea &mdash; the request keeps moving until something takes responsibility. Web &ldquo;middleware&rdquo; pipelines are this pattern by another name.</p>
+    <pre class="code" data-src="// Servlet filters ARE a chain of responsibility (jakarta.servlet.Filter):
+public class AuthFilter implements Filter {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
+        if (isAuthenticated(req))
+            chain.doFilter(req, res);                      // pass along to the next filter/servlet
+        else
+            ((HttpServletResponse) res).sendError(401);    // handle it here and stop the chain
+    }
+}
+// Spring Security's filter chain, java.util.logging Handler/parent-logger propagation,
+// and an exception bubbling up the call stack until a catch block accepts it
+// are all the same shape: try each link until one takes responsibility."></pre>
+    <h3>Chain of Responsibility vs Decorator</h3>
+    <p>Both build a linked stack of wrappers, which makes them easy to confuse. The difference is intent: a <strong>decorator</strong> has <em>every</em> layer add behaviour and then always call the layer it wraps, so all of them contribute. A <strong>chain</strong> gives <em>one</em> handler the chance to <em>stop</em> the request &mdash; once handled, the remaining links never run. Additive pipeline versus first-willing-handler.</p>
+    <pre class="code" data-src="// Decorator: EVERY layer contributes, then always calls the wrapped object.
+Reader r = new BufferedReader(new InputStreamReader(in));   // both layers do work
+
+// Chain of Responsibility: ONE link may STOP the chain; later links never run.
+if (canHandle(req)) process(req);   // handled -&gt; successors are skipped
+else next.handle(req);              // not handled -&gt; keep looking down the chain
+// Same &quot;linked wrappers&quot; structure, opposite intent:
+// decorator = additive pipeline; CoR = find the first willing handler."></pre>
+
   </div>
 </section>
 
@@ -234,6 +335,10 @@ System.out.println("passed along until someone could handle it.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Why not one big if/else?</h3><p class="prompt">What does a handler chain give you that a single method full of <span class='key'>if/else</span> branches doesn’t?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">You can <b>add, remove, and reorder</b> handlers independently without touching a giant method, and senders stay decoupled from who handles the request. Each handler is small and testable on its own (also better for Open/Closed).</div></details></div>
       <div class="exercise"><h3>2 &middot; Unhandled requests</h3><p class="prompt">What happens if a request reaches the end of the chain and no handler accepted it? How might you design for that?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">By default it’s silently dropped. Add a <b>default/fallback handler</b> at the end that always handles (logs an error, returns a 404, etc.) so nothing falls through unnoticed.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Build an approval chain</h3><p class="prompt">Wire a <span class='key'>TeamLead</span> (&le;$1,000), <span class='key'>Manager</span> (&le;$10,000), and <span class='key'>Director</span> (&le;$100,000) into a chain. Which handler prints for a <span class='key'>$7,500</span> request, and which for <span class='key'>$250,000</span>?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>$7,500</span> escalates past the team lead and is approved by the <b>Manager</b>. <span class='key'>$250,000</span> exceeds every limit, reaches the tail with no successor, and hits the final <span class='key'>else</span> &mdash; &ldquo;No one can approve&rdquo;. That&rsquo;s a request falling off the end.</div></details></div>
+      <div class="exercise"><h3>4 &middot; CoR or Decorator?</h3><p class="prompt">You&rsquo;re wrapping an input stream so each layer buffers, then decompresses, then decrypts the bytes &mdash; all of them always run. Is that Chain of Responsibility or Decorator? Why?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><b>Decorator.</b> Every layer contributes and then delegates to the one it wraps &mdash; nobody &ldquo;stops&rdquo; the request. Chain of Responsibility is for when you want the <em>first willing</em> handler to take it and the rest to be skipped.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Spot the pattern in the JDK</h3><p class="prompt">A servlet <span class='key'>Filter</span> calls <span class='key'>chain.doFilter(req, res)</span> to continue, or writes a <span class='key'>401</span> and returns without calling it. Which two Chain-of-Responsibility decisions do those branches correspond to?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Calling <span class='key'>chain.doFilter</span> is <b>forward</b> (delegate to the next link); writing the <span class='key'>401</span> and returning is <b>handle</b> (this link takes responsibility and stops the chain). Same intent as exception propagation: bubble up, or catch it here.</div></details></div>
+
   </div>
 </section>
 

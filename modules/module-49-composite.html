@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Leaves and branches share an interface</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127991; Real-world analogy</span>
+      <p><strong>A Composite is a filesystem.</strong> A <b>folder</b> can contain files <em>and</em> other folders, and those folders contain still more files and folders &mdash; the nesting goes as deep as you like. Yet you can point at <em>any</em> node &mdash; a single 2&nbsp;KB text file or the root of a 10,000-file project &mdash; and ask the same question, <span class="key">&quot;what is your total size?&quot;</span>, and it just works. The <b>whole</b> (a folder) and the <b>part</b> (a file) expose one shared interface, so your code walks a lone file and a deep directory tree with the <em>exact same</em> call. A folder answers by quietly <b>recursing</b> into its children and adding up their answers; a file just reports its own size. That is Composite: model a part-whole hierarchy as a tree, then let callers ignore whether they hold a leaf or a branch.</p>
+    </div>
     <p>When data forms a part-whole tree, you don’t want callers checking “is this a single thing or a group?” everywhere. With <strong>Composite</strong>, both the leaf (a File) and the container (a Folder) implement the same interface; the container’s methods just recurse into its children.</p><pre class="code" data-src="interface Node { int size(); }
 class File implements Node { public int size(){ return 1; } }   // leaf
 class Folder implements Node {                                  // composite
@@ -168,6 +176,87 @@ class Folder implements Node {                                  // composite
     }
 }"></pre><p>The payoff: client code calls <span class='key'>node.size()</span> without caring whether it’s a file or a deep folder tree. You see Composite in UI component trees (a panel contains buttons and panels), the file system, org charts, and abstract syntax trees.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: Node then File then Folder then recurse then uniform"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">Node</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">common interface</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">File</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">leaf</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">Folder</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">composite</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">recurse</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">sum children</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">uniform</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">treat the same</text></g></svg></div>
+
+    <h3>The three roles: Component, Leaf, Composite</h3>
+    <p>Every Composite is exactly three collaborating pieces. The <strong>Component</strong> is the interface that declares the operations clients call. A <strong>Leaf</strong> is a node with no children — it implements each operation directly. A <strong>Composite</strong> holds a list of child Components and implements each operation by <em>delegating to its children</em> and combining their results. Crucially, the Composite depends only on the Component interface, so it happily holds leaves, other composites, or a mix — that is what makes the tree arbitrarily deep.</p>
+    <pre class="code" data-src="// COMPONENT: the shared interface every node honors.
+interface FileSystemNode {
+    String name();
+    int sizeBytes();
+}
+
+// LEAF: a node with no children — it implements the operation directly.
+record TextFile(String name, int sizeBytes) implements FileSystemNode {}
+
+// COMPOSITE: holds children and implements the operation by delegating to them.
+final class Directory implements FileSystemNode {
+    private final String name;
+    private final List&lt;FileSystemNode&gt; children = new ArrayList&lt;&gt;();
+    Directory(String name) { this.name = name; }
+    Directory add(FileSystemNode child) { children.add(child); return this; }
+    public String name() { return name; }
+    public int sizeBytes() {
+        int total = 0;
+        for (FileSystemNode c : children) total += c.sizeBytes();  // delegate + combine
+        return total;
+    }
+}"></pre>
+
+    <h3>A worked example: totaling a folder tree</h3>
+    <p>Build a small tree, then call one method on its root. The Composite's <span class='key'>sizeBytes()</span> recurses through every branch; each Leaf is the <strong>base case</strong> that stops the recursion by answering for itself. The client that reads the total never inspects a node's concrete type.</p>
+    <pre class="code" data-src="Directory root = new Directory(&quot;project&quot;)
+    .add(new TextFile(&quot;README.md&quot;, 200))
+    .add(new Directory(&quot;src&quot;)
+        .add(new TextFile(&quot;App.java&quot;, 1_500))
+        .add(new TextFile(&quot;Util.java&quot;, 900)));
+
+System.out.println(root.sizeBytes());   // 2600 — one call walks the entire tree
+
+// The client treats a lone file and a deep folder identically:
+FileSystemNode any = root;              // could just as well be a TextFile
+System.out.println(any.sizeBytes());   // same call, no instanceof, no branching"></pre>
+
+    <h3>Transparency vs. type safety: where do add/remove live?</h3>
+    <p>The classic Composite tension is where to declare the child-management methods (<span class='key'>add</span>, <span class='key'>remove</span>, <span class='key'>getChild</span>). Put them on the <strong>Component</strong> and you get <em>transparency</em>: every node looks alike, so clients never distinguish leaf from branch — but calling <span class='key'>add</span> on a leaf has no meaning and must fail at <em>runtime</em>. Put them only on the <strong>Composite</strong> and you get <em>type safety</em>: a leaf simply has no <span class='key'>add</span> method, so misuse is a <em>compile</em> error — but clients must know a node's concrete type to build the tree. The GoF book leans toward transparency for uniformity; pick safety when accidental structural edits would be a real bug.</p>
+    <pre class="code" data-src="// TRANSPARENT: child-management on the Component. Uniform, but leaves fail at runtime.
+interface Node {
+    int size();
+    default void add(Node child)    { throw new UnsupportedOperationException(&quot;leaf&quot;); }
+    default void remove(Node child) { throw new UnsupportedOperationException(&quot;leaf&quot;); }
+}
+
+// SAFE: child-management only on the Composite. Misuse won't compile,
+// but callers must hold a Branch (not a Node) to add children.
+interface Node2 { int size(); }
+final class Branch implements Node2 {
+    private final List&lt;Node2&gt; kids = new ArrayList&lt;&gt;();
+    public void add(Node2 c) { kids.add(c); }        // only Branch exposes this
+    public int size() { return kids.stream().mapToInt(Node2::size).sum(); }
+}"></pre>
+
+    <h3>Composite in the wild</h3>
+    <p>You have been using Composites for years. In Swing/AWT a <span class='key'>Container</span> <em>is a</em> <span class='key'>Component</span> and holds child Components, so a panel nests buttons and other panels through one <span class='key'>add</span>. The browser <strong>DOM</strong>, an XML document (<span class='key'>org.w3c.dom.Node</span>), and a compiler's abstract syntax tree are all Composites. Even <span class='key'>java.io.File</span> is one: a single <span class='key'>File</span> may be a plain file or a directory, and <span class='key'>listFiles()</span> returns more <span class='key'>File</span>s — leaf and branch are literally the same type.</p>
+    <pre class="code" data-src="// Swing: a Container IS-A Component and holds child Components.
+Container panel = new JPanel();
+panel.add(new JButton(&quot;OK&quot;));   // add a leaf
+panel.add(new JPanel());        // add another composite — the SAME method
+
+// java.io.File: one type is both leaf (file) and branch (directory).
+File dir = new File(&quot;/project&quot;);
+long bytes = Arrays.stream(dir.listFiles())     // children are Files too
+                   .mapToLong(File::length)     // recurse for true totals
+                   .sum();"></pre>
+
+    <h3>When Composite fits — and when a tree is overkill</h3>
+    <p>Reach for Composite whenever you have a genuine <strong>part-whole hierarchy</strong> whose depth is open-ended: file systems, UI widget trees, org charts, menus with sub-menus, grouped shapes in a drawing tool, ASTs. The signal is that clients want to treat &quot;one&quot; and &quot;a group of&quot; uniformly. If your structure is really <em>flat</em> or fixed at a known depth, a tree is overkill — an <span class='key'>Order</span> that holds a list of <span class='key'>LineItem</span>s is always exactly two levels, so a plain <span class='key'>List</span> is simpler than inventing a shared node interface.</p>
+    <pre class="code" data-src="// Overkill: a fixed two-level shape needs no leaf/branch interface.
+record LineItem(String sku, int qty) {}
+record Order(List&lt;LineItem&gt; items) {
+    int totalQty() { return items.stream().mapToInt(LineItem::qty).sum(); }
+}
+
+// Composite earns its keep only when nesting is real and unbounded:
+//   folder -&gt; folder -&gt; folder -&gt; file, panel -&gt; panel -&gt; button, etc."></pre>
     
   </div>
 </section>
@@ -234,6 +323,9 @@ System.out.println("size() works the same on a file or a folder.");</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Why uniform?</h3><p class="prompt">Without Composite, what does client code have to do every time it processes a node, and why is that bad?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">It must check <b>“is this a single item or a group?”</b> and branch — scattered <span class='key'>instanceof</span> checks everywhere. Composite removes those by giving leaves and containers the same interface, so callers just call the method.</div></details></div>
       <div class="exercise"><h3>2 &middot; Leaf vs composite</h3><p class="prompt">In a Composite, which class holds the list of children — the File or the Folder?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The <b>Folder</b> (the composite). The File is a leaf with no children; only the container holds and recurses over a list of child Nodes.</div></details></div>
+      <div class="exercise"><h3>3 &middot; What stops the recursion?</h3><p class="prompt">A Composite's <span class='key'>size()</span> calls <span class='key'>size()</span> on all its children. What keeps that from recursing forever?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The <b>leaves</b>. A Leaf implements the operation <em>without</em> recursing &mdash; it just returns its own value &mdash; so it is the recursion's <b>base case</b>. As long as the tree has no cycles, every path down eventually reaches leaves and terminates.</div></details></div>
+      <div class="exercise"><h3>4 &middot; add() on a leaf</h3><p class="prompt">You declared <span class='key'>add(Node)</span> on the <span class='key'>Node</span> <em>interface</em> so every node looks the same (transparency). What now happens when someone calls <span class='key'>add</span> on a File, and what did you trade away?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">A File has no children, so its <span class='key'>add</span> typically throws <span class='key'>UnsupportedOperationException</span> at <b>runtime</b>. You bought uniform client code but moved the &ldquo;you can't add to a leaf&rdquo; check from <b>compile time to runtime</b>. The safe alternative puts <span class='key'>add</span> only on the Composite, so the mistake won't compile.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Spot the Composite in the JDK</h3><p class="prompt">Name a type from the JDK or a common Java library that is a Composite, and say which values act as Leaf and which as Composite.</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Several: a Swing <span class='key'>Container</span>/<span class='key'>JComponent</span> (a <span class='key'>JButton</span> is a leaf, a <span class='key'>JPanel</span> is a composite); <span class='key'>java.io.File</span> (a plain file is a leaf, a directory is a composite &mdash; same class for both); an XML <span class='key'>org.w3c.dom.Node</span> (text node = leaf, element = composite). All let containers and leaves share one interface.</div></details></div>
   </div>
 </section>
 
