@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Replace a tangle of links with a hub</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127983; Real-world analogy</span>
+      <p><strong>A mediator is an air-traffic control tower.</strong> Planes never radio each other to negotiate who lands first &mdash; with dozens in the air that would be pure chaos, every pilot tracking every other. Instead each plane talks only to <b>the tower</b>, and the tower alone decides the sequence: who holds, who descends, who takes the runway. Add a new plane and it needs one call sign &mdash; the tower&rsquo;s &mdash; not the position of every other aircraft. The pattern turns an <b>N&times;N</b> tangle of direct links into <b>N</b> spokes around one hub. The trade-off mirrors real life too: if the tower is overloaded, everything stalls &mdash; so you keep its job to <em>coordination</em>, never cramming the airline&rsquo;s whole business into it.</p>
+    </div>
     <p>When many objects all reference each other, you get a tangled web — every component knows about every other. A <strong>mediator</strong> sits in the middle: each component talks only to the mediator, and the mediator orchestrates who needs to know what. Components become simple and reusable.</p><pre class="code" data-src="interface Tower { void requestLanding(Plane p); }    // the mediator
 class Plane {
     private final Tower tower;
@@ -164,6 +172,94 @@ class Plane {
 }
 // Planes are decoupled; the ControlTower decides ordering &amp; spacing."></pre><p>Think of a complex dialog box where enabling one field changes others — a mediator coordinates the widgets instead of each widget knowing all the rest. The risk: the mediator can grow into a “god object,” so keep its job to coordination, not business logic. (The C# <span class='key'>MediatR</span> library is named for this pattern.)</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: tangled web then add a mediator then talk to hub then hub coordinates then decoupled"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">tangled web</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">all-to-all</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">add a mediator</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">the hub</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">talk to hub</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">not peers</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">hub coordinates</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">routes messages</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">decoupled</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">fewer links</text></g></svg></div>
+
+    <h3>Intent: encapsulate how objects interact</h3>
+    <p>The Gang of Four define Mediator as: <em>&ldquo;Define an object that encapsulates how a set of objects interact. Mediator promotes loose coupling by keeping objects from referring to each other explicitly, and it lets you vary their interaction independently.&rdquo;</em> The key word is <strong>encapsulates</strong>: the rules of who-talks-to-whom live in <em>one</em> place instead of being smeared across every participant. A participant (a <strong>colleague</strong>) holds exactly one outbound reference &mdash; the mediator interface &mdash; and reports events to it rather than reaching for a peer.</p>
+<pre class="code" data-src="// The mediator interface: colleagues report here; it decides what happens next.
+interface ChatMediator {
+    void register(User user);
+    void send(String msg, User from);
+}
+
+// A colleague holds ONE reference: the mediator, never its peers.
+abstract class User {
+    protected final ChatMediator hub;
+    protected final String name;
+    User(ChatMediator hub, String name) { this.hub = hub; this.name = name; }
+    abstract void receive(String msg, String from);
+    void send(String msg) { hub.send(msg, this); }   // route through the hub
+}"></pre>
+    <h3>The problem: N&times;N references become N spokes</h3>
+    <p>Let objects wire up directly and coupling grows <strong>quadratically</strong>: a fully connected set of <span class='key'>n</span> peers has <span class='key'>n(n-1)/2</span> edges, and each new peer forces you to touch every existing one. Route everything through a hub and it collapses to <span class='key'>n</span> edges &mdash; one per colleague. That is the whole economic argument for Mediator: it trades a dense mesh for a star.</p>
+<pre class="code" data-src="// WITHOUT a mediator: each widget wires up every other widget.
+class Checkbox {
+    private TextField field;     // knows the field
+    private Button    submit;    // ...and the button
+    private Dropdown  country;   // ...and the dropdown
+    // Add one widget and every other widget's constructor changes.
+    // 4 widgets fully connected = 4*3/2 = 6 direct links.
+}
+
+// WITH a mediator: each widget knows only the hub -&gt; 4 links total, linear growth."></pre>
+    <h3>Colleagues know only the mediator interface</h3>
+    <p>A concrete colleague is deliberately dumb about the system: it never imports another colleague&rsquo;s class. It reacts to inbound calls and pushes outbound events to the <span class='key'>ChatMediator</span> abstraction. Because the dependency points at an <em>interface</em>, you can swap the concrete mediator (a test double, a logging variant) without recompiling a single colleague &mdash; the same dependency-inversion win you saw with Strategy and Observer.</p>
+<pre class="code" data-src="class ChatUser extends User {
+    ChatUser(ChatMediator hub, String name) { super(hub, name); }
+
+    @Override void receive(String msg, String from) {
+        System.out.println(name + &quot; got from &quot; + from + &quot;: &quot; + msg);
+    }
+}
+// ChatUser references User + ChatMediator only. It has NO field of type ChatUser,
+// yet two ChatUsers can still &quot;talk&quot; -- the hub relays between them."></pre>
+    <h3>Worked example: a chat room that routes messages</h3>
+    <p>The <strong>concrete mediator</strong> is where the interaction logic finally lives. Here a <span class='key'>ChatRoom</span> keeps the roster and fans a message out to everyone except the sender. Ada calls <span class='key'>send</span>; the room decides Alan should receive it. Neither user ever held a reference to the other &mdash; add a third user and no existing user code changes.</p>
+<pre class="code" data-src="class ChatRoom implements ChatMediator {
+    private final List&amp;lt;User&amp;gt; users = new ArrayList&amp;lt;&amp;gt;();
+
+    public void register(User u) { users.add(u); }
+
+    public void send(String msg, User from) {
+        for (User u : users)
+            if (u != from) u.receive(msg, from.name);   // fan out, skip the sender
+    }
+}
+
+ChatRoom room = new ChatRoom();
+User ada  = new ChatUser(room, &quot;Ada&quot;);
+User alan = new ChatUser(room, &quot;Alan&quot;);
+room.register(ada);
+room.register(alan);
+ada.send(&quot;standby for landing&quot;);   // Alan receives it; the two users never met"></pre>
+    <h3>The trade-off: the mediator can become a god object</h3>
+    <p>Centralization has a dark side. Every time a new interaction appears, the natural move is to add another branch to the mediator &mdash; and it slowly swells into a <strong>god object</strong> that knows and does everything, the exact monolith the pattern was supposed to prevent. The discipline is simple to state, hard to hold: the mediator should <em>coordinate and route</em>, and delegate real work to the colleagues or to dedicated services.</p>
+<pre class="code" data-src="// SMELL: business logic creeping into the mediator.
+class OrderMediator {
+    void onSubmit(Cart cart) {
+        // validate + price + tax + inventory + email + audit... all in here?
+        // That is a god object -- the mediator is now the whole application.
+    }
+}
+
+// Better: the mediator only decides WHO runs next; each concern is its own service.
+class OrderMediator2 {
+    void onSubmit(Cart cart) {
+        validator.check(cart);
+        pricing.apply(cart);
+        notifier.confirm(cart);   // route to collaborators; hold no logic itself
+    }
+}"></pre>
+    <h3>Mediator vs Observer, and where it hides in real frameworks</h3>
+    <p>The two patterns are cousins and easily confused. <strong>Observer</strong> is a one-way broadcast: a subject fires an event and any number of listeners react, and those listeners do not interact with each other. <strong>Mediator</strong> is bidirectional coordination: a central hub manages back-and-forth traffic among peers, often <em>deciding</em> what each should do next. In practice a mediator is frequently implemented <em>using</em> observer-style dispatch under the hood. Java and its frameworks are full of them: Spring&rsquo;s <span class='key'>ApplicationEventPublisher</span>, message brokers like Kafka or RabbitMQ, and the classic MVC controller that mediates between view and model.</p>
+<pre class="code" data-src="// Observer: subject BROADCASTS one-way; listeners never talk to each other.
+subject.addListener(event -&gt; render(event));      // fire-and-forget, unidirectional
+
+// Mediator: a hub COORDINATES bidirectional traffic among peers.
+// Spring's ApplicationEventPublisher is a mediator-style hub:
+publisher.publishEvent(new OrderPlaced(orderId)); // senders and handlers never meet;
+                                                  // @EventListener beans are wired by the hub
+// Same shape: a message broker between microservices, or an MVC controller
+// mediating a view and a model so neither imports the other."></pre>
     
   </div>
 </section>
@@ -229,6 +325,9 @@ System.out.println("fewer connections? " + (mediatedLinks &lt; directLinks));</t
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; The god-object risk</h3><p class="prompt">What’s the main danger of the Mediator pattern, and how do you keep it in check?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The mediator can balloon into a <b>god object</b> that knows and does everything. Keep it focused on <em>coordination/routing</em> and push actual business logic back into the components or dedicated services.</div></details></div>
       <div class="exercise"><h3>2 &middot; Mediator vs Observer</h3><p class="prompt">Observer (42) also decouples senders and receivers. How is Mediator different?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Observer is <b>one-to-many broadcast</b>: a subject notifies many observers that don’t interact. Mediator is <b>many-to-many coordination</b>: a central hub manages bidirectional interactions among several peers.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Trace the message</h3><p class="prompt">In the <span class='key'>ChatRoom</span> example, Ada calls <span class='key'>ada.send("hi")</span> and Alan receives it &mdash; yet Ada holds no reference to Alan. Trace the calls that make that happen.</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>User.send</span> forwards to <span class='key'>hub.send(msg, this)</span>. The <span class='key'>ChatRoom</span> loops its roster and calls <span class='key'>u.receive(...)</span> on every user except the sender. Ada&rsquo;s only dependency is the <span class='key'>ChatMediator</span> interface; the hub owns the roster and does the routing, so no colleague ever needs a peer reference.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Count the links</h3><p class="prompt">You have 6 components. How many connections exist if every component talks to every other directly, versus if they all route through a mediator? What does this say about how each approach scales?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Direct: <span class='key'>6&times;5/2 = 15</span> edges (quadratic, <span class='key'>O(n&sup2;)</span>). Mediated: <span class='key'>6</span> edges, one spoke per component (linear, <span class='key'>O(n)</span>). The gap widens fast &mdash; 20 components would be 190 direct links versus 20 mediated ones.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Mediator vs Facade</h3><p class="prompt">Facade (module 39) also introduces a middle object that others talk to. How is Mediator different?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">A <b>Facade</b> is a one-way, simplified front door onto a subsystem: callers go through it <em>into</em> the subsystem, and the subsystem classes are unaware of the facade. A <b>Mediator</b> is bidirectional: its colleagues know about it and actively push events to it, and it coordinates traffic <em>among</em> them. Facade simplifies access; Mediator manages interaction.</div></details></div>
   </div>
 </section>
 

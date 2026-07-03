@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>Capture state without breaking encapsulation</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127918; Real-world analogy</span>
+      <p><strong>A memento is a video-game save point.</strong> When you hit &ldquo;save&rdquo; before a boss fight, the game snapshots your <b>entire state</b> &mdash; health, position, inventory &mdash; into a save slot. You can carry that slot around, copy it, or delete it, but you <b>cannot hand-edit</b> its bytes: the internals are sealed, and only the game knows how to read them. Later you &ldquo;load&rdquo; and roll back to that <em>exact</em> moment. The save file is <b>opaque to you</b> (the caretaker), fully understood only by the game (the originator). That is Memento: a snapshot you can hold and restore, but never peek inside.</p>
+    </div>
     <p>You want to snapshot an object’s state and restore it later, but without exposing its private fields to the outside world. The object itself creates a <strong>memento</strong> (an opaque snapshot) and can restore from one. A <em>caretaker</em> holds mementos but can’t read inside them.</p><pre class="code" data-src="class Editor {
     private String text = &quot;&quot;;
     Memento save(){ return new Memento(text); }         // snapshot self
@@ -168,7 +176,103 @@ editor.type(&quot;oops&quot;);
 editor.restore(checkpoint);          // undo back to the snapshot"></pre><p>Push mementos onto a stack and you have multi-level undo (pair it with Command, module 43, for redo). The cost is memory — full snapshots of large state add up — so real editors often store <em>diffs</em> instead of complete copies.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: object state then save() then memento then change on then restore()"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">object state</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">now</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">save()</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">snapshot</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">memento</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">opaque copy</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">change on</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">mutate freely</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">restore()</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">roll back</text></g></svg></div>
     
-  </div>
+
+    <h3>Intent: externalize state, keep encapsulation</h3>
+    <p>The pattern's job is to <strong>capture and externalize an object's internal state so it can be restored later, without violating encapsulation</strong>. The state leaves the object (so something else can hold onto it), yet the private fields never become public. The object hands out a self-contained snapshot and later takes one back &mdash; nobody in between needs to understand the fields.</p>
+    <pre class="code" data-src="// Intent: put an object's state &quot;outside&quot; it, so it can be restored later,
+// WITHOUT exposing the private fields to the outside world.
+class Counter {
+    private int count;                     // private state, never leaked directly
+    void increment() { count++; }
+    Snapshot snapshot()      { return new Snapshot(count); }  // externalize
+    void restore(Snapshot s) { this.count = s.value(); }      // roll back
+}
+record Snapshot(int value) {}              // the externalized state lives here"></pre>
+    <h3>The three roles: Originator, Memento, Caretaker</h3>
+    <p>Memento has exactly three collaborators. The <strong>Originator</strong> owns the state and is the only party that creates a memento or restores itself from one. The <strong>Memento</strong> is the opaque snapshot &mdash; pure data, no behaviour. The <strong>Caretaker</strong> (an undo stack, a history list) holds mementos and hands them back, but never reads or edits what is inside.</p>
+    <pre class="code" data-src="// Originator: owns the state, the ONLY thing that reads/writes a memento.
+class Document {
+    private String body = &quot;&quot;;
+    void write(String s)    { body += s; }
+    Memento save()          { return new Memento(body); }
+    void restore(Memento m) { this.body = m.body(); }
+}
+// Memento: the opaque snapshot - just holds state, no behaviour.
+record Memento(String body) {}
+// Caretaker: keeps mementos, returns them, never looks inside.
+Deque&lt;Memento&gt; history = new ArrayDeque&lt;&gt;();
+history.push(doc.save());     // store, don't inspect
+doc.restore(history.pop());   // return, don't decode"></pre>
+    <h3>Worked example: text-editor undo</h3>
+    <p>The canonical use is undo. Before every change, the editor pushes a memento onto a history stack; <span class='key'>undo()</span> pops the last one and restores it. A second stack of the states you undid gives you redo. Here the memento is just the buffer's text, but it could be any richer snapshot (cursor position, selection, styling).</p>
+    <pre class="code" data-src="class TextEditor {
+    private final StringBuilder buffer = new StringBuilder();
+    private final Deque&lt;String&gt; undo = new ArrayDeque&lt;&gt;();   // stack of mementos
+
+    void type(String s) {
+        undo.push(buffer.toString());   // save a memento BEFORE mutating
+        buffer.append(s);
+    }
+    void undo() {
+        if (!undo.isEmpty())
+            buffer.replace(0, buffer.length(), undo.pop());  // roll back one step
+    }
+    String text() { return buffer.toString(); }
+}
+
+TextEditor ed = new TextEditor();
+ed.type(&quot;Hello&quot;);
+ed.type(&quot;, world&quot;);   // buffer = &quot;Hello, world&quot;
+ed.undo();             // buffer = &quot;Hello&quot;  (restored from the last memento)"></pre>
+    <h3>Keeping the memento truly opaque</h3>
+    <p>Encapsulation is the whole point, so the memento must expose its state <em>only</em> to the Originator. The classic Java trick is a <strong>private static nested class</strong>: the caretaker can hold the object (typed as <span class='key'>Object</span> or a marker interface) but the fields are visible only to the enclosing class. A narrow public interface with no getters achieves the same &ldquo;wide interface for the originator, narrow interface for everyone else&rdquo; split.</p>
+    <pre class="code" data-src="public class Originator {
+    private String state;
+
+    public Object save()          { return new Memento(state); }
+    public void restore(Object m) { this.state = ((Memento) m).state; }
+
+    // Private nested class: only Originator can read its fields.
+    private static final class Memento {
+        private final String state;
+        private Memento(String state) { this.state = state; }
+    }
+}
+// A caretaker holds the Object but can't decode it:
+Object token = orig.save();   // opaque - no accessible fields
+orig.restore(token);          // only Originator understands it"></pre>
+    <h3>The cost: memory, and how to tame it</h3>
+    <p>Every memento is a copy, so full snapshots of large state add up fast in both memory and copy time. Two standard mitigations: store <strong>incremental diffs</strong> (just what changed) and reconstruct past states by replaying them, and <strong>cap history depth</strong> with a ring buffer so the oldest mementos are dropped. Also beware shallow copies &mdash; if a memento shares mutable references with the live object, later edits will silently corrupt your snapshot.</p>
+    <pre class="code" data-src="// Bound the history so old mementos are discarded (limit memory).
+class BoundedHistory {
+    private final Deque&lt;Memento&gt; stack = new ArrayDeque&lt;&gt;();
+    private final int limit;
+    BoundedHistory(int limit) { this.limit = limit; }
+
+    void push(Memento m) {
+        stack.push(m);
+        if (stack.size() &gt; limit) stack.removeLast();  // drop the oldest
+    }
+    Memento pop() { return stack.pop(); }
+}
+// For big state, store a diff instead of a full copy:
+//   record Edit(int at, String removed, String inserted) {}"></pre>
+    <h3>Memento vs Command-based undo</h3>
+    <p>There are two ways to build undo. Memento <strong>stores the state</strong>: snapshot before, replace to roll back &mdash; simple, but memory-heavy for large objects. Command (module 43) <strong>stores the reverse operation</strong>: each action knows how to invert itself &mdash; compact, but every command must implement a correct inverse. Real editors often combine them: commands for fine-grained edits, periodic mementos as checkpoints.</p>
+    <pre class="code" data-src="// Memento-based undo: store the STATE, restore by replacing it.
+Memento before = editor.save();
+editor.replaceAll(&quot;cat&quot;, &quot;dog&quot;);
+editor.restore(before);           // whole state snapped back
+
+// Command-based undo: store the REVERSE OPERATION, undo by executing it.
+interface Command { void execute(); void undo(); }
+class Replace implements Command {
+    public void execute() { /* cat -&gt; dog */ }
+    public void undo()    { /* dog -&gt; cat, the inverse edit */ }
+}
+// Memento: cheap to write, costly in memory.
+// Command:  compact, but each op must know how to invert itself."></pre>
+    </div>
 </section>
 
 <section class="step-through">
@@ -233,6 +337,9 @@ System.out.println("back to saved? " + (score == saved));</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Who can read the memento?</h3><p class="prompt">Why should the caretaker (e.g. an undo-history list) NOT be able to read a memento’s contents?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">To preserve <b>encapsulation</b> — only the originating object should understand and use its own saved state. The caretaker just stores and returns mementos; if it could read/modify them it would couple to the object’s internals.</div></details></div>
       <div class="exercise"><h3>2 &middot; The memory cost</h3><p class="prompt">Full-snapshot undo on a large document gets expensive. What’s a common optimization?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">Store <b>diffs/deltas</b> (just what changed) instead of complete copies, or limit history depth. Reconstruct a past state by applying/reversing the recorded changes rather than keeping every full snapshot.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Which role does the work?</h3><p class="prompt">Of the three roles, which one is allowed to both <em>create</em> and <em>read</em> a memento&rsquo;s state &mdash; and why must it be the only one?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The <b>Originator</b>. It owns the state and is the only party that knows how to interpret it. The <b>Memento</b> is a passive snapshot; the <b>Caretaker</b> only stores and returns it. Concentrating create + restore in the Originator is exactly what keeps the internals encapsulated.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Make it un-peekable</h3><p class="prompt">How can Java guarantee that a caretaker holding a memento genuinely <em>cannot</em> read its fields?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Make <span class='key'>Memento</span> a <b>private static nested class</b> of the Originator (or expose only a narrow marker interface with no getters). Outside code can pass the object around as <span class='key'>Object</span>, but the fields are visible only to the enclosing Originator class.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Snapshot vs reverse-op</h3><p class="prompt">You&rsquo;re adding undo to a huge spreadsheet where full snapshots are too big. Is Memento the wrong choice &mdash; and when would Command-based undo fit better?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Memento isn&rsquo;t wrong: store <b>incremental diffs</b> instead of full copies and <b>cap history depth</b>. <b>Command</b>-based undo shines when each edit has a cheap, well-defined inverse &mdash; you store the reverse operation, not the whole state. Editors often combine both.</div></details></div>
   </div>
 </section>
 

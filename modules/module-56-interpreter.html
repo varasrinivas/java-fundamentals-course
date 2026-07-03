@@ -59,6 +59,10 @@ section p { color: var(--text-secondary); margin-bottom: 14px; max-width: 68ch; 
 section p strong { color: var(--text-primary); }
 .key { color: var(--accent-amber); font-family: var(--font-code); font-size: 0.92em; }
 .panel { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 22px; }
+.analogy { background: var(--bg-surface); border: 1px solid var(--bg-elevated); border-left: 4px solid var(--accent-emerald); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+.analogy .analogy-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-code); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px; }
+.analogy p { margin: 0; font-size: 0.96rem; }
+.analogy b { color: var(--accent-emerald); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 pre.code { background: #12121f; border: 1px solid var(--bg-elevated); border-radius: var(--radius); padding: 16px 18px; overflow-x: auto; font-family: var(--font-code); font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
 .tok-key { color: var(--accent-cyan); }
@@ -156,6 +160,10 @@ footer { padding: 40px 0 80px; color: var(--text-muted); font-size: 0.85rem; tex
   <div class="wrap">
     <p class="section-kicker">Concept</p>
     <h2>A class per grammar rule, evaluated as a tree</h2>
+    <div class="analogy">
+      <span class="analogy-tag">&#127925; Real-world analogy</span>
+      <p><strong>An interpreter is a musician reading sheet music.</strong> The notation has a small, fixed <b>grammar</b> &mdash; notes, rests, sharps, repeat bars &mdash; and a whole <b>score</b> is nothing more than those few symbols composed together into a tree of phrases within phrases. A performer <b>walks the notation top to bottom</b>, &ldquo;evaluating&rdquo; each symbol into sound: a single note is a <em>terminal</em> (it plays on its own), while a chord or a repeated section is a <em>non-terminal</em> that combines the symbols underneath it. The rules of the notation are the <b>grammar</b>, the printed score is the <b>tree of expressions</b>, and <b>playing it is interpretation</b>. Change the ink on the page and the music changes &mdash; you never rewrite the performer.</p>
+    </div>
     <p>For a small, well-defined language, you can model each grammar rule as a class implementing a common <span class='key'>Expr</span> interface. <em>Terminal</em> expressions are leaves (a number); <em>non-terminal</em> ones combine children (add, multiply). Parsing builds a tree; calling <span class='key'>eval()</span> on the root recurses to a result.</p><pre class="code" data-src="interface Expr { int eval(); }
 class Num implements Expr { final int v; public int eval(){ return v; } }      // terminal
 class Add implements Expr { final Expr l, r; public int eval(){ return l.eval() + r.eval(); } }
@@ -165,6 +173,83 @@ class Mul implements Expr { final Expr l, r; public int eval(){ return l.eval() 
 Expr tree = new Add(new Num(2), new Mul(new Num(3), new Num(4)));
 int result = tree.eval();     // 14  (precedence is baked into the tree shape)"></pre><p>Notice precedence is captured by the tree’s <em>shape</em>, not by the eval logic — exactly the lesson from module 03 (bytecode) and the operator-precedence fix in this very course’s playground. Interpreter shines for simple grammars (rules engines, filters, formulas); for anything large, use a real parser generator instead of hand-rolling classes.</p>
     <div class="diagram-wrap"><svg id="pipeConcept" viewBox="0 0 860 200" role="img" aria-label="Diagram: grammar then parse then Num / Add / Mul then eval() then result"><defs><marker id="arrow-pipeConcept" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b80"></path></marker></defs><g class="stage lit" id="c-0"><rect x="8.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="74.0" y="95" text-anchor="middle" font-size="11.5" fill="#00d4ff">grammar</text><text x="74.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">rules</text></g><line class="flow-arrow lit" id="d-0" x1="140.0" y1="100" x2="186.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-1"><rect x="186.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="252.0" y="95" text-anchor="middle" font-size="11.5" fill="#ffb627">parse</text><text x="252.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">to a tree</text></g><line class="flow-arrow lit" id="d-1" x1="318.0" y1="100" x2="364.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-2"><rect x="364.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="430.0" y="95" text-anchor="middle" font-size="11.5" fill="#b088f9">Num / Add / Mul</text><text x="430.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">expression nodes</text></g><line class="flow-arrow lit" id="d-2" x1="496.0" y1="100" x2="542.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-3"><rect x="542.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="608.0" y="95" text-anchor="middle" font-size="11.5" fill="#06d6a0">eval()</text><text x="608.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">recurse tree</text></g><line class="flow-arrow lit" id="d-3" x1="674.0" y1="100" x2="720.0" y2="100" marker-end="url(#arrow-pipeConcept)"></line><g class="stage lit" id="c-4"><rect x="720.0" y="56" width="132.0" height="88" rx="8" fill="#1a1a2e" stroke="#242442" stroke-width="1.5"></rect><text x="786.0" y="95" text-anchor="middle" font-size="11.5" fill="#ef476f">result</text><text x="786.0" y="115" text-anchor="middle" font-size="9.5" fill="#6b6b80">a value</text></g></svg></div>
+
+    <h3>Intent: one class per grammar rule</h3>
+    <p>Interpreter's premise is narrow: <em>given a simple language</em>, represent its grammar as a set of classes &mdash; one per rule &mdash; that all implement a common <span class='key'>Expression</span> interface with a single <span class='key'>interpret(context)</span> method. A <em>sentence</em> in that language becomes a tree of these objects, and evaluating it is just calling <span class='key'>interpret</span> on the root. The <span class='key'>context</span> carries whatever the terminals need at run time &mdash; variable bindings, an input string, a cursor.</p><pre class="code" data-src="// The GoF form: give a simple language, define ONE class per grammar rule,
+// and have each class implement interpret(context) to evaluate a sentence.
+interface Expression {
+    boolean interpret(Map&lt;String, Boolean&gt; context);
+}
+
+// A terminal expression: a variable looked up in the runtime context.
+class Variable implements Expression {
+    private final String name;
+    Variable(String name) { this.name = name; }
+    public boolean interpret(Map&lt;String, Boolean&gt; ctx) {
+        return ctx.getOrDefault(name, false);   // no children - it is a leaf
+    }
+}"></pre>
+    <h3>Terminal vs non-terminal expressions</h3>
+    <p>The structure has two shapes. <strong>Terminal</strong> expressions are the leaves &mdash; literals and variables that evaluate on their own. <strong>Non-terminal</strong> expressions are the operations &mdash; <span class='key'>And</span>, <span class='key'>Or</span>, <span class='key'>Not</span>, <span class='key'>Add</span> &mdash; that hold one or more sub-expressions and combine their results. Compose them and you have an <strong>Abstract Syntax Tree</strong>: every interior node delegates to its children before folding their answers together.</p><pre class="code" data-src="// Non-terminal expressions HOLD sub-expressions and combine their results.
+class And implements Expression {
+    private final Expression left, right;
+    And(Expression left, Expression right) { this.left = left; this.right = right; }
+    public boolean interpret(Map&lt;String, Boolean&gt; ctx) {
+        return left.interpret(ctx) &amp;&amp; right.interpret(ctx);   // recurse into children
+    }
+}
+class Or implements Expression {
+    private final Expression left, right;
+    Or(Expression left, Expression right) { this.left = left; this.right = right; }
+    public boolean interpret(Map&lt;String, Boolean&gt; ctx) {
+        return left.interpret(ctx) || right.interpret(ctx);
+    }
+}
+class Not implements Expression {
+    private final Expression expr;
+    Not(Expression expr) { this.expr = expr; }
+    public boolean interpret(Map&lt;String, Boolean&gt; ctx) {
+        return !expr.interpret(ctx);
+    }
+}"></pre>
+    <h3>A worked boolean grammar</h3>
+    <p>Build the tree once, then feed it different contexts. Here the rule <span class='key'>(sunny OR weekend) AND NOT raining</span> is assembled from the classes above and evaluated against a <span class='key'>Map&lt;String, Boolean&gt;</span> of facts. Nothing in the evaluator knows the specific rule &mdash; the <em>shape of the tree</em> is the rule, exactly as arithmetic precedence lives in the tree shape, not in <span class='key'>eval()</span>.</p><pre class="code" data-src="// Rule:  (sunny OR weekend) AND NOT raining
+Expression rule = new And(
+        new Or(new Variable(&quot;sunny&quot;), new Variable(&quot;weekend&quot;)),
+        new Not(new Variable(&quot;raining&quot;)));
+
+// The &quot;context&quot; supplies values for the terminals at evaluation time.
+Map&lt;String, Boolean&gt; today = Map.of(&quot;sunny&quot;, false, &quot;weekend&quot;, true, &quot;raining&quot;, false);
+
+boolean goOut = rule.interpret(today);
+// (false OR true) AND NOT false  -&gt;  true AND true  -&gt;  true
+
+Map&lt;String, Boolean&gt; wet = Map.of(&quot;sunny&quot;, true, &quot;weekend&quot;, true, &quot;raining&quot;, true);
+boolean stayIn = rule.interpret(wet);   // ... AND NOT true  -&gt;  false"></pre>
+    <h3>Scope: small, stable grammars only</h3>
+    <p>Interpreter is a scalpel, not a chainsaw. It is wonderful for a fixed handful of rules &mdash; rules engines, query filters, config DSLs, formula languages &mdash; where a class per rule stays readable. It <em>explodes</em> for anything resembling a real programming language: the class count balloons and hand-written parsing becomes a maintenance sink. At that point reach for a parser generator such as <span class='key'>ANTLR</span> and keep only the evaluate step for yourself.</p><pre class="code" data-src="// A boolean/calculator grammar has a handful of rules - ideal for Interpreter:
+//     Expr -&gt; Variable | And | Or | Not
+// But a REAL language explodes: hundreds of rules, lexing, error recovery,
+// precedence tables, left-recursion. A class per rule stops scaling fast.
+//
+// Past a small, STABLE grammar, use a parser generator instead of hand-rolling:
+//     grammar Calc;
+//     expr : expr ('*'|'/') expr      // ANTLR generates the lexer + parser
+//          | expr ('+'|'-') expr      // from this .g4 file; you write only
+//          | INT | '(' expr ')' ;     // the evaluate step Interpreter describes.
+// Good fits for the hand-rolled pattern: rules engines, query filters,
+// config DSLs, spreadsheet-style formulas - all small and slow-changing."></pre>
+    <h3>Its relatives: Composite and the parse pipeline</h3>
+    <p>Two connections make Interpreter click. First, the AST <em>is</em> a <strong>Composite</strong> (module 49): terminals are leaves, non-terminals are composites, and <span class='key'>interpret()</span> is the uniform operation walked over the whole tree. Second, Interpreter covers only the <strong>evaluate</strong> stage of the classic <span class='key'>text &rarr; tokens &rarr; AST &rarr; value</span> pipeline &mdash; lexing and parsing are separate concerns the pattern happily assumes are already done.</p><pre class="code" data-src="// The AST *is* a Composite (module 49): leaves = terminal expressions,
+// composites = non-terminal expressions, interpret() = the uniform operation.
+// And Interpreter only owns the LAST step of the classic pipeline:
+String source     = &quot;(5 + 3) - 2&quot;;        // 1. raw text
+List&lt;Token&gt; toks  = lex(source);           // 2. lex   -&gt; tokens        (not Interpreter)
+Expr ast          = parse(toks);           // 3. parse -&gt; AST           (not Interpreter)
+int value         = ast.eval();            // 4. eval  -&gt; 6             (THIS is Interpreter)
+// Parsing is a separate concern; Interpreter assumes the tree already exists
+// and defines how to walk it into a value."></pre>
+    <p>And that is a wrap. Interpreter is the <strong>final pattern</strong> in the final module &mdash; from the JVM and the memory model, through the language and modern Java, the ecosystem, and all twenty-three Gang-of-Four patterns, you have now seen how Java is built and how experienced Java developers think. Congratulations on finishing the course; go build something worth interpreting.</p>
     
   </div>
 </section>
@@ -229,6 +314,9 @@ System.out.println("grammar evaluated to " + result);</textarea>
     <h2>Make it stick</h2>
       <div class="exercise"><h3>1 &middot; Where’s the precedence?</h3><p class="prompt">In <span class='key'>Add(Num 2, Mul(Num 3, Num 4))</span>, nothing in <span class='key'>eval()</span> mentions precedence. How does 3×4 still happen before the +?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">It’s encoded in the <b>tree shape</b>: the Mul node is a child of the Add node, so <span class='key'>eval()</span> must evaluate Mul first to get the Add’s right operand. The parser put precedence into the structure, not the evaluator.</div></details></div>
       <div class="exercise"><h3>2 &middot; When to stop hand-rolling</h3><p class="prompt">Interpreter works for a calculator. Why is it a poor choice for a full programming language?</p><details class="hint"><summary>💡 Show hint</summary><div class="hint-body">The number of grammar rules (and classes) explodes, and hand-written parsing gets unmanageable. For anything beyond a small grammar, use a <b>parser generator</b> (ANTLR) or an existing engine rather than a class per rule.</div></details></div>
+      <div class="exercise"><h3>3 &middot; Terminal or non-terminal?</h3><p class="prompt">Classify each as a <em>terminal</em> or <em>non-terminal</em> expression: <span class='key'>Variable</span>, <span class='key'>And</span>, a numeric literal <span class='key'>Num</span>, <span class='key'>Not</span>. What is the structural difference?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body"><span class='key'>Variable</span> and <span class='key'>Num</span> are <b>terminals</b> &mdash; leaves that evaluate on their own with no children. <span class='key'>And</span> and <span class='key'>Not</span> are <b>non-terminals</b> &mdash; they <em>hold</em> sub-expressions and combine their results. The difference is simply whether the node has children to recurse into.</div></details></div>
+      <div class="exercise"><h3>4 &middot; Add an XOR rule</h3><p class="prompt">Your boolean grammar needs exclusive-or. What do you add, and what existing code must change to support <span class='key'>Xor</span> inside any expression?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">Add <em>one</em> new class &mdash; <span class='key'>class Xor implements Expression</span> holding two children and returning <span class='key'>left.interpret(ctx) ^ right.interpret(ctx)</span>. Nothing else changes: every other node already speaks the <span class='key'>Expression</span> interface, so an <span class='key'>Xor</span> slots in anywhere a sub-expression is expected. That open/closed extensibility is a core payoff of the pattern.</div></details></div>
+      <div class="exercise"><h3>5 &middot; Who builds the tree?</h3><p class="prompt">Interpreter defines <span class='key'>interpret()</span>, but something has to turn <span class='key'>"(5 + 3) - 2"</span> into <span class='key'>Sub(Add(Num 5, Num 3), Num 2)</span>. Whose job is that, and why isn't it part of the Interpreter pattern?</p><details class="hint"><summary>&#128161; Show hint</summary><div class="hint-body">The <b>parser</b> (with a lexer) builds the AST &mdash; that is the <span class='key'>text &rarr; tokens &rarr; AST</span> front of the pipeline. Interpreter deliberately covers only the last step, <b>evaluating an existing tree</b>. Keeping parsing separate is why you can swap parsers (hand-rolled, ANTLR-generated) without touching a single <span class='key'>interpret()</span> method.</div></details></div>
   </div>
 </section>
 
